@@ -1,0 +1,36 @@
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+dist-web/
+web-build/
+expo-env.d.ts
+
+# Native (regenerate with expo prebuild / run:ios)
+ios/
+android/
+.kotlin/
+
+# Secrets — never commit
+.env
+.env.*
+!.env.example
+
+# Metro / debug
+.metro-health-check*
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# OS / tooling
+.DS_Store
+*.pem
+*.tsbuildinfo
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision

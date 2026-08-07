@@ -1,0 +1,28 @@
+{
+  "cli": {
+    "version": ">= 16.0.0"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "ios": {
+        "simulator": true
+      },
+      "env": {
+        "EXPO_PUBLIC_SUPABASE_URL": "https://nhnjrcckjjaihkwjcjux.supabase.co",
+        "EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID": "342539722663-ur2i346m6c8aq71p9f2ekr3q2it0oi6b.apps.googleusercontent.com",
+        "EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID": "342539722663-5q3mhlis53ure4s9hjnkspp0vocvkdvb.apps.googleusercontent.com"
+      }
+    },
+    "preview": {
+      "distribution": "internal"
+    },
+    "production": {
+      "autoIncrement": true
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "name": "Nebula Clinic",
+  "slug": "nebula-clinic",
+  "scheme": "nebulaclinic",
+  "bundle": "com.localgovy.nebulaclinic",
+  "tagline": "Precision botanical therapeutics.",
+  "hero_eyebrow": "CLINICAL WELLNESS",
+  "hero_title": "Ancestral wisdom for modern rituals.",
+  "hero_sub": "Precision-dosed, lab-tested botanicals for mindful regimens.",
+  "hero_cta": "EXPLORE INVENTORY",
+  "ai_powered": "Powered by Nebula Core AI",
+  "loyalty": "Wellness Credits",
+  "order_prefix": "NBC",
+  "promos": {
+    "NEBULA10": 0.1,
+    "CLINIC15": 0.15,
+    "NEWUSER": 0.2
+  },
+  "promo_hint": "NEBULA10, CLINIC15, or NEWUSER",
+  "website": "https://www.nebulaclinic.example",
+  "age_key": "@nebula_clinic_age_verified",
+  "store_key": "@nebula_clinic_selected_store",
+  "android_bg": "#f8f9ff",
+  "ui_style": "light",
+  "product_brand": "Nebula Clinic",
+  "browse_title": "Browse Formulations",
+  "deals_title": "Featured Protocols",
+  "stores": [
+    [
+      "Clinic Downtown",
+      "Toronto",
+      "120 King St W",
+      "M5H 1J9",
+      "(416) 555-0101"
+    ],
+    [
+      "Clinic Midtown",
+      "Toronto",
+      "800 Yonge St",
+      "M4W 2G8",
+      "(416) 555-0102"
+    ],
+    [
+      "Clinic West",
+      "Mississauga",
+      "100 City Centre Dr",
+      "L5B 2C9",
+      "(905) 555-0103"
+    ]
+  ]
+}

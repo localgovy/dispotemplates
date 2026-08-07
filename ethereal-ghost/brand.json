@@ -1,0 +1,31 @@
+{
+  "name": "Ghost Atelier",
+  "slug": "ghost-atelier",
+  "scheme": "ghostatelier",
+  "bundle": "com.localgovy.ghostatelier",
+  "tagline": "Vapor luxury. Weightless ritual.",
+  "hero_eyebrow": "CURATED SELECTION",
+  "hero_title": "Floating in the void of pure taste.",
+  "hero_sub": "Monochrome minimalism for those who prefer discretion.",
+  "hero_cta": "ENTER THE ATELIER",
+  "ai_name": "Sommelier",
+  "ai_powered": "Powered by Ghost Atelier AI",
+  "loyalty": "Atelier Points",
+  "order_prefix": "GST",
+  "promos": {
+    "GHOST10": 0.1,
+    "ATELIER15": 0.15,
+    "NEWUSER": 0.1
+  },
+  "promo_hint": "GHOST10, ATELIER15, or NEWUSER",
+  "website": "https://www.ghostatelier.example",
+  "age_key": "@ghost_atelier_age_verified",
+  "store_key": "@ghost_atelier_selected_store",
+  "android_bg": "#121212",
+  "ui_style": "dark",
+  "status_bar": "light",
+  "product_brand": "Ghost Atelier",
+  "browse_title": "Browse Selection",
+  "deals_title": "Featured Vapors",
+  "pickup_label": "Pickup Atelier"
+}

@@ -1,0 +1,31 @@
+{
+  "name": "Rose Noir",
+  "slug": "rose-noir",
+  "scheme": "rosenoir",
+  "bundle": "com.localgovy.rosenoir",
+  "tagline": "Nocturnal luxury. Dangerous romance.",
+  "hero_eyebrow": "AFTER DARK COLLECTION",
+  "hero_title": "A dimly lit lounge for curated tastes.",
+  "hero_sub": "Crimson silk, rose-gold foil, and strains for the night.",
+  "hero_cta": "ENTER THE LOUNGE",
+  "ai_name": "Noir Concierge",
+  "ai_powered": "Powered by Rose Noir AI",
+  "loyalty": "Noir Points",
+  "order_prefix": "RSE",
+  "promos": {
+    "NOIR10": 0.1,
+    "ROSE15": 0.15,
+    "NEWUSER": 0.1
+  },
+  "promo_hint": "NOIR10, ROSE15, or NEWUSER",
+  "website": "https://www.rosenoir.example",
+  "age_key": "@rose_noir_age_verified",
+  "store_key": "@rose_noir_selected_store",
+  "android_bg": "#0A0A0A",
+  "ui_style": "dark",
+  "status_bar": "light",
+  "product_brand": "Rose Noir",
+  "browse_title": "Browse the Collection",
+  "deals_title": "Midnight Deals",
+  "pickup_label": "Pickup Lounge"
+}

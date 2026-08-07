@@ -1,0 +1,31 @@
+{
+  "name": "Obsidian Lab",
+  "slug": "obsidian-lab",
+  "scheme": "obsidianlab",
+  "bundle": "com.localgovy.obsidianlab",
+  "tagline": "Precision. Potency. Glow.",
+  "hero_eyebrow": "HIGH-TECH APOTHECARY",
+  "hero_title": "Lab-verified strains under UV light.",
+  "hero_sub": "Terpene transparency and cyan-lit potency for the connoisseur.",
+  "hero_cta": "ENTER THE LAB",
+  "ai_name": "AI Sommelier",
+  "ai_powered": "Powered by Obsidian Lab AI",
+  "loyalty": "Lab Credits",
+  "order_prefix": "OBS",
+  "promos": {
+    "OBSIDIAN10": 0.1,
+    "LAB15": 0.15,
+    "NEWUSER": 0.1
+  },
+  "promo_hint": "OBSIDIAN10, LAB15, or NEWUSER",
+  "website": "https://www.obsidianlab.example",
+  "age_key": "@obsidian_lab_age_verified",
+  "store_key": "@obsidian_lab_selected_store",
+  "android_bg": "#0D0D0D",
+  "ui_style": "dark",
+  "status_bar": "light",
+  "product_brand": "Obsidian Lab",
+  "browse_title": "Browse the Archive",
+  "deals_title": "Lab Specials",
+  "pickup_label": "Pickup Node"
+}

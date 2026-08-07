@@ -1,0 +1,51 @@
+{
+  "name": "Citrus Grove",
+  "slug": "citrus-grove",
+  "scheme": "citrusgrove",
+  "bundle": "com.localgovy.citrusgrove",
+  "tagline": "Bright moods. Fresh harvests.",
+  "hero_eyebrow": "SUN-DRENCHED HARVEST",
+  "hero_title": "Squeeze more joy from every ritual.",
+  "hero_sub": "Coral energy, citrus lift, and grove-fresh botanicals.",
+  "hero_cta": "ENTER THE GROVE",
+  "ai_powered": "Powered by Grove Guide AI",
+  "loyalty": "Grove Points",
+  "order_prefix": "CTG",
+  "promos": {
+    "CITRUS10": 0.1,
+    "GROVE15": 0.15,
+    "NEWUSER": 0.2
+  },
+  "promo_hint": "CITRUS10, GROVE15, or NEWUSER",
+  "website": "https://www.citrusgrove.example",
+  "age_key": "@citrus_grove_age_verified",
+  "store_key": "@citrus_grove_selected_store",
+  "android_bg": "#FFF8F0",
+  "ui_style": "light",
+  "product_brand": "Citrus Grove",
+  "browse_title": "Browse the Grove",
+  "deals_title": "Sunny Deals",
+  "stores": [
+    [
+      "Sunnyvale Grove",
+      "Toronto",
+      "200 Queens Quay",
+      "M5J 2Y2",
+      "(416) 555-0301"
+    ],
+    [
+      "Harbour Citrus",
+      "Toronto",
+      "55 Harbour Sq",
+      "M5J 2L1",
+      "(416) 555-0302"
+    ],
+    [
+      "Parkdale Grove",
+      "Toronto",
+      "1267 Queen St W",
+      "M6K 1L5",
+      "(416) 555-0303"
+    ]
+  ]
+}

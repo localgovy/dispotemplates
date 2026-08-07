@@ -1,0 +1,51 @@
+{
+  "name": "Azure Bloom",
+  "slug": "azure-bloom",
+  "scheme": "azurebloom",
+  "bundle": "com.localgovy.azurebloom",
+  "tagline": "Sky-bright rituals. Soft clarity.",
+  "hero_eyebrow": "DAILY BLOOM",
+  "hero_title": "Clear skies for clearer rituals.",
+  "hero_sub": "Periwinkle calm, coral spark, and airy botanical care.",
+  "hero_cta": "START YOUR RITUAL",
+  "ai_powered": "Powered by Azure Bloom AI",
+  "loyalty": "Bloom Points",
+  "order_prefix": "AZB",
+  "promos": {
+    "AZURE10": 0.1,
+    "BLOOM15": 0.15,
+    "NEWUSER": 0.2
+  },
+  "promo_hint": "AZURE10, BLOOM15, or NEWUSER",
+  "website": "https://www.azurebloom.example",
+  "age_key": "@azure_bloom_age_verified",
+  "store_key": "@azure_bloom_selected_store",
+  "android_bg": "#F0F6FF",
+  "ui_style": "light",
+  "product_brand": "Azure Bloom",
+  "browse_title": "Browse Blooms",
+  "deals_title": "Sky Deals",
+  "stores": [
+    [
+      "Azure Annex",
+      "Ottawa",
+      "90 Elgin St",
+      "K1P 5E1",
+      "(613) 555-0401"
+    ],
+    [
+      "Bloom Market",
+      "Ottawa",
+      "240 Sparks St",
+      "K1P 5B2",
+      "(613) 555-0402"
+    ],
+    [
+      "Canal Bloom",
+      "Ottawa",
+      "1 Rideau St",
+      "K1N 8S7",
+      "(613) 555-0403"
+    ]
+  ]
+}

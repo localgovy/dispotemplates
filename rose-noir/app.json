@@ -1,0 +1,46 @@
+{
+  "expo": {
+    "name": "Rose Noir",
+    "slug": "rose-noir",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "scheme": "rosenoir",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.localgovy.rosenoir",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0A0A0A",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "package": "com.localgovy.rosenoir",
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro",
+      "output": "single"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "baseUrl": "/dispotemplates/rose-noir"
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "00000000-0000-4000-8000-163320569349"
+      }
+    }
+  }
+}

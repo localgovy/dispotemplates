@@ -1,0 +1,46 @@
+{
+  "expo": {
+    "name": "Amber Reserve",
+    "slug": "amber-reserve",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "scheme": "amberreserve",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.localgovy.amberreserve",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#131411",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "package": "com.localgovy.amberreserve",
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro",
+      "output": "single"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "baseUrl": "/dispotemplates/amber-reserve"
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "00000000-0000-4000-8000-941338564057"
+      }
+    }
+  }
+}

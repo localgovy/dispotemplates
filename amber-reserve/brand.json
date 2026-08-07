@@ -1,0 +1,31 @@
+{
+  "name": "Amber Reserve",
+  "slug": "amber-reserve",
+  "scheme": "amberreserve",
+  "bundle": "com.localgovy.amberreserve",
+  "tagline": "Top-shelf ritual. Quiet confidence.",
+  "hero_eyebrow": "THE RESERVE COLLECTION",
+  "hero_title": "Crafted for the discerning lounge.",
+  "hero_sub": "Aged selections and amber-lit rituals for members who know.",
+  "hero_cta": "ENTER THE LOUNGE",
+  "ai_name": "Reserve Concierge",
+  "ai_powered": "Powered by Amber Reserve AI",
+  "loyalty": "Reserve Points",
+  "order_prefix": "AMB",
+  "promos": {
+    "AMBER10": 0.1,
+    "RESERVE15": 0.15,
+    "NEWUSER": 0.1
+  },
+  "promo_hint": "AMBER10, RESERVE15, or NEWUSER",
+  "website": "https://www.amberreserve.example",
+  "age_key": "@amber_reserve_age_verified",
+  "store_key": "@amber_reserve_selected_store",
+  "android_bg": "#131411",
+  "ui_style": "dark",
+  "status_bar": "light",
+  "product_brand": "Amber Reserve",
+  "browse_title": "Browse the Humidor",
+  "deals_title": "Featured Reserves",
+  "pickup_label": "Nearest Sanctuary"
+}

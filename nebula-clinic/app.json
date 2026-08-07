@@ -1,0 +1,46 @@
+{
+  "expo": {
+    "name": "Nebula Clinic",
+    "slug": "nebula-clinic",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "scheme": "nebulaclinic",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.localgovy.nebulaclinic",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#f8f9ff",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "package": "com.localgovy.nebulaclinic",
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro",
+      "output": "single"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "baseUrl": "/dispotemplates/nebula-clinic"
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "00000000-0000-4000-8000-548590625259"
+      }
+    }
+  }
+}

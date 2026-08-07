@@ -1,0 +1,46 @@
+{
+  "expo": {
+    "name": "Obsidian Lab",
+    "slug": "obsidian-lab",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "scheme": "obsidianlab",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.localgovy.obsidianlab",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0D0D0D",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "package": "com.localgovy.obsidianlab",
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro",
+      "output": "single"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "baseUrl": "/dispotemplates/obsidian-glow"
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "00000000-0000-4000-8000-272945906149"
+      }
+    }
+  }
+}
