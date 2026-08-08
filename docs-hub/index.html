@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LocalGovy Dispensary Templates</title>
+  <meta name="description" content="Nine unique dispensary app templates — open any demo in the browser." />
+  <style>
+    :root {
+      --bg: #0f1412;
+      --card: #1a221e;
+      --text: #f4f1ea;
+      --muted: #9aa89f;
+      --line: rgba(255,255,255,0.08);
+      --accent: #7dcea0;
+      --accent2: #f0c674;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "SF Pro Display", "Segoe UI", system-ui, sans-serif;
+      background:
+        radial-gradient(900px 500px at 10% -10%, rgba(125,206,160,0.18), transparent 55%),
+        radial-gradient(700px 400px at 100% 0%, rgba(240,198,116,0.12), transparent 50%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 48px 20px 80px; }
+    .eyebrow {
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-size: 12px;
+      color: var(--accent);
+      font-weight: 600;
+      margin: 0 0 12px;
+    }
+    h1 {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      line-height: 1.1;
+      margin: 0 0 12px;
+      letter-spacing: -0.03em;
+    }
+    .lede {
+      color: var(--muted);
+      font-size: 1.05rem;
+      max-width: 56ch;
+      line-height: 1.55;
+      margin: 0 0 36px;
+    }
+    .steps {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.03);
+      border-radius: 16px;
+      padding: 20px 22px;
+      margin-bottom: 40px;
+    }
+    .steps h2 {
+      margin: 0 0 12px;
+      font-size: 1rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--accent2);
+    }
+    .steps ol {
+      margin: 0;
+      padding-left: 1.2rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .steps strong { color: var(--text); }
+    .section-label {
+      margin: 0 0 14px;
+      font-size: 0.85rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 14px;
+      margin-bottom: 36px;
+    }
+    a.card {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 18px 18px 16px;
+      transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+    }
+    a.card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(125,206,160,0.45);
+      background: #1f2a24;
+    }
+    .chip {
+      display: inline-block;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 8px;
+      border-radius: 999px;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+    .chip.dark { background: rgba(125,206,160,0.15); color: var(--accent); }
+    .chip.bright { background: rgba(240,198,116,0.16); color: var(--accent2); }
+    .card h3 { margin: 0 0 6px; font-size: 1.2rem; }
+    .card p { margin: 0 0 14px; color: var(--muted); font-size: 0.92rem; line-height: 1.45; }
+    .go {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+    footer {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+    code {
+      background: rgba(255,255,255,0.06);
+      padding: 1px 6px;
+      border-radius: 6px;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <p class="eyebrow">LocalGovy · Dispensary demos</p>
+    <h1>Nine unique dispensary templates</h1>
+    <p class="lede">
+      Browser demos of the Expo templates. Each app keeps the same core features
+      (age gate, shop, cart, orders, AI, loyalty, pickup) with a distinct visual thesis.
+      Auth is bypassed in these demos so you can explore the UI immediately.
+    </p>
+
+    <div class="steps">
+      <h2>Walkthrough</h2>
+      <ol>
+        <li>Open the <strong>hub</strong> (this page) at <code>https://localgovy.github.io/dispotemplates/</code></li>
+        <li>Pick a template card below — each opens a full-screen web demo.</li>
+        <li>On splash, wait for the age gate → enter any 19+ DOB → continue into the app.</li>
+        <li>Browse <strong>Home</strong>, <strong>Shop</strong>, <strong>Cart</strong>, <strong>Orders</strong>, <strong>Account</strong>, and the floating AI assistant.</li>
+        <li>Use the browser back button or return here to try another skin.</li>
+      </ol>
+    </div>
+
+    <p class="section-label">Dark / nocturnal</p>
+    <div class="grid">
+      <a class="card" href="./amber-reserve/">
+        <span class="chip dark">Dark</span>
+        <h3>Amber Reserve</h3>
+        <p>Mahogany lounge, amber CTAs, Rapid Re-order + Nearest Sanctuary.</p>
+        <span class="go">Open demo →</span>
+      </a>
+      <a class="card" href="./obsidian-glow/">
+        <span class="chip dark">Dark</span>
+        <h3>Obsidian Lab</h3>
+        <p>Matte black + electric cyan, sharp corners, terpene analysis cards.</p>
+        <span class="go">Open demo →</span>
+      </a>
+      <a class="card" href="./rose-noir/">
+        <span class="chip dark">Dark</span>
+        <h3>Rose Noir</h3>
+        <p>Crimson / rose-gold glass, Curated Tastes + Dosage Journal.</p>
+        <span class="go">Open demo →</span>
+      </a>
+      <a class="card" href="./ethereal-ghost/">
+        <span class="chip dark">Dark</span>
+        <h3>Ghost Atelier</h3>
+        <p>Monochrome vapor-luxury, gallery shop, Sommelier AI framing.</p>
+        <span class="go">Open demo →</span>
+      </a>
+      <a class="card" href="./emerald-crypt/">
+        <span class="chip dark">Dark</span>
+        <h3>Emerald Crypt</h3>
+        <p>Neon genetic archive, ACQUIRE BATCH, vault chrome.</p>
+        <span class="go">Open demo →</span>
+      </a>
+    </div>
+
+    <p class="section-label">Bright / colorful</p>
+    <div class="grid">
+      <a class="card" href="./nebula-clinic/">
+        <span class="chip bright">Bright</span>
+        <h3>Nebula Clinic</h3>
+        <p>Clinical lavender-white, formulation cards, Nebula Core + Wellness Journal.</p>
+        <span class="go">Open demo →</span>
+      </a>
+      <a class="card" href="./luminous-botanical/">
+        <span class="chip bright">Bright</span>
+        <h3>Luminous Botanical</h3>
+        <p>Cream sage mint glass, effect bars, Dosage Journal, AI Sommelier.</p>
+        <span class="go">Open demo →</span>
+      </a>
+      <a class="card" href="./citrus-grove/">
+        <span class="chip bright">Bright</span>
+        <h3>Citrus Grove</h3>
+        <p>Sunny coral / citrus / lime, Mood Spectrum chips, Grove Picks.</p>
+        <span class="go">Open demo →</span>
+      </a>
+      <a class="card" href="./azure-bloom/">
+        <span class="chip bright">Bright</span>
+        <h3>Azure Bloom</h3>
+        <p>Sky periwinkle + coral, Daily Ritual checklist, pastel categories.</p>
+        <span class="go">Open demo →</span>
+      </a>
+    </div>
+
+    <footer>
+      Best viewed on a phone-width window (DevTools device mode works well).
+      These are web previews of native Expo apps — some native-only behaviors differ.
+      Source: <code>localgovy/dispotemplates</code>
+    </footer>
+  </div>
+</body>
+</html>

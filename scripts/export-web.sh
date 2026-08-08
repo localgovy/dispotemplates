@@ -54,4 +54,11 @@ NODE
   echo "✓ $app"
 done
 
+# Restore hub files if a source copy exists
+if [ -f "$ROOT/docs-hub/index.html" ]; then
+  cp "$ROOT/docs-hub/index.html" "$OUT/index.html"
+  touch "$OUT/.nojekyll"
+fi
+
 echo "All exports written to $OUT"
+echo "Remember: docs/**/assets/node_modules must be committed (fonts/icons)."

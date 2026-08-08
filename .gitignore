@@ -1,5 +1,11 @@
-# dependencies
+# dependencies (but keep Expo web-export font/icon assets under docs/)
 node_modules/
+!docs/
+!docs/**
+!docs/**/assets/
+!docs/**/assets/**
+!docs/**/assets/node_modules/
+!docs/**/assets/node_modules/**
 
 # Expo
 .expo/

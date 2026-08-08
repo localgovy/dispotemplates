@@ -1,9 +1,9 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { requireOptionalNativeModule } from 'expo';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { View } from 'react-native';
+import { View, Platform } from 'react-native';
 import { useFonts } from 'expo-font';
 import {
   Fraunces_400Regular,
@@ -26,7 +26,8 @@ import { AIAssistantProvider } from '../context/AIAssistantContext';
 import AIAssistantSheet from '../components/AIAssistantSheet';
 import theme from '../theme';
 
-const SCREENSHOT_MODE = process.env.EXPO_PUBLIC_SCREENSHOT_MODE === '1';
+const SCREENSHOT_MODE =
+  process.env.EXPO_PUBLIC_SCREENSHOT_MODE === '1' || Platform.OS === 'web';
 
 if (SCREENSHOT_MODE) {
   requireOptionalNativeModule('DevMenuPreferences')?.setPreferencesAsync({
@@ -52,6 +53,7 @@ function ProtectedRoute() {
 }
 
 export default function RootLayout() {
+  const [fontTimeout, setFontTimeout] = useState(false);
   const [fontsLoaded] = useFonts({
     Fraunces_400Regular,
     Fraunces_400Regular_Italic,
@@ -64,7 +66,12 @@ export default function RootLayout() {
 
   });
 
-  if (!fontsLoaded) {
+  useEffect(() => {
+    const t = setTimeout(() => setFontTimeout(true), 2500);
+    return () => clearTimeout(t);
+  }, []);
+
+  if (!fontsLoaded && !fontTimeout) {
     return <View style={{ flex: 1, backgroundColor: theme.colors.background }} />;
   }
 
