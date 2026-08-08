@@ -91,8 +91,8 @@ export default function SearchScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.pageHeader}>
         <View>
-          <Text style={styles.pageEyebrow}>LAB CATALOG // SCAN</Text>
-          <Text style={styles.pageTitle}>Midnight Shop</Text>
+          <Text style={styles.pageEyebrow}>Lab catalog</Text>
+          <Text style={styles.pageTitle}>Lab Shop</Text>
         </View>
         <AIButton />
       </View>
@@ -138,7 +138,7 @@ export default function SearchScreen() {
           <Ionicons name="search" size={18} color={theme.colors.primary} />
           <TextInput
             style={styles.searchInput}
-            placeholder="Query strain, SKU, effect..."
+            placeholder="Search strains, brands, effects…"
             placeholderTextColor={theme.colors.textMuted}
             value={query}
             onChangeText={setQuery}
@@ -203,7 +203,7 @@ export default function SearchScreen() {
 
       <View style={styles.resultsHeader}>
         <Text style={styles.resultsCount}>
-          {filtered.length} {filtered.length === 1 ? 'SPECIMEN' : 'SPECIMENS'}
+          {filtered.length} {filtered.length === 1 ? 'product' : 'products'}
         </Text>
         {!isIdle && (
           <TouchableOpacity onPress={clearAll} style={styles.clearAllBtn}>
@@ -229,8 +229,8 @@ export default function SearchScreen() {
         ListEmptyComponent={
           <View style={styles.empty}>
             <Ionicons name="search-outline" size={48} color={theme.colors.textMuted} />
-            <Text style={styles.emptyTitle}>No specimens found</Text>
-            <Text style={styles.emptyText}>Try a different query or clear filters</Text>
+            <Text style={styles.emptyTitle}>No products found</Text>
+            <Text style={styles.emptyText}>Try a different search or clear filters</Text>
             <TouchableOpacity style={styles.clearBtn} onPress={clearAll} activeOpacity={0.8}>
               <Text style={styles.clearBtnText}>Clear filters</Text>
             </TouchableOpacity>

@@ -870,7 +870,7 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: 'ap2',
-    name: 'Ghost Atelier Hoodie — Forest',
+    name: 'Ghost Atelier Soft Hoodie',
     brand: 'Ghost Atelier',
     category: 'Apparel',
     strain: 'N/A',

@@ -410,7 +410,7 @@ export default function AIAssistantSheet() {
           <View style={styles.loadingWrap}>
             <ActivityIndicator size="large" color={theme.colors.primary} />
             <Text style={styles.loadingTitle}>Curating your collection…</Text>
-            <Text style={styles.loadingText}>The Midnight Sommelier is tasting the shelf</Text>
+            <Text style={styles.loadingText}>Midnight Sommelier is matching picks</Text>
           </View>
         )}
 

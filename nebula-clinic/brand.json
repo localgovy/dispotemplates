@@ -17,14 +17,14 @@
     "NEWUSER": 0.2
   },
   "promo_hint": "NEBULA10, CLINIC15, or NEWUSER",
-  "website": "https://www.nebulaclinic.example",
+  "website": "https://www.nebulaclinic.com",
   "age_key": "@nebula_clinic_age_verified",
   "store_key": "@nebula_clinic_selected_store",
   "android_bg": "#f8f9ff",
   "ui_style": "light",
   "product_brand": "Nebula Clinic",
-  "browse_title": "Browse Formulations",
-  "deals_title": "Featured Protocols",
+  "browse_title": "Browse the Shop",
+  "deals_title": "Clinic deals",
   "stores": [
     [
       "Clinic Downtown",

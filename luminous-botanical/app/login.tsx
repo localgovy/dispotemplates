@@ -57,7 +57,7 @@ export default function LoginScreen() {
         <Text style={styles.brandSub}>D I S P E N S A R Y</Text>
       </View>
 
-      <Text style={styles.tagline}>The Winter Collection</Text>
+      <Text style={styles.tagline}>Serenity in every leaf.</Text>
 
       {/* Sign-in card */}
       <View style={styles.card}>
@@ -88,7 +88,7 @@ export default function LoginScreen() {
       </View>
 
       <View style={styles.footer}>
-        <Text style={styles.footerText}>Aurora, Ontario · Est. 2024 · 19+ Only</Text>
+        <Text style={styles.footerText}>Barrie, Ontario · Est. 2024 · 19+ Only</Text>
       </View>
     </LinearGradient>
   );

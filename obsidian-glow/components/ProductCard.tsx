@@ -31,7 +31,6 @@ export default function ProductCard({ product, onPress, width, flex }: Props) {
   const isOnSale = product.originalPrice !== undefined;
   const qty = getQty(product.id);
   const fav = isFavourite(product.id);
-  const sku = `OG-${product.id.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8)}`;
   const terpenes = product.terpenes?.slice(0, 3) ?? [];
   const thcPct = product.thc ?? 0;
   const thcBarWidth = Math.min(100, Math.max(0, (thcPct / 35) * 100));
@@ -92,7 +91,6 @@ export default function ProductCard({ product, onPress, width, flex }: Props) {
       </View>
 
       <View style={styles.info}>
-        <Text style={styles.sku}>{sku}</Text>
         <Text style={styles.name} numberOfLines={2}>{product.name}</Text>
         <Text style={styles.brand} numberOfLines={1}>{product.brand}</Text>
 
@@ -110,10 +108,10 @@ export default function ProductCard({ product, onPress, width, flex }: Props) {
 
         {product.terpenes && product.terpenes.length > 0 && (
           <View style={styles.terpBox}>
-            <Text style={styles.terpTitle}>TERPENE PROFILE ANALYSIS</Text>
+            <Text style={styles.terpTitle}>Terpenes</Text>
 
             <View style={styles.potencyRow}>
-              <Text style={styles.potencyLabel}>THC POTENCY</Text>
+              <Text style={styles.potencyLabel}>THC</Text>
               <Text style={styles.potencyValue}>{thcPct}%</Text>
             </View>
             <View style={styles.potencyTrack}>
@@ -209,12 +207,6 @@ const styles = StyleSheet.create({
   info: {
     padding: theme.spacing.md,
     gap: 6,
-  },
-  sku: {
-    fontFamily: theme.fonts.mono,
-    fontSize: 11,
-    color: theme.colors.textMuted,
-    letterSpacing: 1,
   },
   name: {
     fontFamily: theme.fonts.serif,

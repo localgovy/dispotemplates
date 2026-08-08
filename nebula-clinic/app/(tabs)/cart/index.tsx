@@ -66,7 +66,7 @@ export default function CartScreen() {
   }
 
   function handleRemove(productId: string, name: string) {
-    Alert.alert('Remove Item', `Remove "${name}" from your regimen?`, [
+    Alert.alert('Remove Item', `Remove "${name}" from your cart?`, [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Remove', style: 'destructive', onPress: () => removeFromCart(productId) },
     ]);
@@ -136,22 +136,22 @@ export default function CartScreen() {
     return (
       <SafeAreaView style={styles.safe} edges={['top']}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Your Regimen</Text>
+          <Text style={styles.headerTitle}>Cart</Text>
           <AIButton />
         </View>
         <View style={styles.empty}>
           <View style={styles.emptyIcon}>
             <Ionicons name="clipboard-outline" size={48} color={theme.colors.accentDark} />
           </View>
-          <Text style={styles.emptyTitle}>Your regimen is empty</Text>
-          <Text style={styles.emptyText}>Curate your collection from the apothecary</Text>
+          <Text style={styles.emptyTitle}>Your cart is empty</Text>
+          <Text style={styles.emptyText}>Add products to build your order.</Text>
           <TouchableOpacity
             style={styles.browseBtn}
             onPress={() => router.push('/(tabs)/search')}
             activeOpacity={0.85}
           >
             <Ionicons name="storefront-outline" size={16} color={theme.colors.onPrimary} />
-            <Text style={styles.browseBtnText}>Browse Formulations</Text>
+            <Text style={styles.browseBtnText}>Browse the Shop</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -162,9 +162,9 @@ export default function CartScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.headerTitle}>Your Regimen</Text>
+          <Text style={styles.headerTitle}>Cart</Text>
           <Text style={styles.itemCount}>
-            {totalItems} {totalItems === 1 ? 'formulation' : 'formulations'}
+            {totalItems} {totalItems === 1 ? 'product' : 'products'}
           </Text>
         </View>
         <AIButton />
@@ -176,7 +176,7 @@ export default function CartScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <Text style={styles.sectionLabel}>REGIMEN ITEMS</Text>
+        <Text style={styles.sectionLabel}>CART ITEMS</Text>
         <View style={styles.itemsSection}>
           {items.map(({ product, qty }) => (
             <View key={product.id} style={styles.cartItem}>
@@ -261,7 +261,7 @@ export default function CartScreen() {
           {promoError !== '' && <Text style={styles.promoError}>{promoError}</Text>}
         </View>
 
-        <Text style={styles.sectionLabel}>CLINICAL TOTALS</Text>
+        <Text style={styles.sectionLabel}>ORDER TOTALS</Text>
         <View style={styles.totalsTable}>
           <View style={styles.tableRow}>
             <Text style={styles.tableLabel}>Subtotal</Text>
@@ -296,7 +296,7 @@ export default function CartScreen() {
           ) : (
             <>
               <Ionicons name="checkmark-circle-outline" size={18} color={theme.colors.onPrimary} />
-              <Text style={styles.placeBtnText}>Place Regimen Order</Text>
+              <Text style={styles.placeBtnText}>Place order</Text>
             </>
           )}
         </TouchableOpacity>

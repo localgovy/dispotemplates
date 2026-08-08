@@ -51,7 +51,7 @@ export default function LoginScreen() {
       {/* Logo */}
       <View style={styles.logoWrap}>
         <View style={styles.seal}>
-          <Text style={styles.sealLetter}>L</Text>
+          <Text style={styles.sealLetter}>E</Text>
         </View>
         <Text style={styles.brand}>Emerald Crypt</Text>
         <Text style={styles.brandSub}>D I S P E N S A R Y</Text>
@@ -88,7 +88,7 @@ export default function LoginScreen() {
       </View>
 
       <View style={styles.footer}>
-        <Text style={styles.footerText}>Aurora, Ontario · Est. 2024 · 19+ Only</Text>
+        <Text style={styles.footerText}>Barrie, Ontario · Est. 2024 · 19+ Only</Text>
       </View>
     </LinearGradient>
   );

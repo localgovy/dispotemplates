@@ -18,14 +18,14 @@
     "NEWUSER": 0.1
   },
   "promo_hint": "GHOST10, ATELIER15, or NEWUSER",
-  "website": "https://www.ghostatelier.example",
+  "website": "https://www.ghostatelier.com",
   "age_key": "@ghost_atelier_age_verified",
   "store_key": "@ghost_atelier_selected_store",
   "android_bg": "#121212",
   "ui_style": "dark",
   "status_bar": "light",
   "product_brand": "Ghost Atelier",
-  "browse_title": "Browse Selection",
-  "deals_title": "Featured Vapors",
-  "pickup_label": "Pickup Atelier"
+  "browse_title": "Browse the Atelier",
+  "deals_title": "Featured picks",
+  "pickup_label": "Pickup"
 }

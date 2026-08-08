@@ -26,7 +26,7 @@ import StoreSheet from '../../../components/StoreSheet';
 import AIButton from '../../../components/AIButton';
 import theme from '../../../theme';
 
-const STORE_WEBSITE = 'https://www.rosenoir.example';
+const STORE_WEBSITE = 'https://www.rosenoir.com';
 const DOSAGE_KEY = '@rose_noir_dosage_journal';
 
 type Profile = Tables['profiles'];
@@ -81,7 +81,7 @@ export default function ProfileScreen() {
     user?.user_metadata?.full_name ??
     user?.user_metadata?.name ??
     user?.email?.split('@')[0] ??
-    'Guest';
+    'Alex Rivera';
 
   const avatarUrl = user?.user_metadata?.avatar_url ?? user?.user_metadata?.picture;
   const avatarInitial = displayName.charAt(0).toUpperCase();
@@ -297,7 +297,7 @@ export default function ProfileScreen() {
         {
           id: 'loyalty',
           icon: 'gift-outline',
-          label: 'Loyalty Points',
+          label: 'Noir Points',
           value: `${loyaltyPts.toLocaleString()} pts`,
         },
       ],

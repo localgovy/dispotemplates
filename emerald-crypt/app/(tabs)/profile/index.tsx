@@ -21,7 +21,7 @@ import StoreSheet from '../../../components/StoreSheet';
 import AIButton from '../../../components/AIButton';
 import theme from '../../../theme';
 
-const STORE_WEBSITE = 'https://www.emeraldcrypt.example';
+const STORE_WEBSITE = 'https://www.emeraldcrypt.com';
 
 type Profile = Tables['profiles'];
 
@@ -48,7 +48,7 @@ export default function ProfileScreen() {
     user?.user_metadata?.full_name ??
     user?.user_metadata?.name ??
     user?.email?.split('@')[0] ??
-    'Guest';
+    'Alex Rivera';
 
   const avatarUrl = user?.user_metadata?.avatar_url ?? user?.user_metadata?.picture;
   const avatarInitial = displayName.charAt(0).toUpperCase();
@@ -173,7 +173,7 @@ export default function ProfileScreen() {
 
   const MENU_SECTIONS: { title: string; items: MenuItem[] }[] = [
     {
-      title: 'VAULT / ACCOUNT',
+      title: 'Account',
       items: [
         { id: 'personal', icon: 'person-outline', label: 'Personal Info', value: displayName },
         { id: 'age', icon: 'shield-checkmark-outline', label: 'Age Verification', value: 'Verified ✓' },
@@ -186,7 +186,7 @@ export default function ProfileScreen() {
       ],
     },
     {
-      title: 'VAULT / PREFERENCES',
+      title: 'Preferences',
       items: [
         { id: 'notif', icon: 'notifications-outline', label: 'Order Updates', toggle: true, toggleKey: 'notif' },
         { id: 'deals', icon: 'pricetag-outline', label: 'Deal Alerts', toggle: true, toggleKey: 'deals' },
@@ -194,14 +194,14 @@ export default function ProfileScreen() {
       ],
     },
     {
-      title: 'VAULT / SHOP',
+      title: 'Shop',
       items: [
         { id: 'favourites', icon: 'heart-outline', label: 'Saved Favourites' },
         { id: 'payment', icon: 'card-outline', label: 'Payment Methods', value: 'Cash / Debit / Credit' },
       ],
     },
     {
-      title: 'VAULT / SUPPORT',
+      title: 'Support',
       items: [
         { id: 'faq', icon: 'call-outline', label: 'Contact & Hours' },
         { id: 'about', icon: 'globe-outline', label: 'Our Website' },
@@ -219,7 +219,7 @@ export default function ProfileScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.topNav}>
-        <Text style={styles.topNavTitle}>Archive</Text>
+        <Text style={styles.topNavTitle}>Account</Text>
         <AIButton />
       </View>
       <ScrollView
@@ -231,7 +231,7 @@ export default function ProfileScreen() {
         <View style={styles.archiveBlock}>
           <View style={styles.fileTab}>
             <Ionicons name="folder-outline" size={12} color={theme.colors.primary} />
-            <Text style={styles.fileTabText}>MEMBER_RECORD.vault</Text>
+            <Text style={styles.fileTabText}>Vault member</Text>
           </View>
           <View style={styles.archiveBody}>
             <View style={styles.archiveHeader}>
@@ -244,9 +244,9 @@ export default function ProfileScreen() {
               )}
               <View style={styles.archiveMeta}>
                 <Text style={styles.userName}>{displayName}</Text>
-                <Text style={styles.fieldLabel}>ARCHIVE ID</Text>
+                <Text style={styles.fieldLabel}>Member ID</Text>
                 <Text style={styles.archiveId}>{archiveId}</Text>
-                <Text style={styles.filedAt}>Filed {memberYear} · {store.city} vault</Text>
+                <Text style={styles.filedAt}>Member since {memberYear} · {store.city} vault</Text>
               </View>
             </View>
 
@@ -262,7 +262,7 @@ export default function ProfileScreen() {
               ) : (
                 <>
                   <View>
-                    <Text style={styles.fieldLabel}>CRYPT TOKENS</Text>
+                    <Text style={styles.fieldLabel}>Crypt Tokens</Text>
                     <Text style={styles.tokenPts}>{loyaltyPts.toLocaleString()}</Text>
                   </View>
                   <View style={styles.tokenRight}>

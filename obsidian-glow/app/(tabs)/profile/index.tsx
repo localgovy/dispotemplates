@@ -21,7 +21,7 @@ import StoreSheet from '../../../components/StoreSheet';
 import AIButton from '../../../components/AIButton';
 import theme from '../../../theme';
 
-const STORE_WEBSITE = 'https://www.obsidianlab.example';
+const STORE_WEBSITE = 'https://www.obsidianlab.com';
 
 type Profile = Tables['profiles'];
 
@@ -48,7 +48,7 @@ export default function ProfileScreen() {
     user?.user_metadata?.full_name ??
     user?.user_metadata?.name ??
     user?.email?.split('@')[0] ??
-    'Guest';
+    'Alex Rivera';
 
   const avatarUrl = user?.user_metadata?.avatar_url ?? user?.user_metadata?.picture;
   const avatarInitial = displayName.charAt(0).toUpperCase();
@@ -171,7 +171,7 @@ export default function ProfileScreen() {
 
   const MENU_SECTIONS: { title: string; items: MenuItem[] }[] = [
     {
-      title: '// ACCOUNT',
+      title: 'Account',
       items: [
         { id: 'personal', icon: 'person-outline', label: 'Personal Info', value: displayName },
         { id: 'age', icon: 'shield-checkmark-outline', label: 'Age Verification', value: 'Verified ✓' },
@@ -184,7 +184,7 @@ export default function ProfileScreen() {
       ],
     },
     {
-      title: '// PREFERENCES',
+      title: 'Preferences',
       items: [
         { id: 'notif', icon: 'notifications-outline', label: 'Order Updates', toggle: true, toggleKey: 'notif' },
         { id: 'deals', icon: 'pricetag-outline', label: 'Deal Alerts', toggle: true, toggleKey: 'deals' },
@@ -192,14 +192,14 @@ export default function ProfileScreen() {
       ],
     },
     {
-      title: '// SHOP',
+      title: 'Shop',
       items: [
         { id: 'favourites', icon: 'heart-outline', label: 'Saved Favourites' },
         { id: 'payment', icon: 'card-outline', label: 'Payment Methods', value: 'Cash / Debit / Credit' },
       ],
     },
     {
-      title: '// SUPPORT',
+      title: 'Support',
       items: [
         { id: 'faq', icon: 'call-outline', label: 'Contact & Hours' },
         { id: 'about', icon: 'globe-outline', label: 'Our Website' },
@@ -217,7 +217,7 @@ export default function ProfileScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.topNav}>
-        <Text style={styles.topNavTitle}>SYSTEM / ACCOUNT</Text>
+        <Text style={styles.topNavTitle}>Account</Text>
         <AIButton />
       </View>
       <ScrollView
@@ -227,7 +227,7 @@ export default function ProfileScreen() {
       >
         {/* Terminal identity block */}
         <View style={styles.terminalBlock}>
-          <Text style={styles.promptLine}>{'>'} USER_SESSION.active</Text>
+          <Text style={styles.promptLine}>{'>'} Session active</Text>
           <View style={styles.identityRow}>
             {avatarUrl ? (
               <Image source={{ uri: avatarUrl }} style={styles.avatarImage} />
@@ -238,8 +238,8 @@ export default function ProfileScreen() {
             )}
             <View style={styles.identityMeta}>
               <Text style={styles.userName}>{displayName}</Text>
-              <Text style={styles.monoMuted}>id: {memberId}</Text>
-              <Text style={styles.monoMuted}>since: {memberYear} · node: {store.city}</Text>
+              <Text style={styles.monoMuted}>ID {memberId}</Text>
+              <Text style={styles.monoMuted}>Member since {memberYear} · {store.city}</Text>
             </View>
           </View>
 
@@ -253,7 +253,7 @@ export default function ProfileScreen() {
             ) : (
               <>
                 <View style={styles.creditsHeader}>
-                  <Text style={styles.creditsLabel}>LAB_CREDITS</Text>
+                  <Text style={styles.creditsLabel}>Lab Credits</Text>
                   <Text style={styles.creditsPts}>{loyaltyPts.toLocaleString()}</Text>
                 </View>
                 <View style={styles.progressBar}>
@@ -326,7 +326,7 @@ export default function ProfileScreen() {
         ))}
 
         <View style={styles.footer}>
-          <Text style={styles.footerLogo}>OBSIDIAN_LAB · v1.0.0</Text>
+          <Text style={styles.footerLogo}>Obsidian Lab</Text>
           <Text style={styles.footerAge}>19+ ONLY · KEEP OUT OF REACH OF CHILDREN</Text>
         </View>
       </ScrollView>

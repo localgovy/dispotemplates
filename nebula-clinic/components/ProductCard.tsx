@@ -16,13 +16,13 @@ interface Props {
 }
 
 function strainLabel(strain: string): string {
-  if (strain === 'N/A') return 'MULTI SPECTRUM';
-  return `${strain.toUpperCase()} DOMINANT`;
+  if (strain === 'N/A') return 'Multi';
+  return strain;
 }
 
-function terpDisplay(product: Product): string {
+function terpDisplay(product: Product): string | null {
   const first = product.terpenes?.[0];
-  if (!first) return '—';
+  if (!first) return null;
   return `${first.pct.toFixed(1)}%`;
 }
 
@@ -33,6 +33,7 @@ export default function ProductCard({ product, onPress, width, flex }: Props) {
   const isOnSale = product.originalPrice !== undefined;
   const qty = getQty(product.id);
   const fav = isFavourite(product.id);
+  const terp = terpDisplay(product);
 
   const compact = width !== undefined && width < 200;
   const sizeStyle =
@@ -108,11 +109,15 @@ export default function ProductCard({ product, onPress, width, flex }: Props) {
                 {product.cbd !== null ? `${product.cbd}%` : '—'}
               </Text>
             </View>
-            <View style={styles.dataDivider} />
-            <View style={styles.dataCell}>
-              <Text style={styles.dataLabel}>TERP</Text>
-              <Text style={styles.dataValue}>{terpDisplay(product)}</Text>
-            </View>
+            {terp && (
+              <>
+                <View style={styles.dataDivider} />
+                <View style={styles.dataCell}>
+                  <Text style={styles.dataLabel}>TERP</Text>
+                  <Text style={styles.dataValue}>{terp}</Text>
+                </View>
+              </>
+            )}
           </View>
         )}
 

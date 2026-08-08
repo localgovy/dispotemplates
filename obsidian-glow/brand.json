@@ -18,7 +18,7 @@
     "NEWUSER": 0.1
   },
   "promo_hint": "OBSIDIAN10, LAB15, or NEWUSER",
-  "website": "https://www.obsidianlab.example",
+  "website": "https://www.obsidianlab.com",
   "age_key": "@obsidian_lab_age_verified",
   "store_key": "@obsidian_lab_selected_store",
   "android_bg": "#0D0D0D",
@@ -27,5 +27,5 @@
   "product_brand": "Obsidian Lab",
   "browse_title": "Browse the Archive",
   "deals_title": "Lab Specials",
-  "pickup_label": "Pickup Node"
+  "pickup_label": "Pickup"
 }

@@ -22,7 +22,7 @@ import StoreSheet from '../../../components/StoreSheet';
 import AIButton from '../../../components/AIButton';
 import theme from '../../../theme';
 
-const STORE_WEBSITE = 'https://www.citrusgrove.example';
+const STORE_WEBSITE = 'https://www.citrusgrove.com';
 
 type Profile = Tables['profiles'];
 
@@ -49,7 +49,7 @@ export default function ProfileScreen() {
     user?.user_metadata?.full_name ??
     user?.user_metadata?.name ??
     user?.email?.split('@')[0] ??
-    'Guest';
+    'Alex Rivera';
 
   const avatarUrl = user?.user_metadata?.avatar_url ?? user?.user_metadata?.picture;
   const avatarInitial = displayName.charAt(0).toUpperCase();
@@ -218,7 +218,7 @@ export default function ProfileScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.topNav}>
-        <Text style={styles.topNavTitle}>Hey there!</Text>
+        <Text style={styles.topNavTitle}>Account</Text>
         <AIButton />
       </View>
       <ScrollView

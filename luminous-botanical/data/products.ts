@@ -870,7 +870,7 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: 'ap2',
-    name: 'Luminous Botanical Hoodie — Forest',
+    name: 'Luminous Botanical Garden Hoodie',
     brand: 'Luminous Botanical',
     category: 'Apparel',
     strain: 'N/A',

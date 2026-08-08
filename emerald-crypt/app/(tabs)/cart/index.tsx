@@ -27,10 +27,6 @@ const VALID_PROMOS: Record<string, number> = {
   NEWUSER: 0.2,
 };
 
-function formatBatchCode(id: string): string {
-  return id.replace(/-/g, '').slice(0, 8).toUpperCase();
-}
-
 export default function CartScreen() {
   const router = useRouter();
   const { user } = useAuth();
@@ -138,7 +134,7 @@ export default function CartScreen() {
     return (
       <SafeAreaView style={styles.safe} edges={['top']}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Manifest</Text>
+          <Text style={styles.headerTitle}>Cart</Text>
           <AIButton />
         </View>
         <View style={styles.empty}>
@@ -146,7 +142,7 @@ export default function CartScreen() {
             <Ionicons name="bag-handle-outline" size={48} color={theme.colors.accentDark} />
           </View>
           <Text style={styles.emptyTitle}>Your basket is empty</Text>
-          <Text style={styles.emptyText}>Curate your collection from the apothecary</Text>
+          <Text style={styles.emptyText}>Add strains from the vault to get started.</Text>
           <TouchableOpacity
             style={styles.browseBtn}
             onPress={() => router.push('/(tabs)/search')}
@@ -164,9 +160,9 @@ export default function CartScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.headerTitle}>Manifest</Text>
+          <Text style={styles.headerTitle}>Cart</Text>
           <Text style={styles.itemCount}>
-            {totalItems} {totalItems === 1 ? 'ENTRY' : 'ENTRIES'} · VAULT PENDING
+            {totalItems} {totalItems === 1 ? 'item' : 'items'} · Ready for pickup
           </Text>
         </View>
         <AIButton />
@@ -179,7 +175,7 @@ export default function CartScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.manifestBlock}>
-          <Text style={styles.manifestLabel}>MANIFEST ENTRIES</Text>
+          <Text style={styles.manifestLabel}>Items</Text>
           {items.map(({ product, qty }, index) => (
             <View key={product.id} style={styles.manifestRow}>
               <View style={styles.manifestIndex}>
@@ -192,7 +188,7 @@ export default function CartScreen() {
                   <Text style={styles.manifestName} numberOfLines={2}>{product.name}</Text>
                   <Text style={styles.manifestPrice}>${(product.price * qty).toFixed(2)}</Text>
                 </View>
-                <Text style={styles.batchCode}>BATCH · {formatBatchCode(product.id)}</Text>
+                <Text style={styles.batchCode}>{product.brand}</Text>
                 <View style={styles.manifestControls}>
                   <View style={styles.qtyRow}>
                     <TouchableOpacity

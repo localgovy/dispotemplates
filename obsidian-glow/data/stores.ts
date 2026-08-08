@@ -16,7 +16,7 @@ export interface Store {
 export const STORES: Store[] = [
   {
     id: 's1',
-    name: 'Lab Node Alpha',
+    name: 'Lab Downtown',
     address: '435 Bayfield St, Unit 3',
     city: 'Toronto',
     province: 'ON',
@@ -28,7 +28,7 @@ export const STORES: Store[] = [
   },
   {
     id: 's2',
-    name: 'Lab Node Beta',
+    name: 'Lab Midtown',
     address: '82 Hurontario St',
     city: 'Mississauga',
     province: 'ON',
@@ -40,7 +40,7 @@ export const STORES: Store[] = [
   },
   {
     id: 's3',
-    name: 'Lab Node Gamma',
+    name: 'Lab Uptown',
     address: '290 King St',
     city: 'Ottawa',
     province: 'ON',

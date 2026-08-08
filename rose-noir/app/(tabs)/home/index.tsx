@@ -69,7 +69,7 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <TouchableOpacity style={styles.locationPill} activeOpacity={0.7} onPress={() => setShowStoreSheet(true)}>
           <Ionicons name="location-sharp" size={14} color={theme.colors.accent} />
-          <Text style={styles.locationText}>{store.name}, {store.province}</Text>
+          <Text style={styles.locationText} numberOfLines={1}>{store.name}, {store.province}</Text>
           <Ionicons name="chevron-down" size={11} color={theme.colors.accent} />
         </TouchableOpacity>
         <Text style={styles.wordmark}>Rose Noir</Text>
@@ -168,7 +168,7 @@ export default function HomeScreen() {
         <View style={styles.sectionWrap}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Midnight Deals</Text>
-            <TouchableOpacity style={styles.seeAllRow} activeOpacity={0.7}>
+            <TouchableOpacity style={styles.seeAllRow} activeOpacity={0.7} onPress={() => router.push('/(tabs)/search')}>
               <Text style={styles.seeAllText}>View all</Text>
             </TouchableOpacity>
           </View>
@@ -191,15 +191,15 @@ export default function HomeScreen() {
           onProductPress={handleProductPress}
         />
         <SectionRow
-          title="Top Testers"
-          subtitle="Highest potency in store"
+          title="Staff picks"
+          subtitle="Highest THC right now"
           products={TOP_TESTERS}
           accentColor={theme.colors.accent}
           onProductPress={handleProductPress}
         />
         <SectionRow
           title="Budget Finds"
-          subtitle="Considered value"
+          subtitle="Great value"
           products={BUDGET_FINDS}
           accentColor={theme.colors.accent}
           onProductPress={handleProductPress}
@@ -222,9 +222,9 @@ export default function HomeScreen() {
 
         <View style={styles.footer}>
           <View style={styles.seal}>
-            <Text style={styles.sealLetter}>M</Text>
+            <Text style={styles.sealLetter}>R</Text>
           </View>
-          <Text style={styles.footerTitle}>Stay rooted in the harvest.</Text>
+          <Text style={styles.footerTitle}>Midnight ritual. Crimson calm.</Text>
           <Text style={styles.footerText}>Rose Noir · {store.name}, {store.province}</Text>
           <Text style={styles.footerSub}>19+ Only · Please consume responsibly</Text>
         </View>
@@ -265,11 +265,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    width: 92,
+    minWidth: 88,
+    maxWidth: 120,
+    flexShrink: 1,
   },
   locationText: {
     ...theme.typography.small,
     color: theme.colors.textSecondary,
+    flexShrink: 1,
   },
   wordmark: {
     fontFamily: theme.fonts.serifBold,

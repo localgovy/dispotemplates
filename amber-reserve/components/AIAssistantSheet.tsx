@@ -410,7 +410,7 @@ export default function AIAssistantSheet() {
           <View style={styles.loadingWrap}>
             <ActivityIndicator size="large" color={theme.colors.primary} />
             <Text style={styles.loadingTitle}>Finding your best picks…</Text>
-            <Text style={styles.loadingText}>Our AI budtender is on it</Text>
+            <Text style={styles.loadingText}>Reserve Concierge is pairing picks</Text>
           </View>
         )}
 

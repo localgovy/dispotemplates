@@ -17,7 +17,7 @@
     "NEWUSER": 0.2
   },
   "promo_hint": "CITRUS10, GROVE15, or NEWUSER",
-  "website": "https://www.citrusgrove.example",
+  "website": "https://www.citrusgrove.com",
   "age_key": "@citrus_grove_age_verified",
   "store_key": "@citrus_grove_selected_store",
   "android_bg": "#FFF8F0",

@@ -90,8 +90,8 @@ export default function SearchScreen() {
         <View style={styles.titleBlock}>
           <View style={styles.accentLine} />
           <View>
-            <Text style={styles.pageTitle}>CURATED SELECTION</Text>
-            <Text style={styles.pageSub}>Vapor gallery · one column</Text>
+            <Text style={styles.pageTitle}>The Atelier</Text>
+            <Text style={styles.pageSub}>Curated selection</Text>
           </View>
         </View>
         <AIButton />
@@ -103,7 +103,7 @@ export default function SearchScreen() {
           <Ionicons name="search" size={18} color={theme.colors.textMuted} />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search the void..."
+            placeholder="Search products, brands, effects…"
             placeholderTextColor={theme.colors.textMuted}
             value={query}
             onChangeText={setQuery}

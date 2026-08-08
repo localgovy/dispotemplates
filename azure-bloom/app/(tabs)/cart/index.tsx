@@ -136,7 +136,7 @@ export default function CartScreen() {
     return (
       <SafeAreaView style={styles.safe} edges={['top']}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Your Basket</Text>
+          <Text style={styles.headerTitle}>Cart</Text>
           <AIButton />
         </View>
         <View style={styles.empty}>
@@ -144,7 +144,7 @@ export default function CartScreen() {
             <Ionicons name="bag-handle-outline" size={48} color={theme.colors.primary} />
           </View>
           <Text style={styles.emptyTitle}>Your basket is empty</Text>
-          <Text style={styles.emptyText}>Curate your collection from the apothecary</Text>
+          <Text style={styles.emptyText}>Browse blooms to fill your basket.</Text>
           <TouchableOpacity
             style={styles.browseBtn}
             onPress={() => router.push('/(tabs)/search')}
@@ -162,7 +162,7 @@ export default function CartScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.headerTitle}>Your Basket</Text>
+          <Text style={styles.headerTitle}>Cart</Text>
           <Text style={styles.itemCount}>{totalItems} {totalItems === 1 ? 'item' : 'items'}</Text>
         </View>
         <AIButton />

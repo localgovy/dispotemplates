@@ -9,6 +9,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'expo-router';
 import { supabase, Tables } from '../../../lib/supabase';
 import { useAuth } from '../../../context/AuthContext';
 import AIButton from '../../../components/AIButton';
@@ -28,6 +29,7 @@ const STATUS_CONFIG: Record<
 };
 
 export default function OrdersScreen() {
+  const router = useRouter();
   const { user } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -65,7 +67,7 @@ export default function OrdersScreen() {
     return (
       <SafeAreaView style={styles.safe} edges={['top']}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Sky Orders</Text>
+          <Text style={styles.headerTitle}>Orders</Text>
           <AIButton />
         </View>
         <View style={styles.centred}>
@@ -79,13 +81,20 @@ export default function OrdersScreen() {
     return (
       <SafeAreaView style={styles.safe} edges={['top']}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Sky Orders</Text>
+          <Text style={styles.headerTitle}>Orders</Text>
           <AIButton />
         </View>
         <View style={styles.centred}>
           <Ionicons name="receipt-outline" size={48} color={theme.colors.textDisabled} />
           <Text style={styles.emptyTitle}>No orders yet</Text>
           <Text style={styles.emptyText}>Your placed orders will appear here.</Text>
+          <TouchableOpacity
+            style={styles.emptyShopBtn}
+            onPress={() => router.push('/(tabs)/search')}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.emptyShopBtnText}>Shop now</Text>
+          </TouchableOpacity>
         </View>
       </SafeAreaView>
     );
@@ -94,7 +103,7 @@ export default function OrdersScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Sky Orders</Text>
+        <Text style={styles.headerTitle}>Orders</Text>
         <AIButton />
       </View>
 
@@ -216,6 +225,21 @@ const styles = StyleSheet.create({
   emptyText: {
     ...theme.typography.caption,
     color: theme.colors.textMuted,
+  },
+  emptyShopBtn: {
+    marginTop: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    minHeight: 44,
+    borderRadius: 8,
+    backgroundColor: theme.colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyShopBtnText: {
+    fontFamily: theme.fonts.semibold,
+    fontSize: 14,
+    color: theme.colors.onPrimary,
   },
   scroll: { flex: 1 },
   scrollContent: {

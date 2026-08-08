@@ -65,7 +65,7 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <TouchableOpacity style={styles.locationPill} activeOpacity={0.7} onPress={() => setShowStoreSheet(true)}>
           <Ionicons name="location-sharp" size={14} color={theme.colors.primary} />
-          <Text style={styles.locationText}>{store.name}, {store.province}</Text>
+          <Text style={styles.locationText} numberOfLines={1}>{store.name}, {store.province}</Text>
           <Ionicons name="chevron-down" size={11} color={theme.colors.primary} />
         </TouchableOpacity>
         <Text style={styles.wordmark}>Amber Reserve</Text>
@@ -115,10 +115,10 @@ export default function HomeScreen() {
           </LinearGradient>
         </View>
 
-        {/* ── Rapid Re-order ─────────────────────────────────── */}
+        {/* ── Quick picks ─────────────────────────────────── */}
         <View style={styles.sectionWrap}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Rapid Re-order</Text>
+            <Text style={styles.sectionTitle}>Quick picks</Text>
           </View>
           <ScrollView
             horizontal
@@ -215,7 +215,7 @@ export default function HomeScreen() {
         <View style={styles.sectionWrap}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Featured Reserves</Text>
-            <TouchableOpacity style={styles.seeAllRow} activeOpacity={0.7}>
+            <TouchableOpacity style={styles.seeAllRow} activeOpacity={0.7} onPress={() => router.push('/(tabs)/search')}>
               <Text style={styles.seeAllText}>View all</Text>
             </TouchableOpacity>
           </View>
@@ -241,7 +241,7 @@ export default function HomeScreen() {
                   </View>
                   <Text style={styles.storyTitle}>{deal.title}</Text>
                   <Text style={styles.storySubtitle}>{deal.subtitle}</Text>
-                  <Text style={styles.storyCta}>Read the feature →</Text>
+                  <Text style={styles.storyCta}>Shop this offer →</Text>
                 </LinearGradient>
               </TouchableOpacity>
             ))}
@@ -257,15 +257,15 @@ export default function HomeScreen() {
           onProductPress={handleProductPress}
         />
         <SectionRow
-          title="Top Testers"
-          subtitle="Highest potency in store"
+          title="Staff picks"
+          subtitle="Highest THC right now"
           products={TOP_TESTERS}
           accentColor={theme.colors.primary}
           onProductPress={handleProductPress}
         />
         <SectionRow
           title="Budget Finds"
-          subtitle="Considered value"
+          subtitle="Great value"
           products={BUDGET_FINDS}
           accentColor={theme.colors.primary}
           onProductPress={handleProductPress}
@@ -292,7 +292,7 @@ export default function HomeScreen() {
           <View style={styles.seal}>
             <Text style={styles.sealLetter}>A</Text>
           </View>
-          <Text style={styles.footerTitle}>Stay rooted in the harvest.</Text>
+          <Text style={styles.footerTitle}>Crafted for the quiet ritual.</Text>
           <Text style={styles.footerText}>Amber Reserve · {store.name}, {store.province}</Text>
           <Text style={styles.footerSub}>19+ Only · Please consume responsibly</Text>
         </View>
@@ -333,11 +333,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    width: 92,
+    minWidth: 88,
+    maxWidth: 120,
+    flexShrink: 1,
   },
   locationText: {
     ...theme.typography.small,
     color: theme.colors.textSecondary,
+    flexShrink: 1,
   },
   wordmark: {
     fontFamily: theme.fonts.serifBold,

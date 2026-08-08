@@ -158,7 +158,7 @@ export default function HomeScreen() {
             <Ionicons name="sunny-outline" size={18} color={theme.colors.primaryDark} />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={styles.pickupLabel}>SUNNY PICKUP</Text>
+            <Text style={styles.pickupLabel}>Pickup</Text>
             <Text style={styles.pickupAddress} numberOfLines={1}>
               {store.name} · {store.address}
             </Text>
@@ -237,7 +237,7 @@ export default function HomeScreen() {
         <View style={styles.sectionWrap}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Sunny Deals</Text>
-            <TouchableOpacity style={styles.seeAllRow} activeOpacity={0.7}>
+            <TouchableOpacity style={styles.seeAllRow} activeOpacity={0.7} onPress={() => router.push('/(tabs)/search')}>
               <Text style={styles.seeAllText}>View all</Text>
             </TouchableOpacity>
           </View>
@@ -260,15 +260,15 @@ export default function HomeScreen() {
           onProductPress={handleProductPress}
         />
         <SectionRow
-          title="Top Testers"
-          subtitle="Highest potency in store"
+          title="Staff picks"
+          subtitle="Highest THC right now"
           products={TOP_TESTERS}
           accentColor={theme.colors.accentDark}
           onProductPress={handleProductPress}
         />
         <SectionRow
           title="Budget Finds"
-          subtitle="Bright value picks"
+          subtitle="Great value"
           products={BUDGET_FINDS}
           accentColor={theme.colors.success}
           onProductPress={handleProductPress}
@@ -332,7 +332,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    width: 92,
+    minWidth: 88,
+    maxWidth: 120,
+    flexShrink: 1,
   },
   locationText: {
     ...theme.typography.small,

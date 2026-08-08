@@ -18,7 +18,7 @@
     "NEWUSER": 0.1
   },
   "promo_hint": "AMBER10, RESERVE15, or NEWUSER",
-  "website": "https://www.amberreserve.example",
+  "website": "https://www.amberreserve.com",
   "age_key": "@amber_reserve_age_verified",
   "store_key": "@amber_reserve_selected_store",
   "android_bg": "#131411",

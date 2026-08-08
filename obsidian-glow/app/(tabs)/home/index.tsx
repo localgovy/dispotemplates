@@ -21,7 +21,6 @@ import {
   type Category,
   type Product,
 } from '../../../data/products';
-import DealCard from '../../../components/DealCard';
 import SectionRow from '../../../components/SectionRow';
 import ProductDetailModal from '../../../components/ProductDetailModal';
 import StoreSheet from '../../../components/StoreSheet';
@@ -40,8 +39,6 @@ const ALL_CATEGORIES: Category[] = [
   'Accessories',
   'Apparel',
 ];
-
-const POTENCY_SPOTLIGHT = TOP_TESTERS.slice(0, 8);
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -63,7 +60,7 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <TouchableOpacity style={styles.locationPill} activeOpacity={0.7} onPress={() => setShowStoreSheet(true)}>
           <Ionicons name="location-sharp" size={14} color={theme.colors.primary} />
-          <Text style={styles.locationText}>{store.name}, {store.province}</Text>
+          <Text style={styles.locationText} numberOfLines={1}>{store.name}, {store.province}</Text>
           <Ionicons name="chevron-down" size={11} color={theme.colors.primary} />
         </TouchableOpacity>
         <Text style={styles.wordmark}>Obsidian Lab</Text>
@@ -117,7 +114,7 @@ export default function HomeScreen() {
             <Ionicons name="storefront-outline" size={20} color={theme.colors.primary} />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={styles.pickupLabel}>PICKUP NODE</Text>
+            <Text style={styles.pickupLabel}>Pickup</Text>
             <Text style={styles.pickupAddress}>{store.address}, {store.city}</Text>
             <View style={styles.openRow}>
               <View style={styles.openDot} />
@@ -127,30 +124,51 @@ export default function HomeScreen() {
           <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} />
         </TouchableOpacity>
 
-        {/* Potency spotlight — data dashboard */}
+        {/* Deal spotlight — split panels */}
         <View style={styles.sectionWrap}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Potency Spotlight</Text>
-            <Text style={styles.metricHint}>THC %</Text>
+            <Text style={styles.sectionTitle}>Deal Spotlight</Text>
+            <Text style={styles.metricHint}>LIVE OFFERS</Text>
           </View>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.metricScroll}
-          >
-            {POTENCY_SPOTLIGHT.map((product) => (
-              <TouchableOpacity
-                key={`metric-${product.id}`}
-                style={styles.metricTile}
-                onPress={() => handleProductPress(product)}
-                activeOpacity={0.85}
+          {DEALS[0] && (
+            <TouchableOpacity
+              style={styles.dealSplitFeature}
+              onPress={() => router.push('/(tabs)/search')}
+              activeOpacity={0.88}
+            >
+              <LinearGradient
+                colors={DEALS[0].gradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.dealSplitLeft}
               >
-                <Text style={styles.metricValue}>{product.thc?.toFixed(1) ?? '—'}</Text>
-                <Text style={styles.metricUnit}>THC%</Text>
-                <Text style={styles.metricName} numberOfLines={2}>{product.name}</Text>
+                <Text style={styles.dealSplitBadge}>{DEALS[0].badge}</Text>
+                <Text style={styles.dealSplitEyebrow}>Today’s deal</Text>
+              </LinearGradient>
+              <View style={styles.dealSplitRight}>
+                <Text style={styles.dealSplitTitle}>{DEALS[0].title}</Text>
+                <Text style={styles.dealSplitSub}>{DEALS[0].subtitle}</Text>
+                <Text style={styles.dealSplitCta}>Shop offer →</Text>
+              </View>
+            </TouchableOpacity>
+          )}
+          <View style={styles.dealSplitRow}>
+            {DEALS.slice(1).map((deal) => (
+              <TouchableOpacity
+                key={deal.id}
+                style={styles.dealSplitHalf}
+                onPress={() => router.push('/(tabs)/search')}
+                activeOpacity={0.88}
+              >
+                <View style={[styles.dealSplitHalfAccent, { backgroundColor: deal.color }]} />
+                <View style={styles.dealSplitHalfBody}>
+                  <Text style={styles.dealSplitHalfBadge}>{deal.badge}</Text>
+                  <Text style={styles.dealSplitHalfTitle} numberOfLines={2}>{deal.title}</Text>
+                  <Text style={styles.dealSplitHalfSub} numberOfLines={2}>{deal.subtitle}</Text>
+                </View>
               </TouchableOpacity>
             ))}
-          </ScrollView>
+          </View>
         </View>
 
         {/* Sharp segmented categories */}
@@ -184,24 +202,6 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        <View style={styles.sectionWrap}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Lab Specials</Text>
-            <TouchableOpacity style={styles.seeAllRow} activeOpacity={0.7}>
-              <Text style={styles.seeAllText}>View all</Text>
-            </TouchableOpacity>
-          </View>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.hScroll}
-          >
-            {DEALS.map((deal) => (
-              <DealCard key={deal.id} deal={deal} />
-            ))}
-          </ScrollView>
-        </View>
-
         <SectionRow
           title="New & Now"
           subtitle="Just landed in store"
@@ -210,15 +210,15 @@ export default function HomeScreen() {
           onProductPress={handleProductPress}
         />
         <SectionRow
-          title="Top Testers"
-          subtitle="Highest potency in store"
+          title="Staff picks"
+          subtitle="Highest THC right now"
           products={TOP_TESTERS}
           accentColor={theme.colors.primary}
           onProductPress={handleProductPress}
         />
         <SectionRow
           title="Budget Finds"
-          subtitle="Considered value"
+          subtitle="Great value"
           products={BUDGET_FINDS}
           accentColor={theme.colors.primary}
           onProductPress={handleProductPress}
@@ -241,9 +241,9 @@ export default function HomeScreen() {
 
         <View style={styles.footer}>
           <View style={styles.seal}>
-            <Text style={styles.sealLetter}>M</Text>
+            <Text style={styles.sealLetter}>O</Text>
           </View>
-          <Text style={styles.footerTitle}>Stay rooted in the harvest.</Text>
+          <Text style={styles.footerTitle}>Lab-verified. Cyan-lit. Ready for pickup.</Text>
           <Text style={styles.footerText}>Obsidian Lab · {store.name}, {store.province}</Text>
           <Text style={styles.footerSub}>19+ Only · Please consume responsibly</Text>
         </View>
@@ -284,11 +284,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    width: 92,
+    minWidth: 88,
+    maxWidth: 120,
+    flexShrink: 1,
   },
   locationText: {
     ...theme.typography.small,
     color: theme.colors.textSecondary,
+    flexShrink: 1,
   },
   wordmark: {
     fontFamily: theme.fonts.serifBold,
@@ -440,37 +443,94 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     color: theme.colors.textMuted,
   },
-  metricScroll: {
-    paddingHorizontal: theme.spacing.md,
-    gap: theme.spacing.sm,
-  },
-  metricTile: {
-    width: 112,
-    padding: theme.spacing.sm + 2,
-    backgroundColor: theme.colors.surface,
+  dealSplitFeature: {
+    flexDirection: 'row',
+    marginHorizontal: theme.spacing.md,
+    marginBottom: theme.spacing.sm,
+    minHeight: 118,
     borderWidth: 1,
     borderColor: theme.colors.borderLight,
-    borderRadius: 0,
-    gap: 2,
+    backgroundColor: theme.colors.surface,
+    overflow: 'hidden',
   },
-  metricValue: {
+  dealSplitLeft: {
+    width: 108,
+    padding: theme.spacing.md,
+    justifyContent: 'space-between',
+  },
+  dealSplitBadge: {
     fontFamily: theme.fonts.mono,
-    fontSize: 26,
-    color: theme.colors.primary,
-    letterSpacing: -0.5,
+    fontSize: 10,
+    letterSpacing: 1.2,
+    color: theme.colors.onPrimary,
   },
-  metricUnit: {
+  dealSplitEyebrow: {
+    fontFamily: theme.fonts.mono,
+    fontSize: 9,
+    letterSpacing: 2,
+    color: 'rgba(0, 54, 58, 0.7)',
+  },
+  dealSplitRight: {
+    flex: 1,
+    padding: theme.spacing.md,
+    justifyContent: 'center',
+    gap: 4,
+  },
+  dealSplitTitle: {
+    fontFamily: theme.fonts.serifBold,
+    fontSize: 22,
+    lineHeight: 26,
+    color: theme.colors.primary,
+  },
+  dealSplitSub: {
+    ...theme.typography.body,
+    color: theme.colors.textSecondary,
+  },
+  dealSplitCta: {
+    fontFamily: theme.fonts.mono,
+    fontSize: 11,
+    letterSpacing: 1,
+    color: theme.colors.primary,
+    marginTop: 6,
+  },
+  dealSplitRow: {
+    flexDirection: 'row',
+    marginHorizontal: theme.spacing.md,
+    gap: theme.spacing.sm,
+  },
+  dealSplitHalf: {
+    flex: 1,
+    flexDirection: 'row',
+    minHeight: 112,
+    borderWidth: 1,
+    borderColor: theme.colors.borderLight,
+    backgroundColor: theme.colors.surface,
+    overflow: 'hidden',
+  },
+  dealSplitHalfAccent: {
+    width: 6,
+  },
+  dealSplitHalfBody: {
+    flex: 1,
+    padding: theme.spacing.sm + 2,
+    gap: 4,
+    justifyContent: 'center',
+  },
+  dealSplitHalfBadge: {
     fontFamily: theme.fonts.mono,
     fontSize: 9,
     letterSpacing: 1.2,
-    color: theme.colors.textMuted,
+    color: theme.colors.primary,
   },
-  metricName: {
-    fontFamily: theme.fonts.medium,
-    fontSize: 11,
+  dealSplitHalfTitle: {
+    fontFamily: theme.fonts.serifBold,
+    fontSize: 16,
+    lineHeight: 20,
+    color: theme.colors.text,
+  },
+  dealSplitHalfSub: {
+    ...theme.typography.small,
     color: theme.colors.textSecondary,
-    marginTop: 6,
-    lineHeight: 14,
   },
   segmentRow: {
     flexDirection: 'row',
@@ -489,26 +549,10 @@ const styles = StyleSheet.create({
   },
   segmentText: {
     fontFamily: theme.fonts.mono,
-    fontSize: 9,
+    fontSize: 10,
     letterSpacing: 0.6,
     color: theme.colors.primary,
     textTransform: 'uppercase',
-  },
-  seeAllRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  seeAllText: {
-    fontFamily: theme.fonts.mono,
-    fontSize: 12,
-    color: theme.colors.primary,
-    letterSpacing: 0.5,
-  },
-  hScroll: {
-    paddingHorizontal: theme.spacing.md,
-    paddingTop: 2,
-    paddingBottom: 6,
-    gap: theme.spacing.md,
   },
   footer: {
     alignItems: 'center',

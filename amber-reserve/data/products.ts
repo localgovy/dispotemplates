@@ -872,7 +872,7 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: 'ap2',
-    name: 'Amber Reserve Hoodie — Forest',
+    name: 'Amber Reserve Lounge Hoodie',
     brand: 'Amber Reserve',
     category: 'Apparel',
     strain: 'N/A',

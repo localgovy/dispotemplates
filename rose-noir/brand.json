@@ -18,7 +18,7 @@
     "NEWUSER": 0.1
   },
   "promo_hint": "NOIR10, ROSE15, or NEWUSER",
-  "website": "https://www.rosenoir.example",
+  "website": "https://www.rosenoir.com",
   "age_key": "@rose_noir_age_verified",
   "store_key": "@rose_noir_selected_store",
   "android_bg": "#0A0A0A",

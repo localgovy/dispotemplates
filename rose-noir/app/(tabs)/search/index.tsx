@@ -90,7 +90,7 @@ export default function SearchScreen() {
       <View style={styles.pageHeader}>
         <View>
           <Text style={styles.pageEyebrow}>CURATED SELECTION</Text>
-          <Text style={styles.pageTitle}>The Apothecary</Text>
+          <Text style={styles.pageTitle}>The Collection</Text>
         </View>
         <AIButton />
       </View>

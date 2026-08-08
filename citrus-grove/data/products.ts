@@ -871,7 +871,7 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: 'ap2',
-    name: 'Citrus Grove Hoodie — Forest',
+    name: 'Citrus Grove Sunshine Hoodie',
     brand: 'Citrus Grove',
     category: 'Apparel',
     strain: 'N/A',

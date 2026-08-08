@@ -22,7 +22,7 @@ import StoreSheet from '../../../components/StoreSheet';
 import AIButton from '../../../components/AIButton';
 import theme from '../../../theme';
 
-const STORE_WEBSITE = 'https://www.ghostatelier.example';
+const STORE_WEBSITE = 'https://www.ghostatelier.com';
 
 type Profile = Tables['profiles'];
 
@@ -49,7 +49,7 @@ export default function ProfileScreen() {
     user?.user_metadata?.full_name ??
     user?.user_metadata?.name ??
     user?.email?.split('@')[0] ??
-    'Guest';
+    'Alex Rivera';
 
   const avatarUrl = user?.user_metadata?.avatar_url ?? user?.user_metadata?.picture;
   const avatarInitial = displayName.charAt(0).toUpperCase();

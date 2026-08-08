@@ -872,7 +872,7 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: 'ap2',
-    name: 'Obsidian Lab Hoodie — Forest',
+    name: 'Obsidian Lab Tech Hoodie',
     brand: 'Obsidian Lab',
     category: 'Apparel',
     strain: 'N/A',

@@ -871,7 +871,7 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: 'ap2',
-    name: 'Azure Bloom Hoodie — Forest',
+    name: 'Azure Bloom Soft Hoodie',
     brand: 'Azure Bloom',
     category: 'Apparel',
     strain: 'N/A',

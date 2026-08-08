@@ -21,7 +21,7 @@ import StoreSheet from '../../../components/StoreSheet';
 import AIButton from '../../../components/AIButton';
 import theme from '../../../theme';
 
-const STORE_WEBSITE = 'https://www.azurebloom.example';
+const STORE_WEBSITE = 'https://www.azurebloom.com';
 
 type Profile = Tables['profiles'];
 
@@ -48,7 +48,7 @@ export default function ProfileScreen() {
     user?.user_metadata?.full_name ??
     user?.user_metadata?.name ??
     user?.email?.split('@')[0] ??
-    'Guest';
+    'Alex Rivera';
 
   const avatarUrl = user?.user_metadata?.avatar_url ?? user?.user_metadata?.picture;
   const avatarInitial = displayName.charAt(0).toUpperCase();
@@ -230,7 +230,7 @@ export default function ProfileScreen() {
             )}
           </View>
           <View>
-            <Text style={styles.topNavTitle}>Settings</Text>
+            <Text style={styles.topNavTitle}>Account</Text>
             <Text style={styles.topNavSub}>{displayName} · since {memberYear}</Text>
           </View>
         </View>
@@ -245,7 +245,7 @@ export default function ProfileScreen() {
             ) : (
               <>
                 <Ionicons name="flower" size={12} color={theme.colors.primary} />
-                <Text style={styles.pointsChipText}>{loyaltyPts.toLocaleString()} Bloom</Text>
+                <Text style={styles.pointsChipText}>{loyaltyPts.toLocaleString()} pts</Text>
               </>
             )}
           </TouchableOpacity>
@@ -258,10 +258,6 @@ export default function ProfileScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.intro}>
-          Quiet controls for your bloom — points chip above, settings first below.
-        </Text>
-
         {MENU_SECTIONS.map((section, si) => (
           <View key={si} style={styles.section}>
             {section.title !== '' && (
@@ -413,13 +409,6 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: 120,
-  },
-  intro: {
-    ...theme.typography.caption,
-    color: theme.colors.textSecondary,
-    paddingHorizontal: theme.spacing.md,
-    paddingTop: theme.spacing.sm,
-    paddingBottom: theme.spacing.xs,
   },
   section: {
     paddingTop: theme.spacing.md,

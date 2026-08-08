@@ -76,7 +76,7 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <TouchableOpacity style={styles.locationPill} activeOpacity={0.7} onPress={() => setShowStoreSheet(true)}>
           <Ionicons name="location-sharp" size={14} color={theme.colors.textSecondary} />
-          <Text style={styles.locationText}>{store.name}, {store.province}</Text>
+          <Text style={styles.locationText} numberOfLines={1}>{store.name}, {store.province}</Text>
           <Ionicons name="chevron-down" size={11} color={theme.colors.textSecondary} />
         </TouchableOpacity>
         <Text style={styles.wordmark}>Ghost Atelier</Text>
@@ -104,7 +104,7 @@ export default function HomeScreen() {
       >
         {/* Gallery-first spotlight carousel */}
         <View style={styles.spotlightSection}>
-          <Text style={styles.spotlightEyebrow}>FEATURED IN VAPOR</Text>
+          <Text style={styles.spotlightEyebrow}>Featured</Text>
           <ScrollView
             horizontal
             pagingEnabled
@@ -170,7 +170,7 @@ export default function HomeScreen() {
         {/* Vapor category orbs */}
         <View style={styles.sectionWrap}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Browse Selection</Text>
+            <Text style={styles.sectionTitle}>Browse the Atelier</Text>
           </View>
           <ScrollView
             horizontal
@@ -193,8 +193,8 @@ export default function HomeScreen() {
         {/* Deals lower — after categories */}
         <View style={styles.sectionWrap}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Featured Vapors</Text>
-            <TouchableOpacity style={styles.seeAllRow} activeOpacity={0.7}>
+            <Text style={styles.sectionTitle}>Featured picks</Text>
+            <TouchableOpacity style={styles.seeAllRow} activeOpacity={0.7} onPress={() => router.push('/(tabs)/search')}>
               <Text style={styles.seeAllText}>View all</Text>
             </TouchableOpacity>
           </View>
@@ -210,22 +210,22 @@ export default function HomeScreen() {
         </View>
 
         <SectionRow
-          title="New & Now"
+          title="Fresh in the mist"
           subtitle="Just landed in store"
           products={NEW_PRODUCTS}
           accentColor={theme.colors.textSecondary}
           onProductPress={handleProductPress}
         />
         <SectionRow
-          title="Top Testers"
-          subtitle="Highest potency in store"
+          title="Staff picks"
+          subtitle="Curated for the Atelier"
           products={TOP_TESTERS}
           accentColor={theme.colors.textSecondary}
           onProductPress={handleProductPress}
         />
         <SectionRow
-          title="Budget Finds"
-          subtitle="Considered value"
+          title="Quiet values"
+          subtitle="Soft prices, clear picks"
           products={BUDGET_FINDS}
           accentColor={theme.colors.textSecondary}
           onProductPress={handleProductPress}
@@ -248,9 +248,9 @@ export default function HomeScreen() {
 
         <View style={styles.footer}>
           <View style={styles.seal}>
-            <Text style={styles.sealLetter}>M</Text>
+            <Text style={styles.sealLetter}>G</Text>
           </View>
-          <Text style={styles.footerTitle}>Stay rooted in the harvest.</Text>
+          <Text style={styles.footerTitle}>Soft light. Quiet picks. Atelier calm.</Text>
           <Text style={styles.footerText}>Ghost Atelier · {store.name}, {store.province}</Text>
           <Text style={styles.footerSub}>19+ Only · Please consume responsibly</Text>
         </View>
@@ -291,11 +291,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    width: 92,
+    minWidth: 88,
+    maxWidth: 120,
+    flexShrink: 1,
   },
   locationText: {
     ...theme.typography.small,
     color: theme.colors.textSecondary,
+    flexShrink: 1,
   },
   wordmark: {
     fontFamily: theme.fonts.serifBold,

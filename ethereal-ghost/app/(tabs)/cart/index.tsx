@@ -147,14 +147,14 @@ export default function CartScreen() {
             <Ionicons name="bag-handle-outline" size={48} color={theme.colors.accentDark} />
           </View>
           <Text style={styles.emptyTitle}>Your basket is empty</Text>
-          <Text style={styles.emptyText}>Curate your collection from the apothecary</Text>
+          <Text style={styles.emptyText}>Browse the atelier to begin your selection.</Text>
           <TouchableOpacity
             style={styles.browseBtn}
             onPress={() => router.push('/(tabs)/search')}
             activeOpacity={0.85}
           >
             <Ionicons name="storefront-outline" size={16} color={theme.colors.onPrimary} />
-            <Text style={styles.browseBtnText}>Browse Selection</Text>
+            <Text style={styles.browseBtnText}>Browse the Atelier</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>

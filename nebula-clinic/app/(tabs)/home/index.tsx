@@ -77,7 +77,7 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <TouchableOpacity style={styles.locationPill} activeOpacity={0.7} onPress={() => setShowStoreSheet(true)}>
           <Ionicons name="location-sharp" size={14} color={theme.colors.accentDark} />
-          <Text style={styles.locationText}>{store.name}, {store.province}</Text>
+          <Text style={styles.locationText} numberOfLines={1}>{store.name}, {store.province}</Text>
           <Ionicons name="chevron-down" size={11} color={theme.colors.accentDark} />
         </TouchableOpacity>
         <Text style={styles.wordmark}>Nebula Clinic</Text>
@@ -115,16 +115,16 @@ export default function HomeScreen() {
               <View style={styles.heroBadgeDot} />
               <Text style={styles.heroEyebrow}>CLINICAL WELLNESS JOURNAL</Text>
             </View>
-            <Text style={styles.heroTitle}>Precision formulations for mindful regimens.</Text>
+            <Text style={styles.heroTitle}>Lab-tested picks for mindful routines.</Text>
             <Text style={styles.heroSub}>
-              Lab-tested botanicals with clear cannabinoid profiles — curated for wellness routines.
+              Clear profiles and curated wellness favourites — ready for clinic pickup.
             </Text>
             <TouchableOpacity
               style={styles.heroBtn}
               onPress={() => router.push('/(tabs)/search')}
               activeOpacity={0.85}
             >
-              <Text style={styles.heroBtnText}>BROWSE FORMULATIONS</Text>
+              <Text style={styles.heroBtnText}>BROWSE THE SHOP</Text>
               <Ionicons name="arrow-forward" size={15} color={theme.colors.white} />
             </TouchableOpacity>
           </LinearGradient>
@@ -149,7 +149,7 @@ export default function HomeScreen() {
         {/* 2×2 Category Grid */}
         <View style={styles.sectionWrap}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Browse Formulations</Text>
+            <Text style={styles.sectionTitle}>Shop</Text>
           </View>
           <View style={styles.catGrid}>
             {GRID_CATEGORIES.map((cat) => (
@@ -172,7 +172,7 @@ export default function HomeScreen() {
         {protocolOfDay && (
           <View style={styles.sectionWrap}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Protocol of the Day</Text>
+              <Text style={styles.sectionTitle}>Today’s pick</Text>
             </View>
             <TouchableOpacity
               style={styles.protocolCard}
@@ -182,7 +182,7 @@ export default function HomeScreen() {
               <View style={styles.protocolBadge}>
                 <View style={styles.protocolDot} />
                 <Text style={styles.protocolEyebrow}>
-                  {protocolOfDay.isFeatured ? 'FEATURED FORMULATION' : 'NEW ARRIVAL'}
+                  {protocolOfDay.isFeatured ? 'FEATURED PICK' : 'NEW ARRIVAL'}
                 </Text>
               </View>
               <Text style={styles.protocolTitle}>{protocolOfDay.name}</Text>
@@ -201,7 +201,7 @@ export default function HomeScreen() {
                   onPress={() => handleProductPress(protocolOfDay)}
                   activeOpacity={0.85}
                 >
-                  <Text style={styles.protocolCtaText}>OPEN PROTOCOL</Text>
+                  <Text style={styles.protocolCtaText}>VIEW PRODUCT</Text>
                   <Ionicons name="flask-outline" size={14} color={theme.colors.white} />
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -219,7 +219,7 @@ export default function HomeScreen() {
         {/* Featured Protocols — vertical list */}
         <View style={styles.sectionWrap}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Featured Protocols</Text>
+            <Text style={styles.sectionTitle}>Clinic deals</Text>
             <TouchableOpacity
               style={styles.seeAllRow}
               activeOpacity={0.7}
@@ -248,7 +248,7 @@ export default function HomeScreen() {
           onProductPress={handleProductPress}
         />
         <SectionRow
-          title="Top Testers"
+          title="Staff picks"
           subtitle="Highest potency on shelf"
           products={TOP_TESTERS}
           accentColor={theme.colors.primaryDark}
@@ -256,7 +256,7 @@ export default function HomeScreen() {
         />
         <SectionRow
           title="Budget Finds"
-          subtitle="Considered value"
+          subtitle="Great value"
           products={BUDGET_FINDS}
           accentColor={theme.colors.primaryDark}
           onProductPress={handleProductPress}
@@ -281,7 +281,7 @@ export default function HomeScreen() {
           <View style={styles.seal}>
             <Text style={styles.sealLetter}>N</Text>
           </View>
-          <Text style={styles.footerTitle}>Stay consistent with your regimen.</Text>
+          <Text style={styles.footerTitle}>Stay consistent with your wellness routine.</Text>
           <Text style={styles.footerText}>Nebula Clinic · {store.name}, {store.province}</Text>
           <Text style={styles.footerSub}>19+ Only · Please consume responsibly</Text>
         </View>
@@ -322,11 +322,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    width: 92,
+    minWidth: 88,
+    maxWidth: 120,
+    flexShrink: 1,
   },
   locationText: {
     ...theme.typography.small,
     color: theme.colors.textSecondary,
+    flexShrink: 1,
   },
   wordmark: {
     fontFamily: theme.fonts.bold,

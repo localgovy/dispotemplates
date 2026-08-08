@@ -41,7 +41,7 @@ export default function ProductCard({ product, onPress, width = 200, flex }: Pro
 
         {product.strain !== 'N/A' && (
           <View style={styles.strainBadge}>
-            <Text style={styles.strainBadgeText}>{product.strain.toUpperCase()}</Text>
+            <Text style={styles.strainBadgeText}>{product.strain}</Text>
           </View>
         )}
 
@@ -73,7 +73,7 @@ export default function ProductCard({ product, onPress, width = 200, flex }: Pro
       </View>
 
       <View style={styles.info}>
-        <Text style={styles.name} numberOfLines={2}>{product.name.toUpperCase()}</Text>
+        <Text style={styles.name} numberOfLines={2}>{product.name}</Text>
         <Text style={styles.description} numberOfLines={2}>{product.description}</Text>
 
         {terpenes.length > 0 && (
@@ -81,7 +81,7 @@ export default function ProductCard({ product, onPress, width = 200, flex }: Pro
             {terpenes.map((t) => (
               <View key={t.name} style={styles.terpeneRow}>
                 <View style={styles.terpeneLabelRow}>
-                  <Text style={styles.terpeneName}>{t.name.toUpperCase()}</Text>
+                  <Text style={styles.terpeneName}>{t.name}</Text>
                   <Text style={styles.terpenePct}>{t.pct.toFixed(1)}%</Text>
                 </View>
                 <View style={styles.terpeneTrack}>
@@ -112,7 +112,7 @@ export default function ProductCard({ product, onPress, width = 200, flex }: Pro
           activeOpacity={0.85}
         >
           <Text style={styles.acquireText}>
-            {qty > 0 ? `ACQUIRE BATCH · ${qty}` : 'ACQUIRE BATCH'}
+            {qty > 0 ? `Add to cart · ${qty}` : 'Add to cart'}
           </Text>
         </TouchableOpacity>
       </View>

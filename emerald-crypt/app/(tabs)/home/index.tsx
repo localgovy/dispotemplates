@@ -58,7 +58,7 @@ export default function HomeScreen() {
     return {
       productCount: PRODUCTS.length,
       avgThc,
-      batchLabel: 'BATCH 04',
+      dropLabel: 'This week',
     };
   }, []);
 
@@ -76,7 +76,7 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <TouchableOpacity style={styles.locationPill} activeOpacity={0.7} onPress={() => setShowStoreSheet(true)}>
           <Ionicons name="location-sharp" size={14} color={theme.colors.primaryLight} />
-          <Text style={styles.locationText}>{store.name}, {store.province}</Text>
+          <Text style={styles.locationText} numberOfLines={1}>{store.name}, {store.province}</Text>
           <Ionicons name="chevron-down" size={11} color={theme.colors.primaryLight} />
         </TouchableOpacity>
         <Text style={styles.wordmark}>Emerald Crypt</Text>
@@ -97,15 +97,15 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      {/* BATCH / archive stats strip */}
+      {/* Vault stats strip */}
       <View style={styles.statsStrip}>
         <View style={styles.statCell}>
-          <Text style={styles.statLabel}>BATCH</Text>
-          <Text style={styles.statValue}>{archiveStats.batchLabel}</Text>
+          <Text style={styles.statLabel}>DROP</Text>
+          <Text style={styles.statValue}>{archiveStats.dropLabel}</Text>
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statCell}>
-          <Text style={styles.statLabel}>ARCHIVE</Text>
+          <Text style={styles.statLabel}>STRAINS</Text>
           <Text style={styles.statValue}>{archiveStats.productCount}</Text>
         </View>
         <View style={styles.statDivider} />
@@ -127,10 +127,10 @@ export default function HomeScreen() {
             end={{ x: 1, y: 1 }}
             style={styles.hero}
           >
-            <Text style={styles.heroEyebrow}>GENETIC ARCHIVE // BATCH 04</Text>
+            <Text style={styles.heroEyebrow}>Fresh from the vault</Text>
             <Text style={styles.heroTitle}>Reserve strains from the vault.</Text>
             <Text style={styles.heroSub}>
-              Lab-logged cultivars · terpene maps · batch-verified genetics.
+              Lab-logged cultivars · terpene maps · sealed for pickup.
             </Text>
             <TouchableOpacity
               style={styles.heroBtn}
@@ -203,7 +203,7 @@ export default function HomeScreen() {
         <View style={styles.sectionWrap}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Vault Specials</Text>
-            <TouchableOpacity style={styles.seeAllRow} activeOpacity={0.7}>
+            <TouchableOpacity style={styles.seeAllRow} activeOpacity={0.7} onPress={() => router.push('/(tabs)/search')}>
               <Text style={styles.seeAllText}>View all</Text>
             </TouchableOpacity>
           </View>
@@ -220,7 +220,7 @@ export default function HomeScreen() {
 
         {/* Emphasize Top Testers — first curated rail */}
         <SectionRow
-          title="Top Testers"
+          title="Staff picks"
           subtitle="Highest potency in the vault"
           products={TOP_TESTERS}
           accentColor={theme.colors.primaryLight}
@@ -251,9 +251,9 @@ export default function HomeScreen() {
 
         <View style={styles.footer}>
           <View style={styles.seal}>
-            <Text style={styles.sealLetter}>M</Text>
+            <Text style={styles.sealLetter}>E</Text>
           </View>
-          <Text style={styles.footerTitle}>Stay rooted in the harvest.</Text>
+          <Text style={styles.footerTitle}>Sealed strains. Vault-ready pickup.</Text>
           <Text style={styles.footerText}>Emerald Crypt · {store.name}, {store.province}</Text>
           <Text style={styles.footerSub}>19+ Only · Please consume responsibly</Text>
         </View>
@@ -294,11 +294,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    width: 92,
+    minWidth: 88,
+    maxWidth: 120,
+    flexShrink: 1,
   },
   locationText: {
     ...theme.typography.small,
     color: theme.colors.textSecondary,
+    flexShrink: 1,
   },
   wordmark: {
     fontFamily: theme.fonts.serifBold,

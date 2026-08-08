@@ -870,7 +870,7 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: 'ap2',
-    name: 'Emerald Crypt Hoodie — Forest',
+    name: 'Emerald Crypt Vault Hoodie',
     brand: 'Emerald Crypt',
     category: 'Apparel',
     strain: 'N/A',

@@ -870,7 +870,7 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: 'ap2',
-    name: 'Nebula Clinic Hoodie — Forest',
+    name: 'Nebula Clinic Soft Hoodie',
     brand: 'Nebula Clinic',
     category: 'Apparel',
     strain: 'N/A',

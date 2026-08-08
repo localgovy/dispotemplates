@@ -104,7 +104,7 @@ export default function SearchScreen() {
       <View style={styles.pageHeader}>
         <View style={{ flex: 1 }}>
           <Text style={styles.pageEyebrow}>LUMINOUS BOTANICAL</Text>
-          <Text style={styles.pageTitle}>Curated Collection</Text>
+          <Text style={styles.pageTitle}>Botanicals</Text>
         </View>
         <AIButton />
       </View>

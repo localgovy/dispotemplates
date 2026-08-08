@@ -4,7 +4,7 @@
   "scheme": "emeraldcrypt",
   "bundle": "com.localgovy.emeraldcrypt",
   "tagline": "Genetic archive. Neon precision.",
-  "hero_eyebrow": "GENETIC ARCHIVE // BATCH 04",
+  "hero_eyebrow": "Fresh from the vault",
   "hero_title": "Reserve strains from the vault.",
   "hero_sub": "Matrix-green lab data for collectors of rare genetics.",
   "hero_cta": "OPEN THE VAULT",
@@ -18,7 +18,7 @@
     "NEWUSER": 0.1
   },
   "promo_hint": "CRYPT10, VAULT15, or NEWUSER",
-  "website": "https://www.emeraldcrypt.example",
+  "website": "https://www.emeraldcrypt.com",
   "age_key": "@emerald_crypt_age_verified",
   "store_key": "@emerald_crypt_selected_store",
   "android_bg": "#131313",

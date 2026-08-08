@@ -870,7 +870,7 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: 'ap2',
-    name: 'Rose Noir Hoodie — Forest',
+    name: 'Rose Noir Velvet Hoodie',
     brand: 'Rose Noir',
     category: 'Apparel',
     strain: 'N/A',

@@ -109,7 +109,7 @@ export default function SplashScreen() {
     >
       <View style={styles.logoWrap}>
         <View style={styles.seal}>
-          <Text style={styles.sealLetter}>L</Text>
+          <Text style={styles.sealLetter}>A</Text>
         </View>
         <Text style={styles.brand}>Azure Bloom</Text>
         <Text style={styles.brandSub}>D I S P E N S A R Y</Text>

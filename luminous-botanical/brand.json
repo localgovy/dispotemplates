@@ -5,7 +5,7 @@
   "bundle": "com.localgovy.luminousbotanical",
   "tagline": "Serenity in every leaf.",
   "hero_eyebrow": "NEW ARRIVALS",
-  "hero_title": "The Winter Collection",
+  "hero_title": "Botanicals for elevated well-being.",
   "hero_sub": "Curated botanicals for elevated well-being.",
   "hero_cta": "SHOP COLLECTION",
   "ai_powered": "Powered by Midnight AI Sommelier",
@@ -17,13 +17,13 @@
     "NEWUSER": 0.2
   },
   "promo_hint": "LUMINOUS10, BLOOM15, or NEWUSER",
-  "website": "https://www.luminousbotanical.example",
+  "website": "https://www.luminousbotanical.com",
   "age_key": "@luminous_botanical_age_verified",
   "store_key": "@luminous_botanical_selected_store",
   "android_bg": "#faf9f7",
   "ui_style": "light",
   "product_brand": "Luminous Botanical",
-  "browse_title": "Browse the Apothecary",
+  "browse_title": "Browse Botanicals",
   "deals_title": "Featured Picks",
   "stores": [
     [

@@ -22,7 +22,7 @@ import StoreSheet from '../../../components/StoreSheet';
 import AIButton from '../../../components/AIButton';
 import theme from '../../../theme';
 
-const STORE_WEBSITE = 'https://www.nebulaclinic.example';
+const STORE_WEBSITE = 'https://www.nebulaclinic.com';
 const JOURNAL_KEY = '@nebula_clinic_wellness_journal';
 
 type Profile = Tables['profiles'];
@@ -77,7 +77,7 @@ export default function ProfileScreen() {
     user?.user_metadata?.full_name ??
     user?.user_metadata?.name ??
     user?.email?.split('@')[0] ??
-    'Guest';
+    'Alex Rivera';
 
   const avatarUrl = user?.user_metadata?.avatar_url ?? user?.user_metadata?.picture;
   const avatarInitial = displayName.charAt(0).toUpperCase();
@@ -270,7 +270,7 @@ export default function ProfileScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.topNav}>
-        <Text style={styles.topNavTitle}>Patient Record</Text>
+        <Text style={styles.topNavTitle}>Account</Text>
         <AIButton />
       </View>
       <ScrollView
@@ -278,7 +278,7 @@ export default function ProfileScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Verified Patient Record header */}
+        {/* Member header */}
         <View style={styles.profileHeader}>
           <View style={styles.avatarWrap}>
             {avatarUrl ? (
@@ -295,7 +295,7 @@ export default function ProfileScreen() {
           <Text style={styles.userName}>{displayName}</Text>
           <View style={styles.recordBadge}>
             <Ionicons name="shield-checkmark" size={12} color={theme.colors.primaryDark} />
-            <Text style={styles.recordBadgeText}>Verified Patient Record</Text>
+            <Text style={styles.recordBadgeText}>Verified Member</Text>
           </View>
           <Text style={styles.userSince}>Member since {memberYear} · {store.city}, {store.province}</Text>
 

@@ -134,7 +134,7 @@ export default function CartScreen() {
     return (
       <SafeAreaView style={styles.safe} edges={['top']}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Lab Ticket</Text>
+          <Text style={styles.headerTitle}>Cart</Text>
           <AIButton />
         </View>
         <View style={styles.empty}>
@@ -142,14 +142,14 @@ export default function CartScreen() {
             <Ionicons name="bag-handle-outline" size={48} color={theme.colors.accentDark} />
           </View>
           <Text style={styles.emptyTitle}>Your basket is empty</Text>
-          <Text style={styles.emptyText}>Curate your collection from the apothecary</Text>
+          <Text style={styles.emptyText}>Add lab-verified strains to your Lab ticket.</Text>
           <TouchableOpacity
             style={styles.browseBtn}
             onPress={() => router.push('/(tabs)/search')}
             activeOpacity={0.85}
           >
             <Ionicons name="storefront-outline" size={16} color={theme.colors.onPrimary} />
-            <Text style={styles.browseBtnText}>Browse the Archive</Text>
+            <Text style={styles.browseBtnText}>Browse the Lab</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -160,9 +160,9 @@ export default function CartScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.headerTitle}>Lab Ticket</Text>
+          <Text style={styles.headerTitle}>Cart</Text>
           <Text style={styles.itemCount}>
-            {totalItems} {totalItems === 1 ? 'item' : 'items'}
+            Lab ticket · {totalItems} {totalItems === 1 ? 'item' : 'items'}
           </Text>
         </View>
         <AIButton />

@@ -90,8 +90,8 @@ export default function SearchScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.pageHeader}>
         <View style={{ flex: 1 }}>
-          <Text style={styles.pageEyebrow}>THE APOTHECARY</Text>
-          <Text style={styles.pageTitle}>Formulations</Text>
+          <Text style={styles.pageEyebrow}>NEBULA CLINIC</Text>
+          <Text style={styles.pageTitle}>Shop</Text>
           <Text style={styles.pageSub}>Lab-tested profiles · Clear dosing data</Text>
         </View>
         <AIButton />
@@ -102,7 +102,7 @@ export default function SearchScreen() {
           <Ionicons name="search" size={18} color={theme.colors.textMuted} />
           <TextInput
             style={styles.searchInput}
-            placeholder="Compound ID / effect…"
+            placeholder="Search products, brands, effects…"
             placeholderTextColor={theme.colors.textMuted}
             value={query}
             onChangeText={setQuery}
@@ -220,7 +220,7 @@ export default function SearchScreen() {
 
       <View style={styles.resultsHeader}>
         <Text style={styles.resultsCount}>
-          {filtered.length} {filtered.length === 1 ? 'formulation' : 'formulations'}
+          {filtered.length} {filtered.length === 1 ? 'product' : 'products'}
         </Text>
         {!isIdle && (
           <TouchableOpacity onPress={clearAll} style={styles.clearAllBtn}>
@@ -244,7 +244,7 @@ export default function SearchScreen() {
         ListEmptyComponent={
           <View style={styles.empty}>
             <Ionicons name="search-outline" size={48} color={theme.colors.textMuted} />
-            <Text style={styles.emptyTitle}>No formulations found</Text>
+            <Text style={styles.emptyTitle}>No products found</Text>
             <Text style={styles.emptyText}>Try a different search or clear your filters</Text>
             <TouchableOpacity style={styles.clearBtn} onPress={clearAll} activeOpacity={0.8}>
               <Text style={styles.clearBtnText}>Clear filters</Text>

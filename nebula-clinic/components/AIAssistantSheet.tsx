@@ -96,8 +96,8 @@ export default function AIAssistantSheet() {
   }
 
   function headerTitle() {
-    if (uiStep === 'results') return 'Your Regimen Picks';
-    if (uiStep === 'detail') return detailProduct?.name ?? 'Formulation Detail';
+    if (uiStep === 'results') return 'Your picks';
+    if (uiStep === 'detail') return detailProduct?.name ?? 'Product';
     return 'Nebula Core';
   }
 
@@ -294,7 +294,7 @@ export default function AIAssistantSheet() {
                 style={styles.addBtnGradient}
               >
                 <Ionicons name="add-circle-outline" size={18} color={theme.colors.white} />
-                <Text style={styles.addBtnText}>Add to Regimen</Text>
+                <Text style={styles.addBtnText}>Add</Text>
               </LinearGradient>
             </TouchableOpacity>
           ) : (
@@ -409,8 +409,8 @@ export default function AIAssistantSheet() {
         {uiStep === 'loading' && (
           <View style={styles.loadingWrap}>
             <ActivityIndicator size="large" color={theme.colors.primary} />
-            <Text style={styles.loadingTitle}>Analyzing your regimen…</Text>
-            <Text style={styles.loadingText}>Nebula Core is matching formulations</Text>
+            <Text style={styles.loadingTitle}>Finding your matches…</Text>
+            <Text style={styles.loadingText}>Nebula Core is matching picks</Text>
           </View>
         )}
 
@@ -431,13 +431,13 @@ export default function AIAssistantSheet() {
             ) : (
               <View style={styles.blurbCard}>
                 <Text style={styles.blurbText}>
-                  Based on your answers, here are our top formulations. Tap a card for full details.
+                  Based on your answers, here are our top picks. Tap a card for full details.
                 </Text>
               </View>
             )}
 
             <View style={styles.pkCard}>
-              <Text style={styles.pkTitle}>PHARMACOKINETICS</Text>
+              <Text style={styles.pkTitle}>WHAT TO EXPECT</Text>
               <View style={styles.pkRow}>
                 <View style={styles.pkCell}>
                   <Text style={styles.pkLabel}>Onset</Text>
@@ -450,12 +450,12 @@ export default function AIAssistantSheet() {
                 </View>
                 <View style={styles.pkDivider} />
                 <View style={styles.pkCell}>
-                  <Text style={styles.pkLabel}>Bioavail.</Text>
-                  <Text style={styles.pkValue}>35–45%</Text>
+                  <Text style={styles.pkLabel}>Feel</Text>
+                  <Text style={styles.pkValue}>Steady</Text>
                 </View>
               </View>
               <Text style={styles.pkNote}>
-                Typical inhaled/oral averages for reference — individual response varies.
+                Typical averages for reference — individual response varies.
               </Text>
             </View>
 

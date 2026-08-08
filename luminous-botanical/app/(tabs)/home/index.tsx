@@ -67,10 +67,10 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <TouchableOpacity style={styles.locationPill} activeOpacity={0.7} onPress={() => setShowStoreSheet(true)}>
           <Ionicons name="location-sharp" size={14} color={theme.colors.accentDark} />
-          <Text style={styles.locationText}>{store.name}, {store.province}</Text>
+          <Text style={styles.locationText} numberOfLines={1}>{store.name}, {store.province}</Text>
           <Ionicons name="chevron-down" size={11} color={theme.colors.accentDark} />
         </TouchableOpacity>
-        <Text style={styles.wordmark}>Luminous</Text>
+        <Text style={styles.wordmark}>Luminous Botanical</Text>
         <View style={styles.headerActions}>
           <AIButton />
           <TouchableOpacity
@@ -136,7 +136,7 @@ export default function HomeScreen() {
         {/* Circular category row */}
         <View style={styles.sectionWrap}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Browse</Text>
+            <Text style={styles.sectionTitle}>Browse Botanicals</Text>
           </View>
           <ScrollView
             horizontal
@@ -222,15 +222,15 @@ export default function HomeScreen() {
           onProductPress={handleProductPress}
         />
         <SectionRow
-          title="Top Testers"
-          subtitle="Highest potency in store"
+          title="Staff picks"
+          subtitle="Highest THC right now"
           products={TOP_TESTERS}
           accentColor={theme.colors.primary}
           onProductPress={handleProductPress}
         />
         <SectionRow
           title="Budget Finds"
-          subtitle="Considered value"
+          subtitle="Great value"
           products={BUDGET_FINDS}
           accentColor={theme.colors.primary}
           onProductPress={handleProductPress}
@@ -255,7 +255,7 @@ export default function HomeScreen() {
           <View style={styles.seal}>
             <Text style={styles.sealLetter}>L</Text>
           </View>
-          <Text style={styles.footerTitle}>Stay rooted in the harvest.</Text>
+          <Text style={styles.footerTitle}>Serenity in every leaf.</Text>
           <Text style={styles.footerText}>Luminous Botanical · {store.name}, {store.province}</Text>
           <Text style={styles.footerSub}>19+ Only · Please consume responsibly</Text>
         </View>
@@ -294,17 +294,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    width: 92,
+    minWidth: 88,
+    maxWidth: 120,
+    flexShrink: 1,
   },
   locationText: {
     ...theme.typography.small,
     color: theme.colors.textSecondary,
+    flexShrink: 1,
   },
   wordmark: {
     fontFamily: theme.fonts.serifBold,
-    fontSize: 22,
+    fontSize: 15,
     color: theme.colors.primary,
-    letterSpacing: -0.3,
+    letterSpacing: -0.2,
+    flex: 1,
+    textAlign: 'center',
   },
   headerActions: {
     flexDirection: 'row',

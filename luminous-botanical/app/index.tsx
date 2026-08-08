@@ -115,7 +115,7 @@ export default function SplashScreen() {
         <Text style={styles.brandSub}>D I S P E N S A R Y</Text>
       </View>
 
-      <Text style={styles.tagline}>The Winter Collection</Text>
+      <Text style={styles.tagline}>Serenity in every leaf.</Text>
       <Text style={styles.location}>Barrie, Ontario · Est. 2024</Text>
 
       <Modal visible={showAgeGate} transparent animationType="fade" statusBarTranslucent>
