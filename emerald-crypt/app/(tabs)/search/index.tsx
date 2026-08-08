@@ -29,7 +29,8 @@ const QUICK_SEARCHES = [
 ];
 
 const { width: SCREEN_W } = Dimensions.get('window');
-const CARD_W = SCREEN_W - theme.spacing.md * 2;
+const ACCENT_RAIL_W = 3;
+const CARD_W = SCREEN_W - theme.spacing.md * 2 - ACCENT_RAIL_W - theme.spacing.sm;
 
 export default function SearchScreen() {
   const params = useLocalSearchParams<{ category?: string }>();
@@ -91,141 +92,147 @@ export default function SearchScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <View style={styles.pageHeader}>
-        <View style={styles.titleBlock}>
-          <View style={styles.accentLine} />
-          <View>
-            <Text style={styles.pageTitle}>RESERVE STRAINS</Text>
-            <Text style={styles.pageSub}>GENETIC ARCHIVE // BATCH 04</Text>
-          </View>
-        </View>
-        <AIButton />
-      </View>
+      <View style={styles.pageBody}>
+        {/* Left accent rail */}
+        <View style={styles.accentRail} />
 
-      <View style={styles.searchWrap}>
-        <View style={styles.searchBar}>
-          <Ionicons name="search" size={18} color={theme.colors.textMuted} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Query batch, cultivar, terpene..."
-            placeholderTextColor={theme.colors.textMuted}
-            value={query}
-            onChangeText={setQuery}
-            returnKeyType="search"
-            autoCapitalize="none"
-            autoCorrect={false}
-          />
-          {query.length > 0 && (
-            <TouchableOpacity onPress={() => setQuery('')} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-              <Ionicons name="close-circle" size={18} color={theme.colors.textMuted} />
+        <View style={styles.content}>
+          <View style={styles.pageHeader}>
+            <View style={styles.titleBlock}>
+              <View>
+                <Text style={styles.pageTitle}>RESERVE STRAINS</Text>
+                <Text style={styles.pageSub}>GENETIC ARCHIVE // BATCH 04</Text>
+              </View>
+            </View>
+            <AIButton />
+          </View>
+
+          <View style={styles.searchWrap}>
+            <View style={styles.searchBar}>
+              <Ionicons name="search" size={18} color={theme.colors.textMuted} />
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Query batch, cultivar, terpene..."
+                placeholderTextColor={theme.colors.textMuted}
+                value={query}
+                onChangeText={setQuery}
+                returnKeyType="search"
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+              {query.length > 0 && (
+                <TouchableOpacity onPress={() => setQuery('')} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                  <Ionicons name="close-circle" size={18} color={theme.colors.textMuted} />
+                </TouchableOpacity>
+              )}
+            </View>
+            <TouchableOpacity
+              style={[styles.filterBtn, showFilters && styles.filterBtnActive]}
+              onPress={() => setShowFilters((v) => !v)}
+              activeOpacity={0.8}
+            >
+              <Ionicons
+                name="options"
+                size={20}
+                color={showFilters ? theme.colors.onPrimary : theme.colors.text}
+              />
+              {activeFilterCount > 0 && (
+                <View style={styles.filterDot}>
+                  <Text style={styles.filterDotText}>{activeFilterCount}</Text>
+                </View>
+              )}
             </TouchableOpacity>
-          )}
-        </View>
-        <TouchableOpacity
-          style={[styles.filterBtn, showFilters && styles.filterBtnActive]}
-          onPress={() => setShowFilters((v) => !v)}
-          activeOpacity={0.8}
-        >
-          <Ionicons
-            name="options"
-            size={20}
-            color={showFilters ? theme.colors.onPrimary : theme.colors.text}
+          </View>
+
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.categoryChips}
+            style={styles.categoryRow}
+            keyboardShouldPersistTaps="handled"
+          >
+            {CATEGORIES.map((cat) => (
+              <CategoryPill
+                key={cat.id}
+                category={cat}
+                size="sm"
+                isSelected={activeCategory === cat.id}
+                onPress={() => {
+                  setActiveCategory(cat.id);
+                  Keyboard.dismiss();
+                }}
+              />
+            ))}
+          </ScrollView>
+
+          <FilterSheet
+            visible={showFilters}
+            onClose={() => setShowFilters(false)}
+            sortOptions={DEFAULT_SORT_OPTIONS}
+            activeSort={activeSort}
+            onSortChange={setActiveSort}
+            filterGroups={[STRAIN_FILTER_GROUP]}
+            activeFilters={{ strain: activeStrain }}
+            onFilterChange={(_group, value) => setActiveStrain(value)}
+            onClearAll={clearAll}
           />
-          {activeFilterCount > 0 && (
-            <View style={styles.filterDot}>
-              <Text style={styles.filterDotText}>{activeFilterCount}</Text>
+
+          {isIdle && (
+            <View style={styles.quickWrap}>
+              <Text style={styles.quickLabel}>QUICK FILTERS</Text>
+              <View style={styles.quickRow}>
+                {QUICK_SEARCHES.map((q) => (
+                  <TouchableOpacity
+                    key={q}
+                    style={styles.quickChip}
+                    onPress={() => setQuery(q)}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={styles.quickText}>{q.toUpperCase()}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
             </View>
           )}
-        </TouchableOpacity>
-      </View>
 
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.categoryChips}
-        style={styles.categoryRow}
-        keyboardShouldPersistTaps="handled"
-      >
-        {CATEGORIES.map((cat) => (
-          <CategoryPill
-            key={cat.id}
-            category={cat}
-            size="sm"
-            isSelected={activeCategory === cat.id}
-            onPress={() => {
-              setActiveCategory(cat.id);
-              Keyboard.dismiss();
-            }}
-          />
-        ))}
-      </ScrollView>
-
-      <FilterSheet
-        visible={showFilters}
-        onClose={() => setShowFilters(false)}
-        sortOptions={DEFAULT_SORT_OPTIONS}
-        activeSort={activeSort}
-        onSortChange={setActiveSort}
-        filterGroups={[STRAIN_FILTER_GROUP]}
-        activeFilters={{ strain: activeStrain }}
-        onFilterChange={(_group, value) => setActiveStrain(value)}
-        onClearAll={clearAll}
-      />
-
-      {isIdle && (
-        <View style={styles.quickWrap}>
-          <Text style={styles.quickLabel}>QUICK FILTERS</Text>
-          <View style={styles.quickRow}>
-            {QUICK_SEARCHES.map((q) => (
-              <TouchableOpacity
-                key={q}
-                style={styles.quickChip}
-                onPress={() => setQuery(q)}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.quickText}>{q.toUpperCase()}</Text>
+          <View style={styles.resultsHeader}>
+            <Text style={styles.resultsCount}>
+              {filtered.length} {filtered.length === 1 ? 'BATCH' : 'BATCHES'}
+            </Text>
+            {!isIdle && (
+              <TouchableOpacity onPress={clearAll} style={styles.clearAllBtn}>
+                <Text style={styles.clearAllText}>CLEAR</Text>
               </TouchableOpacity>
-            ))}
+            )}
           </View>
-        </View>
-      )}
 
-      <View style={styles.resultsHeader}>
-        <Text style={styles.resultsCount}>
-          {filtered.length} {filtered.length === 1 ? 'BATCH' : 'BATCHES'}
-        </Text>
-        {!isIdle && (
-          <TouchableOpacity onPress={clearAll} style={styles.clearAllBtn}>
-            <Text style={styles.clearAllText}>CLEAR</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-
-      <FlatList
-        data={filtered}
-        keyExtractor={(item) => item.id}
-        numColumns={1}
-        contentContainerStyle={styles.list}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-        renderItem={({ item }) => (
-          <ProductCard
-            product={item}
-            width={CARD_W}
-            onPress={() => setSelectedProduct(item)}
+          <FlatList
+            data={filtered}
+            keyExtractor={(item) => item.id}
+            numColumns={1}
+            contentContainerStyle={styles.list}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            renderItem={({ item }) => (
+              <ProductCard
+                product={item}
+                width={CARD_W}
+                onPress={() => setSelectedProduct(item)}
+              />
+            )}
+            ListEmptyComponent={
+              <View style={styles.empty}>
+                <Ionicons name="search-outline" size={48} color={theme.colors.textMuted} />
+                <Text style={styles.emptyTitle}>No batches found</Text>
+                <Text style={styles.emptyText}>Try a different query or clear filters</Text>
+                <TouchableOpacity style={styles.clearBtn} onPress={clearAll} activeOpacity={0.8}>
+                  <Text style={styles.clearBtnText}>Clear filters</Text>
+                </TouchableOpacity>
+              </View>
+            }
           />
-        )}
-        ListEmptyComponent={
-          <View style={styles.empty}>
-            <Ionicons name="search-outline" size={48} color={theme.colors.textMuted} />
-            <Text style={styles.emptyTitle}>No batches found</Text>
-            <Text style={styles.emptyText}>Try a different query or clear filters</Text>
-            <TouchableOpacity style={styles.clearBtn} onPress={clearAll} activeOpacity={0.8}>
-              <Text style={styles.clearBtnText}>Clear filters</Text>
-            </TouchableOpacity>
-          </View>
-        }
-      />
+        </View>
+      </View>
 
       <ProductDetailModal
         product={selectedProduct}
@@ -241,6 +248,17 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.background,
   },
+  pageBody: {
+    flex: 1,
+    flexDirection: 'row',
+  },
+  accentRail: {
+    width: ACCENT_RAIL_W,
+    backgroundColor: theme.colors.primary,
+  },
+  content: {
+    flex: 1,
+  },
   pageHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -253,11 +271,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-  },
-  accentLine: {
-    width: 3,
-    height: 40,
-    backgroundColor: theme.colors.primary,
   },
   pageTitle: {
     fontFamily: theme.fonts.bold,
@@ -364,7 +377,7 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.border,
   },
   quickText: {
-    fontFamily: theme.fonts.bold,
+    fontFamily: theme.fonts.mono,
     fontSize: 10,
     letterSpacing: 1,
     color: theme.colors.textSecondary,

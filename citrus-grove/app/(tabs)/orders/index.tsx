@@ -21,10 +21,10 @@ const STATUS_CONFIG: Record<
   OrderStatus,
   { label: string; color: string; icon: React.ComponentProps<typeof Ionicons>['name'] }
 > = {
-  ready:      { label: 'Ready for Pickup', color: theme.colors.primary,   icon: 'checkmark-circle' },
-  processing: { label: 'Processing',       color: theme.colors.accent,    icon: 'time' },
-  picked_up:  { label: 'Picked Up',        color: theme.colors.textMuted, icon: 'bag-check-outline' },
-  cancelled:  { label: 'Cancelled',        color: theme.colors.danger,    icon: 'close-circle-outline' },
+  ready:      { label: 'READY', color: theme.colors.primary,   icon: 'checkmark-circle' },
+  processing: { label: 'PROCESSING', color: theme.colors.accent, icon: 'time' },
+  picked_up:  { label: 'PICKED UP', color: theme.colors.textMuted, icon: 'bag-check-outline' },
+  cancelled:  { label: 'CANCELLED', color: theme.colors.danger, icon: 'close-circle-outline' },
 };
 
 export default function OrdersScreen() {
@@ -44,7 +44,6 @@ export default function OrdersScreen() {
       .then(({ data, error }) => {
         if (!error && data) {
           setOrders(data as Order[]);
-          // Auto-expand the most recent order if it is ready
           const first = data[0] as Order | undefined;
           if (first?.status === 'ready') setExpanded(first.id);
         }
@@ -66,7 +65,7 @@ export default function OrdersScreen() {
     return (
       <SafeAreaView style={styles.safe} edges={['top']}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>My Orders</Text>
+          <Text style={styles.headerTitle}>Order Stamps</Text>
           <AIButton />
         </View>
         <View style={styles.centred}>
@@ -80,7 +79,7 @@ export default function OrdersScreen() {
     return (
       <SafeAreaView style={styles.safe} edges={['top']}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>My Orders</Text>
+          <Text style={styles.headerTitle}>Order Stamps</Text>
           <AIButton />
         </View>
         <View style={styles.centred}>
@@ -95,7 +94,7 @@ export default function OrdersScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>My Orders</Text>
+        <Text style={styles.headerTitle}>Order Stamps</Text>
         <AIButton />
       </View>
 
@@ -117,7 +116,7 @@ export default function OrdersScreen() {
             >
               {order.status === 'ready' && (
                 <View style={styles.readyBanner}>
-                  <Ionicons name="checkmark-circle" size={14} color={theme.colors.white} />
+                  <Ionicons name="checkmark-circle" size={14} color={theme.colors.onPrimary} />
                   <Text style={styles.readyBannerText}>Ready for Pickup!</Text>
                 </View>
               )}
@@ -130,8 +129,8 @@ export default function OrdersScreen() {
                 <View style={styles.orderRight}>
                   <View
                     style={[
-                      styles.statusBadge,
-                      { backgroundColor: cfg.color + '20', borderColor: cfg.color + '50' },
+                      styles.statusStamp,
+                      { borderColor: cfg.color, backgroundColor: cfg.color + '18' },
                     ]}
                   >
                     <Ionicons name={cfg.icon} size={12} color={cfg.color} />
@@ -155,7 +154,9 @@ export default function OrdersScreen() {
                   {order.status === 'ready' && (
                     <View style={styles.viewCodeBtn}>
                       <Ionicons name="qr-code-outline" size={16} color={theme.colors.primary} />
-                      <Text style={styles.viewCodeText}>Show Pickup Code: {order.confirmation_code}</Text>
+                      <Text style={styles.viewCodeText}>
+                        Show Pickup Code: {order.confirmation_code}
+                      </Text>
                     </View>
                   )}
                 </View>
@@ -193,6 +194,9 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
   },
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.md,
     borderBottomWidth: 1,
@@ -217,18 +221,16 @@ const styles = StyleSheet.create({
     ...theme.typography.caption,
     color: theme.colors.textMuted,
   },
-  scroll: {
-    flex: 1,
-  },
+  scroll: { flex: 1 },
   scrollContent: {
     padding: theme.spacing.md,
     gap: theme.spacing.md,
-    paddingBottom: 120,
+    paddingBottom: 100,
   },
   orderCard: {
     backgroundColor: theme.colors.surface,
-    ...theme.asymmetricSm,
-    borderWidth: 1,
+    borderRadius: theme.radius.lg,
+    borderWidth: 2,
     borderColor: theme.colors.border,
     overflow: 'hidden',
     ...theme.shadows.small,
@@ -243,7 +245,7 @@ const styles = StyleSheet.create({
   },
   readyBannerText: {
     ...theme.typography.label,
-    color: theme.colors.white,
+    color: theme.colors.onPrimary,
     letterSpacing: 0.5,
   },
   orderHeader: {
@@ -256,7 +258,7 @@ const styles = StyleSheet.create({
   orderCode: {
     ...theme.typography.subheading,
     color: theme.colors.text,
-    fontWeight: '700',
+    fontFamily: theme.fonts.bold,
   },
   orderDate: {
     ...theme.typography.small,
@@ -267,23 +269,26 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     gap: 6,
   },
-  statusBadge: {
+  statusStamp: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
     paddingHorizontal: theme.spacing.sm,
-    paddingVertical: 3,
-    borderRadius: theme.radius.full,
-    borderWidth: 1,
+    paddingVertical: 4,
+    borderRadius: theme.radius.sm,
+    borderWidth: 3,
+    transform: [{ rotate: '-2deg' }],
   },
   statusText: {
     ...theme.typography.small,
-    fontWeight: '700',
+    fontFamily: theme.fonts.bold,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
   },
   orderTotal: {
     ...theme.typography.subheading,
     color: theme.colors.text,
-    fontWeight: '700',
+    fontFamily: theme.fonts.bold,
   },
   orderBody: {
     paddingHorizontal: theme.spacing.md,
@@ -301,9 +306,9 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   itemDot: {
-    width: 5,
-    height: 5,
-    borderRadius: 2.5,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
     backgroundColor: theme.colors.primary,
   },
   itemName: {
@@ -321,7 +326,7 @@ const styles = StyleSheet.create({
     color: theme.colors.text,
     width: 54,
     textAlign: 'right',
-    fontWeight: '600',
+    fontFamily: theme.fonts.semibold,
   },
   viewCodeBtn: {
     flexDirection: 'row',
@@ -332,13 +337,13 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.sm,
     backgroundColor: theme.colors.primaryMuted,
     borderRadius: theme.radius.md,
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: theme.colors.primary,
   },
   viewCodeText: {
     ...theme.typography.caption,
     color: theme.colors.primary,
-    fontWeight: '700',
+    fontFamily: theme.fonts.bold,
   },
   orderFooter: {
     flexDirection: 'row',
@@ -346,7 +351,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.sm,
-    borderTopWidth: 1,
+    borderTopWidth: 2,
     borderTopColor: theme.colors.divider,
   },
   itemSummary: {

@@ -4,7 +4,6 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
-  Image,
   Alert,
   TextInput,
   ActivityIndicator,
@@ -19,14 +18,8 @@ import { useStore } from '../../../context/StoreContext';
 import theme from '../../../theme';
 import { useCart } from '../../../context/CartContext';
 import AIButton from '../../../components/AIButton';
-import { CATEGORY_IMAGE_MAP } from '../../../data/products';
 
-// ─── Loyalty constants ────────────────────────────────────────────────────
-// 1 pt per $1 spent (pre-tax subtotal, before discounts).
-// 500 pts = $10 off.  ~30 avg orders (~$50 each) → ~$30 in free product.
 const PTS_PER_DOLLAR = 1;
-const REDEEM_THRESHOLD = 500;   // pts needed for one redemption
-const REDEEM_VALUE = 10;        // dollars off per redemption
 
 const VALID_PROMOS: Record<string, number> = {
   OBSIDIAN10: 0.1,
@@ -87,7 +80,6 @@ export default function CartScreen() {
     try {
       const code = `OBS-${Math.random().toString(36).toUpperCase().slice(2, 7)}`;
 
-      // Insert the order header
       const { data: orderData, error: orderError } = await supabase
         .from('orders')
         .insert({
@@ -105,7 +97,6 @@ export default function CartScreen() {
 
       if (orderError) throw orderError;
 
-      // Insert line items
       const lineItems = items.map(({ product, qty }) => ({
         order_id: orderData.id,
         product_id: product.id,
@@ -118,7 +109,6 @@ export default function CartScreen() {
       const { error: itemsError } = await supabase.from('order_items').insert(lineItems);
       if (itemsError) throw itemsError;
 
-      // Award loyalty points — 1 pt per $1 of subtotal (before discounts / tax)
       const ptsEarned = Math.floor(subtotal * PTS_PER_DOLLAR);
       const { data: newBalance } = await supabase.rpc('award_loyalty_pts', {
         p_user_id: user.id,
@@ -144,7 +134,7 @@ export default function CartScreen() {
     return (
       <SafeAreaView style={styles.safe} edges={['top']}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Your Basket</Text>
+          <Text style={styles.headerTitle}>Lab Ticket</Text>
           <AIButton />
         </View>
         <View style={styles.empty}>
@@ -170,8 +160,10 @@ export default function CartScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.headerTitle}>Your Basket</Text>
-          <Text style={styles.itemCount}>{totalItems} {totalItems === 1 ? 'item' : 'items'}</Text>
+          <Text style={styles.headerTitle}>Lab Ticket</Text>
+          <Text style={styles.itemCount}>
+            {totalItems} {totalItems === 1 ? 'item' : 'items'}
+          </Text>
         </View>
         <AIButton />
       </View>
@@ -182,69 +174,63 @@ export default function CartScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Items */}
-        <View style={styles.itemsSection}>
-          {items.map(({ product, qty }) => (
-            <View key={product.id} style={styles.cartItem}>
-              <Image source={CATEGORY_IMAGE_MAP[product.category]} style={styles.itemImage} />
-              <View style={styles.itemDetails}>
-                <View style={styles.itemTopRow}>
-                  <Text style={styles.itemName} numberOfLines={2}>{product.name}</Text>
+        <View style={styles.ticketBlock}>
+          <Text style={styles.ticketLabel}>LINE ITEMS</Text>
+          {items.map(({ product, qty }, index) => (
+            <View key={product.id}>
+              <View style={styles.receiptRow}>
+                <Text style={styles.receiptName} numberOfLines={2}>{product.name}</Text>
+                <Text style={styles.receiptCalc}>
+                  {qty} × ${product.price.toFixed(2)}
+                </Text>
+              </View>
+              <View style={styles.controlRow}>
+                <View style={styles.qtyRow}>
                   <TouchableOpacity
-                    onPress={() => handleRemove(product.id, product.name)}
-                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                    style={styles.qtyBtn}
+                    onPress={() => setQty(product.id, qty - 1)}
+                    activeOpacity={0.8}
                   >
-                    <Ionicons name="trash-outline" size={17} color={theme.colors.textMuted} />
+                    <Ionicons name="remove" size={14} color={theme.colors.text} />
+                  </TouchableOpacity>
+                  <Text style={styles.qtyText}>{qty}</Text>
+                  <TouchableOpacity
+                    style={styles.qtyBtn}
+                    onPress={() => setQty(product.id, qty + 1)}
+                    activeOpacity={0.8}
+                  >
+                    <Ionicons name="add" size={14} color={theme.colors.text} />
                   </TouchableOpacity>
                 </View>
-                <Text style={styles.itemMeta}>{product.brand} · {product.weight}</Text>
-                <View style={styles.itemBottomRow}>
-                  <View style={styles.qtyRow}>
-                    <TouchableOpacity
-                      style={styles.qtyBtn}
-                      onPress={() => setQty(product.id, qty - 1)}
-                      activeOpacity={0.8}
-                    >
-                      <Ionicons name="remove" size={15} color={theme.colors.text} />
-                    </TouchableOpacity>
-                    <Text style={styles.qtyText}>{qty}</Text>
-                    <TouchableOpacity
-                      style={styles.qtyBtn}
-                      onPress={() => setQty(product.id, qty + 1)}
-                      activeOpacity={0.8}
-                    >
-                      <Ionicons name="add" size={15} color={theme.colors.text} />
-                    </TouchableOpacity>
-                  </View>
-                  <Text style={styles.itemPrice}>${(product.price * qty).toFixed(2)}</Text>
-                </View>
+                <TouchableOpacity
+                  onPress={() => handleRemove(product.id, product.name)}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                >
+                  <Text style={styles.removeText}>REMOVE</Text>
+                </TouchableOpacity>
               </View>
+              {index < items.length - 1 && <View style={styles.hairline} />}
             </View>
           ))}
         </View>
 
-        {/* Pickup */}
-        <Text style={styles.blockHeading}>Pickup Location</Text>
-        <View style={styles.pickupCard}>
-          <View style={styles.pickupIconWrap}>
-            <Ionicons name="storefront-outline" size={22} color={theme.colors.accentDark} />
-          </View>
-          <View style={styles.pickupInfo}>
-            <Text style={styles.pickupTitle}>Obsidian Lab</Text>
-            <Text style={styles.pickupAddr}>{store.address}, {store.city}</Text>
-            <Text style={styles.readyText}>Ready in: ~15 min</Text>
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>PICKUP LOCATION</Text>
+          <View style={styles.flatRow}>
+            <Ionicons name="storefront-outline" size={18} color={theme.colors.primary} />
+            <View style={styles.flatRowText}>
+              <Text style={styles.pickupTitle}>Obsidian Lab</Text>
+              <Text style={styles.pickupAddr}>{store.address}, {store.city}</Text>
+              <Text style={styles.readyText}>Ready in: ~15 min</Text>
+            </View>
           </View>
         </View>
 
-        {/* Promo */}
-        <View style={styles.promoCard}>
+        <View style={styles.section}>
           <View style={styles.promoHeader}>
-            <Ionicons name="pricetag-outline" size={15} color={theme.colors.accentDark} />
-            <Text style={styles.promoLabel}>Promo Code</Text>
+            <Text style={styles.sectionLabel}>PROMO CODE</Text>
             {promoApplied !== '' && (
-              <View style={styles.promoAppliedBadge}>
-                <Text style={styles.promoAppliedText}>-{Math.round(promoDiscount * 100)}%</Text>
-              </View>
+              <Text style={styles.promoBadge}>-{Math.round(promoDiscount * 100)}%</Text>
             )}
           </View>
 
@@ -265,14 +251,14 @@ export default function CartScreen() {
                 disabled={promoInput.length < 3}
                 activeOpacity={0.8}
               >
-                <Text style={styles.promoApplyText}>Apply</Text>
+                <Text style={styles.promoApplyText}>APPLY</Text>
               </TouchableOpacity>
             </View>
           ) : (
             <View style={styles.promoActiveRow}>
               <Text style={styles.promoActiveCode}>{promoApplied}</Text>
-              <TouchableOpacity onPress={removePromo} style={styles.promoRemoveBtn}>
-                <Ionicons name="close-circle" size={18} color={theme.colors.textMuted} />
+              <TouchableOpacity onPress={removePromo} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                <Ionicons name="close" size={16} color={theme.colors.textMuted} />
               </TouchableOpacity>
             </View>
           )}
@@ -280,59 +266,52 @@ export default function CartScreen() {
           {promoError !== '' && <Text style={styles.promoError}>{promoError}</Text>}
         </View>
 
-        {/* Order Summary — forest card */}
-        <View style={styles.summaryCard}>
-          <View style={styles.summaryTop}>
-            <Text style={styles.summaryTitle}>Order Summary</Text>
-            <View style={styles.organicBadge}>
-              <Ionicons name="checkmark-circle" size={13} color={theme.colors.gold} />
-              <Text style={styles.organicText}>Certified</Text>
-            </View>
-          </View>
-
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>ORDER SUMMARY</Text>
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Subtotal ({totalItems} items)</Text>
             <Text style={styles.summaryValue}>${subtotal.toFixed(2)}</Text>
           </View>
           {promoDiscount > 0 && (
             <View style={styles.summaryRow}>
-              <Text style={[styles.summaryLabel, { color: theme.colors.gold }]}>Promo ({promoApplied})</Text>
-              <Text style={[styles.summaryValue, { color: theme.colors.gold }]}>-${discountAmt.toFixed(2)}</Text>
+              <Text style={styles.summaryLabel}>Promo ({promoApplied})</Text>
+              <Text style={[styles.summaryValue, { color: theme.colors.primary }]}>
+                -${discountAmt.toFixed(2)}
+              </Text>
             </View>
           )}
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>HST (13%)</Text>
             <Text style={styles.summaryValue}>${tax.toFixed(2)}</Text>
           </View>
-          <View style={styles.summaryRowBorder}>
+          <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Pickup</Text>
             <Text style={styles.summaryValue}>Included</Text>
           </View>
-
+          <View style={styles.hairline} />
           <View style={styles.totalRow}>
-            <Text style={styles.totalLabel}>Total</Text>
+            <Text style={styles.totalLabel}>TOTAL</Text>
             <Text style={styles.totalValue}>${total.toFixed(2)}</Text>
           </View>
-
-          <TouchableOpacity
-            style={[styles.placeBtn, placing && { opacity: 0.7 }]}
-            onPress={checkout}
-            activeOpacity={0.9}
-            disabled={placing}
-          >
-            {placing ? (
-              <ActivityIndicator size="small" color={theme.colors.primary} />
-            ) : (
-              <>
-                <Text style={styles.placeBtnText}>PLACE ORDER</Text>
-                <Ionicons name="arrow-forward" size={17} color={theme.colors.primary} />
-              </>
-            )}
-          </TouchableOpacity>
-
           <Text style={styles.summaryNote}>Valid 19+ government ID required at pickup</Text>
         </View>
       </ScrollView>
+
+      <TouchableOpacity
+        style={[styles.checkoutDock, placing && { opacity: 0.7 }]}
+        onPress={checkout}
+        activeOpacity={0.9}
+        disabled={placing}
+      >
+        {placing ? (
+          <ActivityIndicator size="small" color={theme.colors.onPrimary} />
+        ) : (
+          <View style={styles.dockInner}>
+            <Text style={styles.dockText}>PLACE ORDER</Text>
+            <Text style={styles.dockTotal}>${total.toFixed(2)}</Text>
+          </View>
+        )}
+      </TouchableOpacity>
     </SafeAreaView>
   );
 }
@@ -348,7 +327,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.md,
-    borderBottomWidth: 1,
+    borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: theme.colors.border,
   },
   headerTitle: {
@@ -356,157 +335,128 @@ const styles = StyleSheet.create({
     color: theme.colors.primary,
   },
   itemCount: {
-    ...theme.typography.caption,
+    fontFamily: theme.fonts.mono,
+    fontSize: 11,
     color: theme.colors.textMuted,
+    letterSpacing: 0.4,
   },
   scroll: { flex: 1 },
   scrollContent: {
-    padding: theme.spacing.md,
+    paddingHorizontal: theme.spacing.md,
+    paddingTop: theme.spacing.md,
+    paddingBottom: 180,
     gap: theme.spacing.md,
-    paddingBottom: 130,
   },
 
-  // Items
-  itemsSection: { gap: theme.spacing.sm },
-  cartItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: theme.colors.surface,
-    ...theme.asymmetricSm,
-    borderWidth: 1,
+  ticketBlock: {
+    borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
-    padding: theme.spacing.sm,
-    gap: theme.spacing.sm,
   },
-  itemImage: {
-    width: 84,
-    height: 84,
-    ...theme.asymmetricSm,
+  ticketLabel: {
+    ...theme.typography.label,
+    color: theme.colors.textMuted,
+    paddingHorizontal: theme.spacing.sm,
+    paddingTop: theme.spacing.sm,
+    paddingBottom: theme.spacing.xs,
   },
-  itemDetails: {
-    flex: 1,
-    gap: 3,
-  },
-  itemTopRow: {
+  receiptRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
-    gap: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: theme.spacing.sm,
+    gap: theme.spacing.md,
   },
-  itemName: {
-    fontFamily: theme.fonts.serif,
-    fontSize: 16,
-    lineHeight: 20,
+  receiptName: {
+    fontFamily: theme.fonts.mono,
+    fontSize: 13,
+    lineHeight: 18,
     color: theme.colors.text,
     flex: 1,
   },
-  itemMeta: {
-    ...theme.typography.small,
-    color: theme.colors.textMuted,
+  receiptCalc: {
+    fontFamily: theme.fonts.mono,
+    fontSize: 13,
+    color: theme.colors.text,
+    letterSpacing: 0.3,
   },
-  itemBottomRow: {
+  controlRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 4,
+    paddingHorizontal: theme.spacing.sm,
+    paddingBottom: theme.spacing.sm,
   },
   qtyRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: theme.spacing.sm,
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
-    borderRadius: theme.radius.full,
-    paddingHorizontal: 6,
-    paddingVertical: 3,
   },
   qtyBtn: {
-    width: 24,
-    height: 24,
+    width: 28,
+    height: 28,
     alignItems: 'center',
     justifyContent: 'center',
   },
   qtyText: {
-    ...theme.typography.bodyBold,
+    fontFamily: theme.fonts.mono,
+    fontSize: 12,
     color: theme.colors.text,
-    minWidth: 18,
+    minWidth: 20,
     textAlign: 'center',
   },
-  itemPrice: {
-    fontFamily: theme.fonts.serifBold,
-    fontSize: 18,
-    color: theme.colors.text,
+  removeText: {
+    ...theme.typography.label,
+    color: theme.colors.textMuted,
+  },
+  hairline: {
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: theme.colors.divider,
   },
 
-  // Block heading
-  blockHeading: {
-    ...theme.typography.heading,
-    color: theme.colors.primary,
-    marginBottom: -4,
-  },
-
-  // Pickup
-  pickupCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  section: {
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    padding: theme.spacing.sm,
     gap: theme.spacing.sm,
-    backgroundColor: theme.colors.surfaceElevated,
-    borderRadius: theme.radius.md,
-    padding: theme.spacing.md,
   },
-  pickupIconWrap: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: theme.colors.accentMuted,
-    alignItems: 'center',
-    justifyContent: 'center',
+  sectionLabel: {
+    ...theme.typography.label,
+    color: theme.colors.textMuted,
   },
-  pickupInfo: { flex: 1, gap: 2 },
+  flatRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: theme.spacing.sm,
+  },
+  flatRowText: { flex: 1, gap: 2 },
   pickupTitle: {
-    fontFamily: theme.fonts.serif,
-    fontSize: 15,
+    fontFamily: theme.fonts.mono,
+    fontSize: 13,
     color: theme.colors.text,
   },
   pickupAddr: {
-    ...theme.typography.small,
+    fontFamily: theme.fonts.mono,
+    fontSize: 11,
     color: theme.colors.textMuted,
   },
   readyText: {
-    ...theme.typography.small,
-    color: theme.colors.accentDark,
-    fontFamily: theme.fonts.semibold,
+    fontFamily: theme.fonts.mono,
+    fontSize: 11,
+    color: theme.colors.primary,
   },
 
-  // Promo
-  promoCard: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.radius.md,
-    padding: theme.spacing.md,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    gap: theme.spacing.sm,
-  },
   promoHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: theme.spacing.xs,
+    justifyContent: 'space-between',
   },
-  promoLabel: {
-    ...theme.typography.bodyBold,
-    color: theme.colors.text,
-    flex: 1,
-  },
-  promoAppliedBadge: {
-    backgroundColor: theme.colors.accentMuted,
-    borderRadius: theme.radius.full,
-    paddingHorizontal: 10,
-    paddingVertical: 3,
-  },
-  promoAppliedText: {
-    ...theme.typography.small,
-    color: theme.colors.accentDark,
-    fontFamily: theme.fonts.bold,
+  promoBadge: {
+    fontFamily: theme.fonts.mono,
+    fontSize: 11,
+    color: theme.colors.primary,
   },
   promoInputRow: {
     flexDirection: 'row',
@@ -514,157 +464,127 @@ const styles = StyleSheet.create({
   },
   promoInput: {
     flex: 1,
-    backgroundColor: theme.colors.background,
-    borderRadius: theme.radius.sm,
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
-    ...theme.typography.body,
+    fontFamily: theme.fonts.mono,
+    fontSize: 13,
     color: theme.colors.text,
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: theme.spacing.sm,
   },
   promoApplyBtn: {
-    backgroundColor: theme.colors.primary,
-    borderRadius: theme.radius.sm,
-    paddingHorizontal: theme.spacing.lg,
+    backgroundColor: theme.colors.surfaceElevated,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.primary,
+    paddingHorizontal: theme.spacing.md,
     alignItems: 'center',
     justifyContent: 'center',
   },
   promoApplyBtnDisabled: { opacity: 0.4 },
   promoApplyText: {
-    ...theme.typography.caption,
-    color: theme.colors.onPrimary,
-    fontFamily: theme.fonts.semibold,
+    ...theme.typography.label,
+    color: theme.colors.primary,
   },
   promoActiveRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: theme.colors.accentMuted,
-    borderRadius: theme.radius.sm,
-    paddingHorizontal: theme.spacing.md,
+    justifyContent: 'space-between',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.primary,
+    paddingHorizontal: theme.spacing.sm,
     paddingVertical: theme.spacing.sm,
   },
   promoActiveCode: {
-    ...theme.typography.bodyBold,
-    color: theme.colors.accentDark,
-    flex: 1,
+    fontFamily: theme.fonts.mono,
+    fontSize: 13,
+    color: theme.colors.primary,
     letterSpacing: 1,
   },
-  promoRemoveBtn: { padding: 2 },
   promoError: {
-    ...theme.typography.small,
+    fontFamily: theme.fonts.mono,
+    fontSize: 11,
     color: theme.colors.danger,
   },
 
-  // Summary — forest card
-  summaryCard: {
-    backgroundColor: theme.colors.primary,
-    ...theme.asymmetric,
-    padding: theme.spacing.lg,
-    gap: theme.spacing.sm,
-    ...theme.shadows.medium,
-  },
-  summaryTop: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: theme.spacing.xs,
-  },
-  summaryTitle: {
-    fontFamily: theme.fonts.serifBold,
-    fontSize: 22,
-    color: theme.colors.white,
-  },
-  organicBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: 'rgba(253, 221, 186, 0.14)',
-    borderRadius: theme.radius.full,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-  },
-  organicText: {
-    ...theme.typography.small,
-    color: theme.colors.gold,
-    fontFamily: theme.fonts.semibold,
-  },
   summaryRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  summaryRowBorder: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.12)',
-    paddingTop: theme.spacing.sm,
-  },
   summaryLabel: {
-    ...theme.typography.body,
-    color: theme.colors.onPrimaryMuted,
+    fontFamily: theme.fonts.mono,
+    fontSize: 12,
+    color: theme.colors.textMuted,
   },
   summaryValue: {
-    ...theme.typography.body,
-    color: theme.colors.white,
+    fontFamily: theme.fonts.mono,
+    fontSize: 12,
+    color: theme.colors.text,
   },
   totalRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-end',
-    marginTop: theme.spacing.sm,
-    marginBottom: theme.spacing.sm,
+    alignItems: 'center',
+    paddingTop: theme.spacing.xs,
   },
   totalLabel: {
-    fontFamily: theme.fonts.serif,
-    fontSize: 18,
-    color: theme.colors.white,
+    ...theme.typography.label,
+    color: theme.colors.text,
   },
   totalValue: {
-    fontFamily: theme.fonts.serifBold,
-    fontSize: 34,
-    color: theme.colors.gold,
-  },
-  placeBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: theme.spacing.sm,
-    backgroundColor: theme.colors.white,
-    borderRadius: theme.radius.full,
-    paddingVertical: theme.spacing.md,
-  },
-  placeBtnText: {
-    fontFamily: theme.fonts.semibold,
-    fontSize: 14,
-    letterSpacing: 1.5,
+    fontFamily: theme.fonts.mono,
+    fontSize: 22,
     color: theme.colors.primary,
   },
   summaryNote: {
-    ...theme.typography.small,
-    color: theme.colors.onPrimaryMuted,
+    fontFamily: theme.fonts.mono,
+    fontSize: 10,
+    color: theme.colors.textMuted,
     textAlign: 'center',
-    marginTop: 4,
   },
 
-  // Empty
+  checkoutDock: {
+    position: 'absolute',
+    bottom: 100,
+    left: 0,
+    right: 0,
+    backgroundColor: theme.colors.primary,
+    paddingVertical: theme.spacing.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  dockInner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.lg,
+  },
+  dockText: {
+    ...theme.typography.label,
+    color: theme.colors.onPrimary,
+    letterSpacing: 2,
+  },
+  dockTotal: {
+    fontFamily: theme.fonts.mono,
+    fontSize: 18,
+    color: theme.colors.onPrimary,
+  },
+
   empty: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     gap: theme.spacing.md,
     paddingHorizontal: theme.spacing.xl,
-    paddingBottom: 80,
+    paddingBottom: 100,
   },
   emptyIcon: {
     width: 104,
     height: 104,
-    borderRadius: 52,
     backgroundColor: theme.colors.accentMuted,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
   },
   emptyTitle: {
     ...theme.typography.heading,
@@ -680,7 +600,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: theme.spacing.sm,
     backgroundColor: theme.colors.primary,
-    borderRadius: theme.radius.full,
     paddingVertical: theme.spacing.md,
     paddingHorizontal: theme.spacing.xl,
     marginTop: theme.spacing.xs,

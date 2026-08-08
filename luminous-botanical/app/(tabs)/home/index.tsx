@@ -45,6 +45,8 @@ const ALL_CATEGORIES: Category[] = [
 
 const CIRCLE_CATEGORIES = CATEGORIES.filter((c) => c.id !== 'all');
 
+const MOOD_CHIPS = ['Relax', 'Focus', 'Euphoria', 'Calm'] as const;
+
 export default function HomeScreen() {
   const router = useRouter();
   const { totalItems } = useCart();
@@ -91,29 +93,35 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* Large rounded hero image-card */}
+        {/* Full-bleed image-style hero with overlay CTA */}
         <View style={styles.heroWrap}>
-          <LinearGradient
-            colors={['#1a4a35', theme.colors.primary, '#2d6b4f']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.hero}
+          <TouchableOpacity
+            activeOpacity={0.95}
+            onPress={() => router.push('/(tabs)/search')}
           >
-            <View style={styles.heroGlow} />
-            <Text style={styles.heroEyebrow}>LUMINOUS BOTANICAL</Text>
-            <Text style={styles.heroTitle}>The Winter Collection</Text>
-            <Text style={styles.heroSub}>
-              Soft botanicals for elevated well-being — curated with care.
-            </Text>
-            <TouchableOpacity
-              style={styles.heroBtn}
-              onPress={() => router.push('/(tabs)/search')}
-              activeOpacity={0.85}
-            >
-              <Text style={styles.heroBtnText}>Shop Collection</Text>
-              <Ionicons name="arrow-forward" size={15} color={theme.colors.primaryDark} />
-            </TouchableOpacity>
-          </LinearGradient>
+            <View style={styles.hero}>
+              <Image
+                source={CATEGORY_IMAGE_MAP.Flower}
+                style={styles.heroImage}
+                resizeMode="cover"
+              />
+              <LinearGradient
+                colors={['transparent', 'rgba(0,33,18,0.55)', 'rgba(0,33,18,0.92)']}
+                locations={[0, 0.45, 1]}
+                style={styles.heroOverlay}
+              >
+                <Text style={styles.heroEyebrow}>LUMINOUS BOTANICAL</Text>
+                <Text style={styles.heroTitle}>The Winter Collection</Text>
+                <Text style={styles.heroSub}>
+                  Soft botanicals for elevated well-being — curated with care.
+                </Text>
+                <View style={styles.heroBtn}>
+                  <Text style={styles.heroBtnText}>Shop Collection</Text>
+                  <Ionicons name="arrow-forward" size={15} color={theme.colors.primaryDark} />
+                </View>
+              </LinearGradient>
+            </View>
+          </TouchableOpacity>
         </View>
 
         {/* Pickup pill chip */}
@@ -153,6 +161,34 @@ export default function HomeScreen() {
                 </TouchableOpacity>
               );
             })}
+          </ScrollView>
+        </View>
+
+        {/* Effect mood strip */}
+        <View style={styles.sectionWrap}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Mood</Text>
+          </View>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.moodScroll}
+          >
+            {MOOD_CHIPS.map((mood) => (
+              <TouchableOpacity
+                key={mood}
+                style={styles.moodChip}
+                onPress={() =>
+                  router.push({
+                    pathname: '/(tabs)/search',
+                    params: { category: 'all', mood },
+                  })
+                }
+                activeOpacity={0.85}
+              >
+                <Text style={styles.moodChipText}>{mood}</Text>
+              </TouchableOpacity>
+            ))}
           </ScrollView>
         </View>
 
@@ -306,26 +342,26 @@ const styles = StyleSheet.create({
   },
 
   heroWrap: {
-    paddingHorizontal: theme.spacing.md,
     marginBottom: theme.spacing.md,
   },
   hero: {
-    borderRadius: theme.radius.xl,
-    padding: theme.spacing.xl,
-    gap: theme.spacing.sm,
-    minHeight: 220,
-    justifyContent: 'flex-end',
+    minHeight: 280,
     overflow: 'hidden',
-    ...theme.shadows.medium,
+    backgroundColor: theme.colors.primaryDark,
   },
-  heroGlow: {
-    position: 'absolute',
-    top: -40,
-    right: -30,
-    width: 160,
-    height: 160,
-    borderRadius: 80,
-    backgroundColor: 'rgba(191, 237, 209, 0.18)',
+  heroImage: {
+    ...StyleSheet.absoluteFill,
+    width: '100%',
+    height: '100%',
+  },
+  heroOverlay: {
+    flex: 1,
+    minHeight: 280,
+    paddingHorizontal: theme.spacing.lg,
+    paddingBottom: theme.spacing.xl,
+    paddingTop: theme.spacing.xxl,
+    justifyContent: 'flex-end',
+    gap: theme.spacing.sm,
   },
   heroEyebrow: {
     fontFamily: theme.fonts.semibold,
@@ -444,6 +480,24 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: theme.colors.textSecondary,
     textAlign: 'center',
+  },
+
+  moodScroll: {
+    paddingHorizontal: theme.spacing.md,
+    gap: theme.spacing.sm,
+  },
+  moodChip: {
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.secondaryContainer,
+    borderWidth: 1,
+    borderColor: 'rgba(20, 66, 45, 0.12)',
+  },
+  moodChipText: {
+    fontFamily: theme.fonts.semibold,
+    fontSize: 13,
+    color: theme.colors.primaryDark,
   },
 
   footer: {

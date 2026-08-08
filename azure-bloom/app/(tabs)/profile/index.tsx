@@ -13,7 +13,6 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { supabase, Tables } from '../../../lib/supabase';
 import { useAuth } from '../../../context/AuthContext';
@@ -55,15 +54,16 @@ export default function ProfileScreen() {
   const avatarInitial = displayName.charAt(0).toUpperCase();
   const loyaltyPts = profile?.loyalty_pts ?? 0;
   const memberYear = profile?.created_at ? new Date(profile.created_at).getFullYear() : 2024;
-  // 500 pts = $10 off — progress toward the next redemption tier
   const REDEEM_THRESHOLD = 500;
   const REDEEM_VALUE = 10;
-  const progressPct = Math.min((loyaltyPts % REDEEM_THRESHOLD) / REDEEM_THRESHOLD, 1);
   const ptsToNext = REDEEM_THRESHOLD - (loyaltyPts % REDEEM_THRESHOLD);
   const totalRedeemable = Math.floor(loyaltyPts / REDEEM_THRESHOLD) * REDEEM_VALUE;
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     supabase
       .from('profiles')
       .select('*')
@@ -167,22 +167,10 @@ export default function ProfileScreen() {
     }
   }
 
-  const MENU_SECTIONS: { title: string; items: MenuItem[] }[] = [
-    {
-      title: 'Account',
-      items: [
-        { id: 'personal', icon: 'person-outline', label: 'Personal Info', value: displayName },
-        { id: 'age', icon: 'shield-checkmark-outline', label: 'Age Verification', value: 'Verified ✓' },
-        {
-          id: 'loyalty',
-          icon: 'gift-outline',
-          label: 'Loyalty Points',
-          value: `${loyaltyPts.toLocaleString()} pts`,
-        },
-      ],
-    },
+  const MENU_SECTIONS: { title: string; pastel: string; items: MenuItem[] }[] = [
     {
       title: 'Preferences',
+      pastel: theme.colors.surfaceElevated,
       items: [
         { id: 'notif', icon: 'notifications-outline', label: 'Order Updates', toggle: true, toggleKey: 'notif' },
         { id: 'deals', icon: 'pricetag-outline', label: 'Deal Alerts', toggle: true, toggleKey: 'deals' },
@@ -190,7 +178,22 @@ export default function ProfileScreen() {
       ],
     },
     {
+      title: 'Account',
+      pastel: theme.colors.secondaryContainer,
+      items: [
+        { id: 'personal', icon: 'person-outline', label: 'Personal Info', value: displayName },
+        { id: 'age', icon: 'shield-checkmark-outline', label: 'Age Verification', value: 'Verified ✓' },
+        {
+          id: 'loyalty',
+          icon: 'flower-outline',
+          label: 'Bloom Points',
+          value: `${loyaltyPts.toLocaleString()} pts`,
+        },
+      ],
+    },
+    {
       title: 'Shop',
+      pastel: '#E8F8FF',
       items: [
         { id: 'favourites', icon: 'heart-outline', label: 'Saved Favourites' },
         { id: 'payment', icon: 'card-outline', label: 'Payment Methods', value: 'Cash / Debit / Credit' },
@@ -198,6 +201,7 @@ export default function ProfileScreen() {
     },
     {
       title: 'Support',
+      pastel: '#FFF0EC',
       items: [
         { id: 'faq', icon: 'call-outline', label: 'Contact & Hours' },
         { id: 'about', icon: 'globe-outline', label: 'Our Website' },
@@ -206,6 +210,7 @@ export default function ProfileScreen() {
     },
     {
       title: '',
+      pastel: theme.colors.white,
       items: [
         { id: 'signout', icon: 'log-out-outline', label: 'Sign Out', destructive: true },
       ],
@@ -214,76 +219,55 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      {/* Top nav row */}
+      {/* Calm header with Bloom Points chip */}
       <View style={styles.topNav}>
-        <Text style={styles.topNavTitle}>Account</Text>
-        <AIButton />
+        <View style={styles.topNavLeft}>
+          <View style={styles.miniAvatar}>
+            {avatarUrl ? (
+              <Image source={{ uri: avatarUrl }} style={styles.miniAvatarImage} />
+            ) : (
+              <Text style={styles.miniAvatarText}>{avatarInitial}</Text>
+            )}
+          </View>
+          <View>
+            <Text style={styles.topNavTitle}>Settings</Text>
+            <Text style={styles.topNavSub}>{displayName} · since {memberYear}</Text>
+          </View>
+        </View>
+        <View style={styles.topNavRight}>
+          <TouchableOpacity
+            style={styles.pointsChip}
+            activeOpacity={0.85}
+            onPress={() => handleMenuItem('loyalty')}
+          >
+            {loading ? (
+              <ActivityIndicator size="small" color={theme.colors.primary} />
+            ) : (
+              <>
+                <Ionicons name="flower" size={12} color={theme.colors.primary} />
+                <Text style={styles.pointsChipText}>{loyaltyPts.toLocaleString()} Bloom</Text>
+              </>
+            )}
+          </TouchableOpacity>
+          <AIButton />
+        </View>
       </View>
+
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Profile Header */}
-        <LinearGradient
-          colors={[theme.colors.surfaceElevated, theme.colors.surface]}
-          style={styles.profileHeader}
-        >
-          <View style={styles.avatarWrap}>
-            {avatarUrl ? (
-              <Image source={{ uri: avatarUrl }} style={styles.avatarImage} />
-            ) : (
-              <View style={styles.avatar}>
-                <Text style={styles.avatarText}>{avatarInitial}</Text>
-              </View>
-            )}
-            <View style={styles.verifiedBadge}>
-              <Ionicons name="checkmark" size={10} color={theme.colors.white} />
-            </View>
-          </View>
-          <Text style={styles.userName}>{displayName}</Text>
-          <Text style={styles.userSince}>Member since {memberYear} · Aurora, ON</Text>
+        <Text style={styles.intro}>
+          Quiet controls for your bloom — points chip above, settings first below.
+        </Text>
 
-          {/* Loyalty Card */}
-          <TouchableOpacity
-            style={styles.loyaltyCard}
-            activeOpacity={0.85}
-            onPress={() => handleMenuItem('loyalty')}
-          >
-            {loading ? (
-              <ActivityIndicator size="small" color={theme.colors.info} />
-            ) : (
-              <>
-                <View style={styles.loyaltyLeft}>
-                  <Ionicons name="leaf" size={20} color={theme.colors.info} />
-                  <View>
-                    <Text style={styles.loyaltyLabel}>BLOOM POINTS</Text>
-                    <Text style={styles.loyaltyPoints}>{loyaltyPts.toLocaleString()} pts</Text>
-                  </View>
-                </View>
-                <View style={styles.loyaltyRight}>
-                  <Text style={styles.loyaltyNext}>
-                    {totalRedeemable > 0
-                      ? `$${totalRedeemable} ready to redeem!`
-                      : `${ptsToNext} pts until $${REDEEM_VALUE} off`}
-                  </Text>
-                  <View style={styles.progressBar}>
-                    <View style={[styles.progressFill, { width: `${progressPct * 100}%` }]} />
-                  </View>
-                  <Text style={styles.loyaltyRedeem}>1 pt / $1 · {REDEEM_THRESHOLD} pts = ${REDEEM_VALUE}</Text>
-                </View>
-              </>
-            )}
-          </TouchableOpacity>
-        </LinearGradient>
-
-        {/* Menu Sections */}
         {MENU_SECTIONS.map((section, si) => (
           <View key={si} style={styles.section}>
             {section.title !== '' && (
               <Text style={styles.sectionTitle}>{section.title}</Text>
             )}
-            <View style={styles.menuCard}>
+            <View style={[styles.menuCard, { backgroundColor: section.pastel }]}>
               {section.items.map((item, ii) => (
                 <TouchableOpacity
                   key={item.id}
@@ -335,7 +319,7 @@ export default function ProfileScreen() {
 
         <View style={styles.footer}>
           <View style={styles.footerLogoRow}>
-            <Ionicons name="leaf" size={16} color={theme.colors.accentDark} />
+            <Ionicons name="flower-outline" size={16} color={theme.colors.primary} />
             <Text style={styles.footerLogo}>Azure Bloom</Text>
           </View>
           <Text style={styles.footerVersion}>{store.name}, {store.province} · v1.0.0</Text>
@@ -365,11 +349,64 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.sm + 2,
     backgroundColor: theme.colors.background,
+    gap: theme.spacing.sm,
+  },
+  topNavLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    flex: 1,
+  },
+  topNavRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  miniAvatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: theme.colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  miniAvatarImage: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+  },
+  miniAvatarText: {
+    fontFamily: theme.fonts.serifBold,
+    fontSize: 14,
+    color: theme.colors.white,
   },
   topNavTitle: {
     fontFamily: theme.fonts.serif,
-    fontSize: 28,
+    fontSize: 22,
     color: theme.colors.primary,
+  },
+  topNavSub: {
+    ...theme.typography.small,
+    color: theme.colors.textMuted,
+  },
+  pointsChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.secondaryContainer,
+    borderWidth: 1,
+    borderColor: theme.colors.borderLight,
+    minWidth: 72,
+    justifyContent: 'center',
+  },
+  pointsChipText: {
+    fontFamily: theme.fonts.semibold,
+    fontSize: 11,
+    color: theme.colors.primaryDark,
   },
   scroll: {
     flex: 1,
@@ -377,111 +414,12 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 120,
   },
-  profileHeader: {
-    alignItems: 'center',
-    padding: theme.spacing.xl,
-    gap: theme.spacing.xs,
-    borderBottomWidth: 0,
-    backgroundColor: theme.colors.surfaceElevated,
-  },
-  avatarWrap: {
-    position: 'relative',
-    marginBottom: theme.spacing.xs,
-  },
-  avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: theme.colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: theme.colors.info,
-  },
-  avatarImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    borderWidth: 2,
-    borderColor: theme.colors.info,
-  },
-  avatarText: {
-    fontFamily: theme.fonts.serifBold,
-    fontSize: 32,
-    color: theme.colors.white,
-  },
-  verifiedBadge: {
-    position: 'absolute',
-    bottom: 2,
-    right: 2,
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    backgroundColor: theme.colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: theme.colors.surfaceElevated,
-  },
-  userName: {
-    ...theme.typography.title,
-    color: theme.colors.text,
-  },
-  userSince: {
+  intro: {
     ...theme.typography.caption,
-    color: theme.colors.textMuted,
-  },
-  loyaltyCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: theme.colors.primary,
-    borderRadius: theme.radius.xl,
-    padding: theme.spacing.md,
-    width: '100%',
-    marginTop: theme.spacing.md,
-    gap: theme.spacing.md,
-    ...theme.shadows.medium,
-    minHeight: 72,
-  },
-  loyaltyLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: theme.spacing.sm,
-  },
-  loyaltyLabel: {
-    ...theme.typography.label,
-    color: theme.colors.info,
-  },
-  loyaltyPoints: {
-    fontFamily: theme.fonts.serifBold,
-    fontSize: 22,
-    color: theme.colors.white,
-  },
-  loyaltyRight: {
-    flex: 1,
-    gap: 4,
-  },
-  loyaltyNext: {
-    ...theme.typography.small,
-    color: theme.colors.onPrimaryMuted,
-  },
-  progressBar: {
-    height: 6,
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    borderRadius: theme.radius.full,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    backgroundColor: theme.colors.info,
-    borderRadius: theme.radius.full,
-  },
-  loyaltyRedeem: {
-    fontFamily: theme.fonts.semibold,
-    fontSize: 11,
-    color: theme.colors.info,
-    textAlign: 'right',
+    color: theme.colors.textSecondary,
+    paddingHorizontal: theme.spacing.md,
+    paddingTop: theme.spacing.sm,
+    paddingBottom: theme.spacing.xs,
   },
   section: {
     paddingTop: theme.spacing.md,
@@ -494,7 +432,6 @@ const styles = StyleSheet.create({
     paddingLeft: 4,
   },
   menuCard: {
-    backgroundColor: theme.colors.white,
     borderRadius: theme.radius.lg,
     overflow: 'hidden',
     ...theme.shadows.small,
@@ -503,18 +440,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.md - 2,
+    paddingVertical: theme.spacing.md,
     gap: theme.spacing.sm,
   },
   menuRowBorder: {
     borderBottomWidth: 1,
-    borderBottomColor: theme.colors.divider,
+    borderBottomColor: 'rgba(26, 36, 64, 0.06)',
   },
   menuIcon: {
     width: 34,
     height: 34,
-    borderRadius: 10,
-    backgroundColor: theme.colors.secondaryContainer,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.7)',
     alignItems: 'center',
     justifyContent: 'center',
   },

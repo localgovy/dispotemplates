@@ -132,6 +132,27 @@ export default function SearchScreen() {
         </TouchableOpacity>
       </View>
 
+      {/* Inline search suggestion chips — always under search */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.suggestChips}
+        style={styles.suggestRow}
+        keyboardShouldPersistTaps="handled"
+      >
+        {QUICK_SEARCHES.map((q) => (
+          <TouchableOpacity
+            key={q}
+            style={[styles.suggestChip, query === q && styles.suggestChipActive]}
+            onPress={() => setQuery(q)}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="sparkles" size={11} color={theme.colors.primary} />
+            <Text style={styles.suggestText}>{q}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -164,25 +185,6 @@ export default function SearchScreen() {
         onFilterChange={(_group, value) => setActiveStrain(value)}
         onClearAll={clearAll}
       />
-
-      {isIdle && (
-        <View style={styles.quickWrap}>
-          <Text style={styles.quickLabel}>Trending Searches</Text>
-          <View style={styles.quickRow}>
-            {QUICK_SEARCHES.map((q) => (
-              <TouchableOpacity
-                key={q}
-                style={styles.quickChip}
-                onPress={() => setQuery(q)}
-                activeOpacity={0.8}
-              >
-                <Ionicons name="sparkles" size={12} color={theme.colors.primary} />
-                <Text style={styles.quickText}>{q}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-      )}
 
       <View style={styles.resultsHeader}>
         <Text style={styles.resultsCount}>
@@ -321,30 +323,30 @@ const styles = StyleSheet.create({
     gap: theme.spacing.xs,
     alignItems: 'center',
   },
-  quickWrap: {
+  suggestRow: {
+    flexGrow: 0,
+    flexShrink: 0,
+    height: 40,
+    marginTop: 2,
+  },
+  suggestChips: {
     paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
-  },
-  quickLabel: {
-    ...theme.typography.label,
-    color: theme.colors.textMuted,
-    marginBottom: theme.spacing.sm,
-  },
-  quickRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
     gap: theme.spacing.xs,
+    alignItems: 'center',
   },
-  quickChip: {
+  suggestChip: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
     paddingHorizontal: theme.spacing.sm + 2,
-    paddingVertical: theme.spacing.xs + 2,
+    paddingVertical: theme.spacing.xs + 1,
     borderRadius: theme.radius.full,
     backgroundColor: 'rgba(125, 211, 252, 0.28)',
   },
-  quickText: {
+  suggestChipActive: {
+    backgroundColor: theme.colors.secondaryContainer,
+  },
+  suggestText: {
     ...theme.typography.caption,
     color: theme.colors.primaryDark,
     fontWeight: '600',

@@ -8,21 +8,20 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useRouter } from 'expo-router';
 import theme from '../../../theme';
 import {
   DEALS,
   NEW_PRODUCTS,
   TOP_TESTERS,
-  BUDGET_FINDS,
   CATEGORIES,
+  PRODUCTS,
   getProductsByCategory,
   type Category,
   type Product,
 } from '../../../data/products';
 import DealCard from '../../../components/DealCard';
-import CategoryPill from '../../../components/CategoryPill';
 import SectionRow from '../../../components/SectionRow';
 import ProductDetailModal from '../../../components/ProductDetailModal';
 import StoreSheet from '../../../components/StoreSheet';
@@ -42,36 +41,38 @@ const ALL_CATEGORIES: Category[] = [
   'Apparel',
 ];
 
-const CATEGORY_ICONS: Record<Category, React.ComponentProps<typeof Ionicons>['name']> = {
-  Flower: 'flower-outline',
-  'Pre-Rolls': 'flame-outline',
-  Vape: 'cloud-outline',
-  Edibles: 'cafe-outline',
-  Beverage: 'wine-outline',
-  Oral: 'medical-outline',
-  'Hemp Products': 'leaf-outline',
-  Accessories: 'build-outline',
-  Apparel: 'shirt-outline',
-};
-
 export default function HomeScreen() {
   const router = useRouter();
   const { totalItems } = useCart();
   const { store, setStore } = useStore();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [showStoreSheet, setShowStoreSheet] = useState(false);
+  const [activeTab, setActiveTab] = useState('all');
+
+  const archiveStats = useMemo(() => {
+    const withThc = TOP_TESTERS.filter((p) => p.thc != null);
+    const avgThc =
+      withThc.length > 0
+        ? withThc.reduce((sum, p) => sum + (p.thc ?? 0), 0) / withThc.length
+        : 0;
+    return {
+      productCount: PRODUCTS.length,
+      avgThc,
+      batchLabel: 'BATCH 04',
+    };
+  }, []);
 
   const handleProductPress = useCallback((product: Product) => {
     setSelectedProduct(product);
   }, []);
 
   const navigateToCategory = useCallback((categoryId: string) => {
+    setActiveTab(categoryId);
     router.push({ pathname: '/(tabs)/search', params: { category: categoryId } });
   }, [router]);
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      {/* ── Header ────────────────────────────────────────────── */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.locationPill} activeOpacity={0.7} onPress={() => setShowStoreSheet(true)}>
           <Ionicons name="location-sharp" size={14} color={theme.colors.primaryLight} />
@@ -96,12 +97,29 @@ export default function HomeScreen() {
         </View>
       </View>
 
+      {/* BATCH / archive stats strip */}
+      <View style={styles.statsStrip}>
+        <View style={styles.statCell}>
+          <Text style={styles.statLabel}>BATCH</Text>
+          <Text style={styles.statValue}>{archiveStats.batchLabel}</Text>
+        </View>
+        <View style={styles.statDivider} />
+        <View style={styles.statCell}>
+          <Text style={styles.statLabel}>ARCHIVE</Text>
+          <Text style={styles.statValue}>{archiveStats.productCount}</Text>
+        </View>
+        <View style={styles.statDivider} />
+        <View style={styles.statCell}>
+          <Text style={styles.statLabel}>AVG THC</Text>
+          <Text style={styles.statValue}>{archiveStats.avgThc.toFixed(1)}%</Text>
+        </View>
+      </View>
+
       <ScrollView
         style={styles.scroll}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* ── Editorial Hero ─────────────────────────────────── */}
         <View style={styles.heroWrap}>
           <LinearGradient
             colors={[theme.colors.primary, theme.colors.primaryDark]}
@@ -125,7 +143,6 @@ export default function HomeScreen() {
           </LinearGradient>
         </View>
 
-        {/* ── Pickup ─────────────────────────────────────────── */}
         <TouchableOpacity style={styles.pickupCard} activeOpacity={0.85} onPress={() => setShowStoreSheet(true)}>
           <View style={styles.pickupIcon}>
             <Ionicons name="storefront-outline" size={20} color={theme.colors.primaryLight} />
@@ -141,7 +158,7 @@ export default function HomeScreen() {
           <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} />
         </TouchableOpacity>
 
-        {/* ── Categories ─────────────────────────────────────── */}
+        {/* File-tab categories */}
         <View style={styles.sectionWrap}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Browse the Vault</Text>
@@ -149,19 +166,40 @@ export default function HomeScreen() {
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.hScroll}
+            contentContainerStyle={styles.tabRail}
           >
-            {CATEGORIES.map((cat) => (
-              <CategoryPill
-                key={cat.id}
-                category={cat}
-                onPress={() => navigateToCategory(cat.id)}
-              />
-            ))}
+            <TouchableOpacity
+              style={styles.fileTab}
+              onPress={() => {
+                setActiveTab('all');
+                router.push('/(tabs)/search');
+              }}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.fileTabText, activeTab === 'all' && styles.fileTabTextActive]}>
+                ALL
+              </Text>
+              {activeTab === 'all' && <View style={styles.fileTabUnderline} />}
+            </TouchableOpacity>
+            {CATEGORIES.map((cat) => {
+              const active = activeTab === cat.id;
+              return (
+                <TouchableOpacity
+                  key={cat.id}
+                  style={styles.fileTab}
+                  onPress={() => navigateToCategory(cat.id)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={[styles.fileTabText, active && styles.fileTabTextActive]}>
+                    {cat.name.toUpperCase()}
+                  </Text>
+                  {active && <View style={styles.fileTabUnderline} />}
+                </TouchableOpacity>
+              );
+            })}
           </ScrollView>
         </View>
 
-        {/* ── Vault Specials ─────────────────────────────────── */}
         <View style={styles.sectionWrap}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Vault Specials</Text>
@@ -180,7 +218,14 @@ export default function HomeScreen() {
           </ScrollView>
         </View>
 
-        {/* ── Curated Sections ───────────────────────────────── */}
+        {/* Emphasize Top Testers — first curated rail */}
+        <SectionRow
+          title="Top Testers"
+          subtitle="Highest potency in the vault"
+          products={TOP_TESTERS}
+          accentColor={theme.colors.primaryLight}
+          onProductPress={handleProductPress}
+        />
         <SectionRow
           title="New & Now"
           subtitle="Just landed in store"
@@ -188,22 +233,7 @@ export default function HomeScreen() {
           accentColor={theme.colors.primaryLight}
           onProductPress={handleProductPress}
         />
-        <SectionRow
-          title="Top Testers"
-          subtitle="Highest potency in store"
-          products={TOP_TESTERS}
-          accentColor={theme.colors.primaryLight}
-          onProductPress={handleProductPress}
-        />
-        <SectionRow
-          title="Budget Finds"
-          subtitle="Considered value"
-          products={BUDGET_FINDS}
-          accentColor={theme.colors.primaryLight}
-          onProductPress={handleProductPress}
-        />
 
-        {/* ── Per-Category Sections ──────────────────────────── */}
         {ALL_CATEGORIES.map((cat) => {
           const products = getProductsByCategory(cat);
           if (products.length === 0) return null;
@@ -219,7 +249,6 @@ export default function HomeScreen() {
           );
         })}
 
-        {/* ── Seal Footer ────────────────────────────────────── */}
         <View style={styles.footer}>
           <View style={styles.seal}>
             <Text style={styles.sealLetter}>M</Text>
@@ -306,13 +335,42 @@ const styles = StyleSheet.create({
     fontSize: 9,
     color: theme.colors.white,
   },
+  statsStrip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.sm + 2,
+    backgroundColor: theme.colors.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+  },
+  statCell: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 2,
+  },
+  statLabel: {
+    fontFamily: theme.fonts.mono,
+    fontSize: 9,
+    letterSpacing: 1.4,
+    color: theme.colors.primaryLight,
+  },
+  statValue: {
+    fontFamily: theme.fonts.bold,
+    fontSize: 14,
+    color: theme.colors.textPrimary,
+    letterSpacing: 0.4,
+  },
+  statDivider: {
+    width: 1,
+    height: 28,
+    backgroundColor: theme.colors.border,
+  },
   scroll: { flex: 1 },
   scrollContent: {
     paddingTop: theme.spacing.md,
     paddingBottom: 120,
   },
-
-  // Hero
   heroWrap: {
     paddingHorizontal: theme.spacing.md,
     marginBottom: theme.spacing.lg,
@@ -357,8 +415,6 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     color: theme.colors.primaryDark,
   },
-
-  // Pickup
   pickupCard: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -405,8 +461,6 @@ const styles = StyleSheet.create({
     ...theme.typography.small,
     color: theme.colors.success,
   },
-
-  // Sections
   sectionWrap: { marginBottom: theme.spacing.lg },
   sectionHeader: {
     flexDirection: 'row',
@@ -429,14 +483,36 @@ const styles = StyleSheet.create({
     color: theme.colors.primaryLight,
     textDecorationLine: 'underline',
   },
+  tabRail: {
+    paddingHorizontal: theme.spacing.md,
+    gap: theme.spacing.lg,
+    alignItems: 'flex-end',
+  },
+  fileTab: {
+    paddingBottom: 8,
+    alignItems: 'center',
+  },
+  fileTabText: {
+    fontFamily: theme.fonts.mono,
+    fontSize: 11,
+    letterSpacing: 1.2,
+    color: theme.colors.textMuted,
+  },
+  fileTabTextActive: {
+    color: theme.colors.primaryLight,
+  },
+  fileTabUnderline: {
+    marginTop: 6,
+    height: 2,
+    alignSelf: 'stretch',
+    backgroundColor: theme.colors.primary,
+  },
   hScroll: {
     paddingHorizontal: theme.spacing.md,
     paddingTop: 2,
     paddingBottom: 6,
     gap: theme.spacing.md,
   },
-
-  // Footer
   footer: {
     alignItems: 'center',
     paddingVertical: theme.spacing.xl,

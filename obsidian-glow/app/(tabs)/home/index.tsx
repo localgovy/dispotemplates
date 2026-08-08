@@ -22,7 +22,6 @@ import {
   type Product,
 } from '../../../data/products';
 import DealCard from '../../../components/DealCard';
-import CategoryPill from '../../../components/CategoryPill';
 import SectionRow from '../../../components/SectionRow';
 import ProductDetailModal from '../../../components/ProductDetailModal';
 import StoreSheet from '../../../components/StoreSheet';
@@ -42,6 +41,8 @@ const ALL_CATEGORIES: Category[] = [
   'Apparel',
 ];
 
+const POTENCY_SPOTLIGHT = TOP_TESTERS.slice(0, 8);
+
 export default function HomeScreen() {
   const router = useRouter();
   const { totalItems } = useCart();
@@ -59,7 +60,6 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      {/* ── Header ────────────────────────────────────────────── */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.locationPill} activeOpacity={0.7} onPress={() => setShowStoreSheet(true)}>
           <Ionicons name="location-sharp" size={14} color={theme.colors.primary} />
@@ -89,7 +89,6 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* ── Editorial Hero ─────────────────────────────────── */}
         <View style={styles.heroWrap}>
           <LinearGradient
             colors={[theme.colors.primary, theme.colors.primaryDark]}
@@ -113,7 +112,6 @@ export default function HomeScreen() {
           </LinearGradient>
         </View>
 
-        {/* ── Pickup ─────────────────────────────────────────── */}
         <TouchableOpacity style={styles.pickupCard} activeOpacity={0.85} onPress={() => setShowStoreSheet(true)}>
           <View style={styles.pickupIcon}>
             <Ionicons name="storefront-outline" size={20} color={theme.colors.primary} />
@@ -129,27 +127,63 @@ export default function HomeScreen() {
           <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} />
         </TouchableOpacity>
 
-        {/* ── Categories ─────────────────────────────────────── */}
+        {/* Potency spotlight — data dashboard */}
         <View style={styles.sectionWrap}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Browse the Archive</Text>
+            <Text style={styles.sectionTitle}>Potency Spotlight</Text>
+            <Text style={styles.metricHint}>THC %</Text>
           </View>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.hScroll}
+            contentContainerStyle={styles.metricScroll}
           >
-            {CATEGORIES.map((cat) => (
-              <CategoryPill
-                key={cat.id}
-                category={cat}
-                onPress={() => navigateToCategory(cat.id)}
-              />
+            {POTENCY_SPOTLIGHT.map((product) => (
+              <TouchableOpacity
+                key={`metric-${product.id}`}
+                style={styles.metricTile}
+                onPress={() => handleProductPress(product)}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.metricValue}>{product.thc?.toFixed(1) ?? '—'}</Text>
+                <Text style={styles.metricUnit}>THC%</Text>
+                <Text style={styles.metricName} numberOfLines={2}>{product.name}</Text>
+              </TouchableOpacity>
             ))}
           </ScrollView>
         </View>
 
-        {/* ── Lab Specials ─────────────────────────────────── */}
+        {/* Sharp segmented categories */}
+        <View style={styles.sectionWrap}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Browse the Archive</Text>
+          </View>
+          <View style={styles.segmentRow}>
+            {CATEGORIES.slice(0, 5).map((cat) => (
+              <TouchableOpacity
+                key={cat.id}
+                style={styles.segmentBtn}
+                onPress={() => navigateToCategory(cat.id)}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.segmentText} numberOfLines={1}>{cat.name}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <View style={[styles.segmentRow, { marginTop: 1 }]}>
+            {CATEGORIES.slice(5).map((cat) => (
+              <TouchableOpacity
+                key={cat.id}
+                style={styles.segmentBtn}
+                onPress={() => navigateToCategory(cat.id)}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.segmentText} numberOfLines={1}>{cat.name}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
         <View style={styles.sectionWrap}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Lab Specials</Text>
@@ -168,7 +202,6 @@ export default function HomeScreen() {
           </ScrollView>
         </View>
 
-        {/* ── Curated Sections ───────────────────────────────── */}
         <SectionRow
           title="New & Now"
           subtitle="Just landed in store"
@@ -191,7 +224,6 @@ export default function HomeScreen() {
           onProductPress={handleProductPress}
         />
 
-        {/* ── Per-Category Sections ──────────────────────────── */}
         {ALL_CATEGORIES.map((cat) => {
           const products = getProductsByCategory(cat);
           if (products.length === 0) return null;
@@ -207,7 +239,6 @@ export default function HomeScreen() {
           );
         })}
 
-        {/* ── Seal Footer ────────────────────────────────────── */}
         <View style={styles.footer}>
           <View style={styles.seal}>
             <Text style={styles.sealLetter}>M</Text>
@@ -299,8 +330,6 @@ const styles = StyleSheet.create({
     paddingTop: theme.spacing.md,
     paddingBottom: 120,
   },
-
-  // Hero
   heroWrap: {
     paddingHorizontal: theme.spacing.md,
     marginBottom: theme.spacing.lg,
@@ -347,8 +376,6 @@ const styles = StyleSheet.create({
     letterSpacing: 1.2,
     color: theme.colors.primary,
   },
-
-  // Pickup
   pickupCard: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -395,8 +422,6 @@ const styles = StyleSheet.create({
     ...theme.typography.small,
     color: theme.colors.success,
   },
-
-  // Sections
   sectionWrap: { marginBottom: theme.spacing.lg },
   sectionHeader: {
     flexDirection: 'row',
@@ -408,6 +433,66 @@ const styles = StyleSheet.create({
   sectionTitle: {
     ...theme.typography.heading,
     color: theme.colors.primary,
+  },
+  metricHint: {
+    fontFamily: theme.fonts.mono,
+    fontSize: 11,
+    letterSpacing: 1,
+    color: theme.colors.textMuted,
+  },
+  metricScroll: {
+    paddingHorizontal: theme.spacing.md,
+    gap: theme.spacing.sm,
+  },
+  metricTile: {
+    width: 112,
+    padding: theme.spacing.sm + 2,
+    backgroundColor: theme.colors.surface,
+    borderWidth: 1,
+    borderColor: theme.colors.borderLight,
+    borderRadius: 0,
+    gap: 2,
+  },
+  metricValue: {
+    fontFamily: theme.fonts.mono,
+    fontSize: 26,
+    color: theme.colors.primary,
+    letterSpacing: -0.5,
+  },
+  metricUnit: {
+    fontFamily: theme.fonts.mono,
+    fontSize: 9,
+    letterSpacing: 1.2,
+    color: theme.colors.textMuted,
+  },
+  metricName: {
+    fontFamily: theme.fonts.medium,
+    fontSize: 11,
+    color: theme.colors.textSecondary,
+    marginTop: 6,
+    lineHeight: 14,
+  },
+  segmentRow: {
+    flexDirection: 'row',
+    marginHorizontal: theme.spacing.md,
+    borderWidth: 1,
+    borderColor: theme.colors.primary,
+  },
+  segmentBtn: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.surface,
+    borderRightWidth: 1,
+    borderRightColor: theme.colors.primary,
+  },
+  segmentText: {
+    fontFamily: theme.fonts.mono,
+    fontSize: 9,
+    letterSpacing: 0.6,
+    color: theme.colors.primary,
+    textTransform: 'uppercase',
   },
   seeAllRow: {
     flexDirection: 'row',
@@ -425,8 +510,6 @@ const styles = StyleSheet.create({
     paddingBottom: 6,
     gap: theme.spacing.md,
   },
-
-  // Footer
   footer: {
     alignItems: 'center',
     paddingVertical: theme.spacing.xl,

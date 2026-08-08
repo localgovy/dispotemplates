@@ -4,9 +4,12 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
+  Image,
+  Dimensions,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useState, useCallback } from 'react';
 import { useRouter } from 'expo-router';
@@ -17,12 +20,12 @@ import {
   TOP_TESTERS,
   BUDGET_FINDS,
   CATEGORIES,
+  CATEGORY_IMAGE_MAP,
   getProductsByCategory,
   type Category,
   type Product,
 } from '../../../data/products';
 import DealCard from '../../../components/DealCard';
-import CategoryPill from '../../../components/CategoryPill';
 import SectionRow from '../../../components/SectionRow';
 import ProductDetailModal from '../../../components/ProductDetailModal';
 import StoreSheet from '../../../components/StoreSheet';
@@ -42,24 +45,17 @@ const ALL_CATEGORIES: Category[] = [
   'Apparel',
 ];
 
-const CATEGORY_ICONS: Record<Category, React.ComponentProps<typeof Ionicons>['name']> = {
-  Flower: 'flower-outline',
-  'Pre-Rolls': 'flame-outline',
-  Vape: 'cloud-outline',
-  Edibles: 'cafe-outline',
-  Beverage: 'wine-outline',
-  Oral: 'medical-outline',
-  'Hemp Products': 'leaf-outline',
-  Accessories: 'build-outline',
-  Apparel: 'shirt-outline',
-};
+const { width: SCREEN_W } = Dimensions.get('window');
+const SPOTLIGHT = [...NEW_PRODUCTS, ...TOP_TESTERS].slice(0, 5);
+const SLIDE_W = SCREEN_W;
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { totalItems } = useCart();
+  const { totalItems, addToCart } = useCart();
   const { store, setStore } = useStore();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [showStoreSheet, setShowStoreSheet] = useState(false);
+  const [spotlightIndex, setSpotlightIndex] = useState(0);
 
   const handleProductPress = useCallback((product: Product) => {
     setSelectedProduct(product);
@@ -69,9 +65,14 @@ export default function HomeScreen() {
     router.push({ pathname: '/(tabs)/search', params: { category: categoryId } });
   }, [router]);
 
+  const onSpotlightScroll = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const x = e.nativeEvent.contentOffset.x;
+    const idx = Math.round(x / SLIDE_W);
+    setSpotlightIndex(idx);
+  }, []);
+
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      {/* ── Header ────────────────────────────────────────────── */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.locationPill} activeOpacity={0.7} onPress={() => setShowStoreSheet(true)}>
           <Ionicons name="location-sharp" size={14} color={theme.colors.textSecondary} />
@@ -101,31 +102,56 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* ── Editorial Hero ─────────────────────────────────── */}
-        <View style={styles.heroWrap}>
-          <LinearGradient
-            colors={[theme.colors.primary, theme.colors.primaryDark]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.hero}
+        {/* Gallery-first spotlight carousel */}
+        <View style={styles.spotlightSection}>
+          <Text style={styles.spotlightEyebrow}>FEATURED IN VAPOR</Text>
+          <ScrollView
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            onMomentumScrollEnd={onSpotlightScroll}
+            decelerationRate="fast"
           >
-            <Text style={styles.heroEyebrow}>CURATED SELECTION</Text>
-            <Text style={styles.heroTitle}>Floating in the void of pure taste.</Text>
-            <Text style={styles.heroSub}>
-              Monochrome minimalism for those who prefer discretion.
-            </Text>
-            <TouchableOpacity
-              style={styles.heroBtn}
-              onPress={() => router.push('/(tabs)/search')}
-              activeOpacity={0.85}
-            >
-              <Text style={styles.heroBtnText}>ENTER THE ATELIER</Text>
-              <Ionicons name="arrow-forward" size={15} color={theme.colors.primaryDark} />
-            </TouchableOpacity>
-          </LinearGradient>
+            {SPOTLIGHT.map((product) => (
+              <View key={`spot-${product.id}`} style={styles.spotlightSlide}>
+                <TouchableOpacity
+                  activeOpacity={0.9}
+                  onPress={() => handleProductPress(product)}
+                  style={styles.spotlightCard}
+                >
+                  <Image
+                    source={CATEGORY_IMAGE_MAP[product.category]}
+                    style={styles.spotlightImage}
+                    resizeMode="cover"
+                  />
+                  <View style={styles.spotlightScrim} />
+                  <View style={styles.spotlightMeta}>
+                    <Text style={styles.spotlightName} numberOfLines={2}>{product.name}</Text>
+                    <Text style={styles.spotlightPrice}>${product.price.toFixed(2)}</Text>
+                    <TouchableOpacity
+                      style={styles.spotlightAdd}
+                      onPress={() => addToCart(product)}
+                      activeOpacity={0.85}
+                    >
+                      <Text style={styles.spotlightAddText}>Add</Text>
+                      <Ionicons name="add" size={16} color={theme.colors.onPrimary} />
+                    </TouchableOpacity>
+                  </View>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </ScrollView>
+          <View style={styles.dots}>
+            {SPOTLIGHT.map((p, i) => (
+              <View
+                key={`dot-${p.id}`}
+                style={[styles.dot, i === spotlightIndex && styles.dotActive]}
+              />
+            ))}
+          </View>
         </View>
 
-        {/* ── Pickup ─────────────────────────────────────────── */}
+        {/* Pickup */}
         <TouchableOpacity style={styles.pickupCard} activeOpacity={0.85} onPress={() => setShowStoreSheet(true)}>
           <View style={styles.pickupIcon}>
             <Ionicons name="storefront-outline" size={20} color={theme.colors.textSecondary} />
@@ -141,7 +167,7 @@ export default function HomeScreen() {
           <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} />
         </TouchableOpacity>
 
-        {/* ── Categories ─────────────────────────────────────── */}
+        {/* Vapor category orbs */}
         <View style={styles.sectionWrap}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Browse Selection</Text>
@@ -149,19 +175,22 @@ export default function HomeScreen() {
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.hScroll}
+            contentContainerStyle={styles.orbScroll}
           >
             {CATEGORIES.map((cat) => (
-              <CategoryPill
+              <TouchableOpacity
                 key={cat.id}
-                category={cat}
+                style={styles.orb}
                 onPress={() => navigateToCategory(cat.id)}
-              />
+                activeOpacity={0.8}
+              >
+                <Text style={styles.orbText} numberOfLines={2}>{cat.name}</Text>
+              </TouchableOpacity>
             ))}
           </ScrollView>
         </View>
 
-        {/* ── Featured Vapors ─────────────────────────────────── */}
+        {/* Deals lower — after categories */}
         <View style={styles.sectionWrap}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Featured Vapors</Text>
@@ -180,7 +209,6 @@ export default function HomeScreen() {
           </ScrollView>
         </View>
 
-        {/* ── Curated Sections ───────────────────────────────── */}
         <SectionRow
           title="New & Now"
           subtitle="Just landed in store"
@@ -203,7 +231,6 @@ export default function HomeScreen() {
           onProductPress={handleProductPress}
         />
 
-        {/* ── Per-Category Sections ──────────────────────────── */}
         {ALL_CATEGORIES.map((cat) => {
           const products = getProductsByCategory(cat);
           if (products.length === 0) return null;
@@ -219,7 +246,6 @@ export default function HomeScreen() {
           );
         })}
 
-        {/* ── Seal Footer ────────────────────────────────────── */}
         <View style={styles.footer}>
           <View style={styles.seal}>
             <Text style={styles.sealLetter}>M</Text>
@@ -308,57 +334,90 @@ const styles = StyleSheet.create({
   },
   scroll: { flex: 1 },
   scrollContent: {
-    paddingTop: theme.spacing.md,
+    paddingTop: theme.spacing.sm,
     paddingBottom: 120,
   },
-
-  // Hero
-  heroWrap: {
-    paddingHorizontal: theme.spacing.md,
+  spotlightSection: {
     marginBottom: theme.spacing.lg,
   },
-  hero: {
-    ...theme.asymmetric,
+  spotlightEyebrow: {
+    ...theme.typography.label,
+    color: theme.colors.textMuted,
+    paddingHorizontal: theme.spacing.md,
+    marginBottom: theme.spacing.sm,
+  },
+  spotlightSlide: {
+    width: SLIDE_W,
+    paddingHorizontal: theme.spacing.md,
+  },
+  spotlightCard: {
+    height: 360,
+    borderRadius: theme.radius.xl,
+    overflow: 'hidden',
+    backgroundColor: theme.colors.surface,
+    ...theme.shadows.large,
+  },
+  spotlightImage: {
+    ...StyleSheet.absoluteFill,
+    width: '100%',
+    height: '100%',
+  },
+  spotlightScrim: {
+    ...StyleSheet.absoluteFill,
+    backgroundColor: 'rgba(18,18,18,0.45)',
+  },
+  spotlightMeta: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
     padding: theme.spacing.lg,
     gap: theme.spacing.sm,
-    ...theme.shadows.medium,
   },
-  heroEyebrow: {
-    fontFamily: theme.fonts.semibold,
-    fontSize: 11,
-    letterSpacing: 2,
-    color: theme.colors.gold,
-  },
-  heroTitle: {
-    fontFamily: theme.fonts.serifItalic,
-    fontSize: 30,
-    lineHeight: 36,
+  spotlightName: {
+    fontFamily: theme.fonts.bold,
+    fontSize: 26,
+    lineHeight: 32,
     color: theme.colors.white,
+    letterSpacing: -0.3,
   },
-  heroSub: {
-    ...theme.typography.body,
-    color: theme.colors.onPrimaryMuted,
-    marginBottom: theme.spacing.xs,
+  spotlightPrice: {
+    fontFamily: theme.fonts.medium,
+    fontSize: 16,
+    color: theme.colors.textSecondary,
   },
-  heroBtn: {
+  spotlightAdd: {
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
-    gap: 8,
-    backgroundColor: theme.colors.gold,
+    gap: 6,
+    marginTop: 4,
+    backgroundColor: theme.colors.white,
     paddingHorizontal: theme.spacing.md,
-    paddingVertical: 12,
+    paddingVertical: 10,
     borderRadius: theme.radius.full,
-    marginTop: theme.spacing.xs,
   },
-  heroBtnText: {
+  spotlightAddText: {
     fontFamily: theme.fonts.semibold,
-    fontSize: 12,
-    letterSpacing: 1,
-    color: theme.colors.primaryDark,
+    fontSize: 13,
+    color: theme.colors.onPrimary,
   },
-
-  // Pickup
+  dots: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 6,
+    marginTop: theme.spacing.md,
+  },
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: theme.colors.border,
+  },
+  dotActive: {
+    backgroundColor: theme.colors.white,
+    width: 18,
+  },
   pickupCard: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -405,8 +464,6 @@ const styles = StyleSheet.create({
     ...theme.typography.small,
     color: theme.colors.success,
   },
-
-  // Sections
   sectionWrap: { marginBottom: theme.spacing.lg },
   sectionHeader: {
     flexDirection: 'row',
@@ -429,14 +486,35 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
     textDecorationLine: 'underline',
   },
+  orbScroll: {
+    paddingHorizontal: theme.spacing.md,
+    gap: theme.spacing.md,
+  },
+  orb: {
+    width: 84,
+    height: 84,
+    borderRadius: 42,
+    backgroundColor: theme.colors.surfaceElevated,
+    borderWidth: 1,
+    borderColor: theme.colors.borderLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 8,
+    ...theme.shadows.small,
+  },
+  orbText: {
+    fontFamily: theme.fonts.medium,
+    fontSize: 11,
+    lineHeight: 14,
+    color: theme.colors.textPrimary,
+    textAlign: 'center',
+  },
   hScroll: {
     paddingHorizontal: theme.spacing.md,
     paddingTop: 2,
     paddingBottom: 6,
     gap: theme.spacing.md,
   },
-
-  // Footer
   footer: {
     alignItems: 'center',
     paddingVertical: theme.spacing.xl,

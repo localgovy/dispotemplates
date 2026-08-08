@@ -21,12 +21,7 @@ import { useCart } from '../../../context/CartContext';
 import AIButton from '../../../components/AIButton';
 import { CATEGORY_IMAGE_MAP } from '../../../data/products';
 
-// ─── Loyalty constants ────────────────────────────────────────────────────
-// 1 pt per $1 spent (pre-tax subtotal, before discounts).
-// 500 pts = $10 off.  ~30 avg orders (~$50 each) → ~$30 in free product.
 const PTS_PER_DOLLAR = 1;
-const REDEEM_THRESHOLD = 500;   // pts needed for one redemption
-const REDEEM_VALUE = 10;        // dollars off per redemption
 
 const VALID_PROMOS: Record<string, number> = {
   LUMINOUS10: 0.1,
@@ -48,6 +43,7 @@ export default function CartScreen() {
   const discountAmt = subtotal * promoDiscount;
   const tax = (subtotal - discountAmt) * 0.13;
   const total = subtotal - discountAmt + tax;
+  const ptsPreview = Math.floor(subtotal * PTS_PER_DOLLAR);
 
   function applyPromo() {
     const code = promoInput.trim().toUpperCase();
@@ -87,7 +83,6 @@ export default function CartScreen() {
     try {
       const code = `LUM-${Math.random().toString(36).toUpperCase().slice(2, 7)}`;
 
-      // Insert the order header
       const { data: orderData, error: orderError } = await supabase
         .from('orders')
         .insert({
@@ -105,7 +100,6 @@ export default function CartScreen() {
 
       if (orderError) throw orderError;
 
-      // Insert line items
       const lineItems = items.map(({ product, qty }) => ({
         order_id: orderData.id,
         product_id: product.id,
@@ -118,7 +112,6 @@ export default function CartScreen() {
       const { error: itemsError } = await supabase.from('order_items').insert(lineItems);
       if (itemsError) throw itemsError;
 
-      // Award loyalty points — 1 pt per $1 of subtotal (before discounts / tax)
       const ptsEarned = Math.floor(subtotal * PTS_PER_DOLLAR);
       const { data: newBalance } = await supabase.rpc('award_loyalty_pts', {
         p_user_id: user.id,
@@ -149,7 +142,7 @@ export default function CartScreen() {
         </View>
         <View style={styles.empty}>
           <View style={styles.emptyIcon}>
-            <Ionicons name="bag-handle-outline" size={48} color={theme.colors.accentDark} />
+            <Ionicons name="leaf-outline" size={48} color={theme.colors.primary} />
           </View>
           <Text style={styles.emptyTitle}>Your basket is empty</Text>
           <Text style={styles.emptyText}>Curate your collection from the apothecary</Text>
@@ -182,7 +175,6 @@ export default function CartScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Items */}
         <View style={styles.itemsSection}>
           {items.map(({ product, qty }) => (
             <View key={product.id} style={styles.cartItem}>
@@ -223,11 +215,9 @@ export default function CartScreen() {
           ))}
         </View>
 
-        {/* Pickup */}
-        <Text style={styles.blockHeading}>Pickup Location</Text>
         <View style={styles.pickupCard}>
           <View style={styles.pickupIconWrap}>
-            <Ionicons name="storefront-outline" size={22} color={theme.colors.accentDark} />
+            <Ionicons name="leaf-outline" size={22} color={theme.colors.primary} />
           </View>
           <View style={styles.pickupInfo}>
             <Text style={styles.pickupTitle}>Luminous Botanical</Text>
@@ -236,7 +226,6 @@ export default function CartScreen() {
           </View>
         </View>
 
-        {/* Promo */}
         <View style={styles.promoCard}>
           <View style={styles.promoHeader}>
             <Ionicons name="pricetag-outline" size={15} color={theme.colors.accentDark} />
@@ -280,14 +269,14 @@ export default function CartScreen() {
           {promoError !== '' && <Text style={styles.promoError}>{promoError}</Text>}
         </View>
 
-        {/* Order Summary — forest card */}
         <View style={styles.summaryCard}>
-          <View style={styles.summaryTop}>
-            <Text style={styles.summaryTitle}>Order Summary</Text>
-            <View style={styles.organicBadge}>
-              <Ionicons name="checkmark-circle" size={13} color={theme.colors.gold} />
-              <Text style={styles.organicText}>Certified</Text>
-            </View>
+          <Text style={styles.summaryTitle}>Order Summary</Text>
+
+          <View style={styles.pointsPreview}>
+            <Ionicons name="sparkles-outline" size={16} color={theme.colors.accentDark} />
+            <Text style={styles.pointsPreviewText}>
+              Earn ~{ptsPreview} Botanical Points
+            </Text>
           </View>
 
           <View style={styles.summaryRow}>
@@ -296,8 +285,12 @@ export default function CartScreen() {
           </View>
           {promoDiscount > 0 && (
             <View style={styles.summaryRow}>
-              <Text style={[styles.summaryLabel, { color: theme.colors.gold }]}>Promo ({promoApplied})</Text>
-              <Text style={[styles.summaryValue, { color: theme.colors.gold }]}>-${discountAmt.toFixed(2)}</Text>
+              <Text style={[styles.summaryLabel, { color: theme.colors.accentDark }]}>
+                Promo ({promoApplied})
+              </Text>
+              <Text style={[styles.summaryValue, { color: theme.colors.accentDark }]}>
+                -${discountAmt.toFixed(2)}
+              </Text>
             </View>
           )}
           <View style={styles.summaryRow}>
@@ -321,11 +314,11 @@ export default function CartScreen() {
             disabled={placing}
           >
             {placing ? (
-              <ActivityIndicator size="small" color={theme.colors.primary} />
+              <ActivityIndicator size="small" color={theme.colors.onPrimary} />
             ) : (
               <>
                 <Text style={styles.placeBtnText}>PLACE ORDER</Text>
-                <Ionicons name="arrow-forward" size={17} color={theme.colors.primary} />
+                <Ionicons name="arrow-forward" size={17} color={theme.colors.onPrimary} />
               </>
             )}
           </TouchableOpacity>
@@ -365,23 +358,21 @@ const styles = StyleSheet.create({
     gap: theme.spacing.md,
     paddingBottom: 130,
   },
-
-  // Items
   itemsSection: { gap: theme.spacing.sm },
   cartItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: theme.colors.surface,
-    ...theme.asymmetricSm,
+    backgroundColor: theme.colors.overlayLight,
+    borderRadius: theme.radius.lg,
     borderWidth: 1,
-    borderColor: theme.colors.border,
-    padding: theme.spacing.sm,
+    borderColor: theme.colors.borderLight,
+    padding: theme.spacing.md,
     gap: theme.spacing.sm,
   },
   itemImage: {
-    width: 84,
-    height: 84,
-    ...theme.asymmetricSm,
+    width: 80,
+    height: 80,
+    borderRadius: theme.radius.lg,
   },
   itemDetails: {
     flex: 1,
@@ -414,15 +405,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: theme.spacing.sm,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
     borderRadius: theme.radius.full,
     paddingHorizontal: 6,
     paddingVertical: 3,
   },
   qtyBtn: {
-    width: 24,
-    height: 24,
+    width: 26,
+    height: 26,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -437,28 +427,21 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: theme.colors.text,
   },
-
-  // Block heading
-  blockHeading: {
-    ...theme.typography.heading,
-    color: theme.colors.primary,
-    marginBottom: -4,
-  },
-
-  // Pickup
   pickupCard: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: theme.spacing.sm,
-    backgroundColor: theme.colors.surfaceElevated,
-    borderRadius: theme.radius.md,
+    backgroundColor: theme.colors.overlayLight,
+    borderRadius: theme.radius.lg,
+    borderWidth: 1,
+    borderColor: theme.colors.borderLight,
     padding: theme.spacing.md,
   },
   pickupIconWrap: {
     width: 48,
     height: 48,
-    borderRadius: 24,
-    backgroundColor: theme.colors.accentMuted,
+    borderRadius: theme.radius.lg,
+    backgroundColor: theme.colors.primaryMuted,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -474,17 +457,15 @@ const styles = StyleSheet.create({
   },
   readyText: {
     ...theme.typography.small,
-    color: theme.colors.accentDark,
+    color: theme.colors.primary,
     fontFamily: theme.fonts.semibold,
   },
-
-  // Promo
   promoCard: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.radius.md,
-    padding: theme.spacing.md,
+    backgroundColor: theme.colors.overlayLight,
+    borderRadius: theme.radius.lg,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.borderLight,
+    padding: theme.spacing.md,
     gap: theme.spacing.sm,
   },
   promoHeader: {
@@ -514,18 +495,18 @@ const styles = StyleSheet.create({
   },
   promoInput: {
     flex: 1,
-    backgroundColor: theme.colors.background,
-    borderRadius: theme.radius.sm,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.lg,
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.sm,
     ...theme.typography.body,
     color: theme.colors.text,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.borderLight,
   },
   promoApplyBtn: {
     backgroundColor: theme.colors.primary,
-    borderRadius: theme.radius.sm,
+    borderRadius: theme.radius.lg,
     paddingHorizontal: theme.spacing.lg,
     alignItems: 'center',
     justifyContent: 'center',
@@ -540,7 +521,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: theme.colors.accentMuted,
-    borderRadius: theme.radius.sm,
+    borderRadius: theme.radius.lg,
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.sm,
   },
@@ -555,38 +536,32 @@ const styles = StyleSheet.create({
     ...theme.typography.small,
     color: theme.colors.danger,
   },
-
-  // Summary — forest card
   summaryCard: {
-    backgroundColor: theme.colors.primary,
-    ...theme.asymmetric,
+    backgroundColor: theme.colors.overlayLight,
+    borderRadius: theme.radius.lg,
+    borderWidth: 1,
+    borderColor: theme.colors.borderLight,
     padding: theme.spacing.lg,
     gap: theme.spacing.sm,
-    ...theme.shadows.medium,
-  },
-  summaryTop: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: theme.spacing.xs,
   },
   summaryTitle: {
     fontFamily: theme.fonts.serifBold,
-    fontSize: 22,
-    color: theme.colors.white,
+    fontSize: 20,
+    color: theme.colors.primary,
   },
-  organicBadge: {
+  pointsPreview: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    backgroundColor: 'rgba(253, 221, 186, 0.14)',
+    gap: theme.spacing.xs,
+    backgroundColor: theme.colors.accentMuted,
     borderRadius: theme.radius.full,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
+    alignSelf: 'flex-start',
   },
-  organicText: {
-    ...theme.typography.small,
-    color: theme.colors.gold,
+  pointsPreviewText: {
+    ...theme.typography.caption,
+    color: theme.colors.accentDark,
     fontFamily: theme.fonts.semibold,
   },
   summaryRow: {
@@ -599,16 +574,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.12)',
+    borderTopColor: theme.colors.border,
     paddingTop: theme.spacing.sm,
   },
   summaryLabel: {
     ...theme.typography.body,
-    color: theme.colors.onPrimaryMuted,
+    color: theme.colors.textMuted,
   },
   summaryValue: {
     ...theme.typography.body,
-    color: theme.colors.white,
+    color: theme.colors.text,
+    fontFamily: theme.fonts.semibold,
   },
   totalRow: {
     flexDirection: 'row',
@@ -620,19 +596,19 @@ const styles = StyleSheet.create({
   totalLabel: {
     fontFamily: theme.fonts.serif,
     fontSize: 18,
-    color: theme.colors.white,
+    color: theme.colors.text,
   },
   totalValue: {
     fontFamily: theme.fonts.serifBold,
-    fontSize: 34,
-    color: theme.colors.gold,
+    fontSize: 32,
+    color: theme.colors.primary,
   },
   placeBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: theme.spacing.sm,
-    backgroundColor: theme.colors.white,
+    backgroundColor: theme.colors.primary,
     borderRadius: theme.radius.full,
     paddingVertical: theme.spacing.md,
   },
@@ -640,16 +616,14 @@ const styles = StyleSheet.create({
     fontFamily: theme.fonts.semibold,
     fontSize: 14,
     letterSpacing: 1.5,
-    color: theme.colors.primary,
+    color: theme.colors.onPrimary,
   },
   summaryNote: {
     ...theme.typography.small,
-    color: theme.colors.onPrimaryMuted,
+    color: theme.colors.textMuted,
     textAlign: 'center',
     marginTop: 4,
   },
-
-  // Empty
   empty: {
     flex: 1,
     alignItems: 'center',
@@ -661,8 +635,8 @@ const styles = StyleSheet.create({
   emptyIcon: {
     width: 104,
     height: 104,
-    borderRadius: 52,
-    backgroundColor: theme.colors.accentMuted,
+    borderRadius: theme.radius.lg,
+    backgroundColor: theme.colors.primaryMuted,
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -4,7 +4,6 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
-  Image,
   Alert,
   TextInput,
   ActivityIndicator,
@@ -19,14 +18,8 @@ import { useStore } from '../../../context/StoreContext';
 import theme from '../../../theme';
 import { useCart } from '../../../context/CartContext';
 import AIButton from '../../../components/AIButton';
-import { CATEGORY_IMAGE_MAP } from '../../../data/products';
 
-// ─── Loyalty constants ────────────────────────────────────────────────────
-// 1 pt per $1 spent (pre-tax subtotal, before discounts).
-// 500 pts = $10 off.  ~30 avg orders (~$50 each) → ~$30 in free product.
 const PTS_PER_DOLLAR = 1;
-const REDEEM_THRESHOLD = 500;   // pts needed for one redemption
-const REDEEM_VALUE = 10;        // dollars off per redemption
 
 const VALID_PROMOS: Record<string, number> = {
   GHOST10: 0.1,
@@ -44,6 +37,7 @@ export default function CartScreen() {
   const [promoApplied, setPromoApplied] = useState('');
   const [promoError, setPromoError] = useState('');
   const [placing, setPlacing] = useState(false);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const discountAmt = subtotal * promoDiscount;
   const tax = (subtotal - discountAmt) * 0.13;
@@ -77,6 +71,10 @@ export default function CartScreen() {
     ]);
   }
 
+  function toggleExpand(productId: string) {
+    setExpandedId(expandedId === productId ? null : productId);
+  }
+
   async function checkout() {
     if (placing) return;
     if (!user) {
@@ -87,7 +85,6 @@ export default function CartScreen() {
     try {
       const code = `GST-${Math.random().toString(36).toUpperCase().slice(2, 7)}`;
 
-      // Insert the order header
       const { data: orderData, error: orderError } = await supabase
         .from('orders')
         .insert({
@@ -105,7 +102,6 @@ export default function CartScreen() {
 
       if (orderError) throw orderError;
 
-      // Insert line items
       const lineItems = items.map(({ product, qty }) => ({
         order_id: orderData.id,
         product_id: product.id,
@@ -118,7 +114,6 @@ export default function CartScreen() {
       const { error: itemsError } = await supabase.from('order_items').insert(lineItems);
       if (itemsError) throw itemsError;
 
-      // Award loyalty points — 1 pt per $1 of subtotal (before discounts / tax)
       const ptsEarned = Math.floor(subtotal * PTS_PER_DOLLAR);
       const { data: newBalance } = await supabase.rpc('award_loyalty_pts', {
         p_user_id: user.id,
@@ -182,69 +177,68 @@ export default function CartScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Items */}
-        <View style={styles.itemsSection}>
-          {items.map(({ product, qty }) => (
-            <View key={product.id} style={styles.cartItem}>
-              <Image source={CATEGORY_IMAGE_MAP[product.category]} style={styles.itemImage} />
-              <View style={styles.itemDetails}>
-                <View style={styles.itemTopRow}>
-                  <Text style={styles.itemName} numberOfLines={2}>{product.name}</Text>
-                  <TouchableOpacity
-                    onPress={() => handleRemove(product.id, product.name)}
-                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                  >
-                    <Ionicons name="trash-outline" size={17} color={theme.colors.textMuted} />
-                  </TouchableOpacity>
-                </View>
-                <Text style={styles.itemMeta}>{product.brand} · {product.weight}</Text>
-                <View style={styles.itemBottomRow}>
-                  <View style={styles.qtyRow}>
+        <View style={styles.vaporList}>
+          {items.map(({ product, qty }, index) => {
+            const isExpanded = expandedId === product.id;
+            return (
+              <View key={product.id}>
+                <TouchableOpacity
+                  style={styles.vaporRow}
+                  onPress={() => toggleExpand(product.id)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.vaporName} numberOfLines={isExpanded ? 2 : 1}>
+                    {product.name}
+                  </Text>
+                  <Text style={styles.vaporPrice}>${(product.price * qty).toFixed(2)}</Text>
+                </TouchableOpacity>
+
+                {isExpanded && (
+                  <View style={styles.expandPanel}>
+                    <View style={styles.qtyRow}>
+                      <TouchableOpacity
+                        style={styles.qtyBtn}
+                        onPress={() => setQty(product.id, qty - 1)}
+                        activeOpacity={0.8}
+                      >
+                        <Ionicons name="remove" size={16} color={theme.colors.text} />
+                      </TouchableOpacity>
+                      <Text style={styles.qtyText}>{qty}</Text>
+                      <TouchableOpacity
+                        style={styles.qtyBtn}
+                        onPress={() => setQty(product.id, qty + 1)}
+                        activeOpacity={0.8}
+                      >
+                        <Ionicons name="add" size={16} color={theme.colors.text} />
+                      </TouchableOpacity>
+                    </View>
                     <TouchableOpacity
-                      style={styles.qtyBtn}
-                      onPress={() => setQty(product.id, qty - 1)}
-                      activeOpacity={0.8}
+                      onPress={() => handleRemove(product.id, product.name)}
+                      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                     >
-                      <Ionicons name="remove" size={15} color={theme.colors.text} />
-                    </TouchableOpacity>
-                    <Text style={styles.qtyText}>{qty}</Text>
-                    <TouchableOpacity
-                      style={styles.qtyBtn}
-                      onPress={() => setQty(product.id, qty + 1)}
-                      activeOpacity={0.8}
-                    >
-                      <Ionicons name="add" size={15} color={theme.colors.text} />
+                      <Text style={styles.removeText}>Remove</Text>
                     </TouchableOpacity>
                   </View>
-                  <Text style={styles.itemPrice}>${(product.price * qty).toFixed(2)}</Text>
-                </View>
+                )}
+
+                {index < items.length - 1 && <View style={styles.softDivider} />}
               </View>
-            </View>
-          ))}
+            );
+          })}
         </View>
 
-        {/* Pickup */}
-        <Text style={styles.blockHeading}>Pickup Location</Text>
-        <View style={styles.pickupCard}>
-          <View style={styles.pickupIconWrap}>
-            <Ionicons name="storefront-outline" size={22} color={theme.colors.accentDark} />
-          </View>
-          <View style={styles.pickupInfo}>
-            <Text style={styles.pickupTitle}>Ghost Atelier</Text>
-            <Text style={styles.pickupAddr}>{store.address}, {store.city}</Text>
-            <Text style={styles.readyText}>Ready in: ~15 min</Text>
-          </View>
+        <View style={styles.softSection}>
+          <Text style={styles.softLabel}>Pickup Location</Text>
+          <Text style={styles.softValue}>Ghost Atelier</Text>
+          <Text style={styles.softMuted}>{store.address}, {store.city}</Text>
+          <Text style={styles.softAccent}>Ready in: ~15 min</Text>
         </View>
 
-        {/* Promo */}
-        <View style={styles.promoCard}>
+        <View style={styles.softSection}>
           <View style={styles.promoHeader}>
-            <Ionicons name="pricetag-outline" size={15} color={theme.colors.accentDark} />
-            <Text style={styles.promoLabel}>Promo Code</Text>
+            <Text style={styles.softLabel}>Promo Code</Text>
             {promoApplied !== '' && (
-              <View style={styles.promoAppliedBadge}>
-                <Text style={styles.promoAppliedText}>-{Math.round(promoDiscount * 100)}%</Text>
-              </View>
+              <Text style={styles.promoBadge}>-{Math.round(promoDiscount * 100)}%</Text>
             )}
           </View>
 
@@ -271,7 +265,7 @@ export default function CartScreen() {
           ) : (
             <View style={styles.promoActiveRow}>
               <Text style={styles.promoActiveCode}>{promoApplied}</Text>
-              <TouchableOpacity onPress={removePromo} style={styles.promoRemoveBtn}>
+              <TouchableOpacity onPress={removePromo} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
                 <Ionicons name="close-circle" size={18} color={theme.colors.textMuted} />
               </TouchableOpacity>
             </View>
@@ -280,15 +274,8 @@ export default function CartScreen() {
           {promoError !== '' && <Text style={styles.promoError}>{promoError}</Text>}
         </View>
 
-        {/* Order Summary — forest card */}
-        <View style={styles.summaryCard}>
-          <View style={styles.summaryTop}>
-            <Text style={styles.summaryTitle}>Order Summary</Text>
-            <View style={styles.organicBadge}>
-              <Ionicons name="checkmark-circle" size={13} color={theme.colors.gold} />
-              <Text style={styles.organicText}>Certified</Text>
-            </View>
-          </View>
+        <View style={styles.softSection}>
+          <Text style={styles.softLabel}>Order Summary</Text>
 
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Subtotal ({totalItems} items)</Text>
@@ -296,15 +283,15 @@ export default function CartScreen() {
           </View>
           {promoDiscount > 0 && (
             <View style={styles.summaryRow}>
-              <Text style={[styles.summaryLabel, { color: theme.colors.gold }]}>Promo ({promoApplied})</Text>
-              <Text style={[styles.summaryValue, { color: theme.colors.gold }]}>-${discountAmt.toFixed(2)}</Text>
+              <Text style={styles.summaryLabel}>Promo ({promoApplied})</Text>
+              <Text style={styles.summaryValue}>-${discountAmt.toFixed(2)}</Text>
             </View>
           )}
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>HST (13%)</Text>
             <Text style={styles.summaryValue}>${tax.toFixed(2)}</Text>
           </View>
-          <View style={styles.summaryRowBorder}>
+          <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Pickup</Text>
             <Text style={styles.summaryValue}>Included</Text>
           </View>
@@ -321,12 +308,9 @@ export default function CartScreen() {
             disabled={placing}
           >
             {placing ? (
-              <ActivityIndicator size="small" color={theme.colors.primary} />
+              <ActivityIndicator size="small" color={theme.colors.onPrimary} />
             ) : (
-              <>
-                <Text style={styles.placeBtnText}>PLACE ORDER</Text>
-                <Ionicons name="arrow-forward" size={17} color={theme.colors.primary} />
-              </>
+              <Text style={styles.placeBtnText}>Place Order</Text>
             )}
           </TouchableOpacity>
 
@@ -349,7 +333,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
+    borderBottomColor: theme.colors.divider,
   },
   headerTitle: {
     ...theme.typography.title,
@@ -362,151 +346,101 @@ const styles = StyleSheet.create({
   scroll: { flex: 1 },
   scrollContent: {
     padding: theme.spacing.md,
-    gap: theme.spacing.md,
-    paddingBottom: 130,
+    gap: theme.spacing.lg,
+    paddingBottom: 120,
   },
 
-  // Items
-  itemsSection: { gap: theme.spacing.sm },
-  cartItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: theme.colors.surface,
-    ...theme.asymmetricSm,
+  vaporList: {
     borderWidth: 1,
     borderColor: theme.colors.border,
-    padding: theme.spacing.sm,
-    gap: theme.spacing.sm,
+    borderRadius: theme.radius.lg,
+    paddingVertical: theme.spacing.xs,
   },
-  itemImage: {
-    width: 84,
-    height: 84,
-    ...theme.asymmetricSm,
-  },
-  itemDetails: {
-    flex: 1,
-    gap: 3,
-  },
-  itemTopRow: {
+  vaporRow: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    gap: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.md,
+    gap: theme.spacing.md,
   },
-  itemName: {
-    fontFamily: theme.fonts.serif,
-    fontSize: 16,
-    lineHeight: 20,
+  vaporName: {
+    ...theme.typography.body,
     color: theme.colors.text,
     flex: 1,
   },
-  itemMeta: {
-    ...theme.typography.small,
-    color: theme.colors.textMuted,
+  vaporPrice: {
+    ...theme.typography.bodyBold,
+    color: theme.colors.text,
   },
-  itemBottomRow: {
+  expandPanel: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 4,
+    paddingHorizontal: theme.spacing.md,
+    paddingBottom: theme.spacing.sm,
   },
   qtyRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: theme.spacing.sm,
+    gap: theme.spacing.md,
     borderWidth: 1,
     borderColor: theme.colors.border,
     borderRadius: theme.radius.full,
-    paddingHorizontal: 6,
-    paddingVertical: 3,
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: 4,
   },
   qtyBtn: {
-    width: 24,
-    height: 24,
+    width: 28,
+    height: 28,
     alignItems: 'center',
     justifyContent: 'center',
   },
   qtyText: {
     ...theme.typography.bodyBold,
     color: theme.colors.text,
-    minWidth: 18,
+    minWidth: 20,
     textAlign: 'center',
   },
-  itemPrice: {
-    fontFamily: theme.fonts.serifBold,
-    fontSize: 18,
-    color: theme.colors.text,
-  },
-
-  // Block heading
-  blockHeading: {
-    ...theme.typography.heading,
-    color: theme.colors.primary,
-    marginBottom: -4,
-  },
-
-  // Pickup
-  pickupCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: theme.spacing.sm,
-    backgroundColor: theme.colors.surfaceElevated,
-    borderRadius: theme.radius.md,
-    padding: theme.spacing.md,
-  },
-  pickupIconWrap: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: theme.colors.accentMuted,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  pickupInfo: { flex: 1, gap: 2 },
-  pickupTitle: {
-    fontFamily: theme.fonts.serif,
-    fontSize: 15,
-    color: theme.colors.text,
-  },
-  pickupAddr: {
-    ...theme.typography.small,
+  removeText: {
+    ...theme.typography.caption,
     color: theme.colors.textMuted,
   },
-  readyText: {
-    ...theme.typography.small,
-    color: theme.colors.accentDark,
-    fontFamily: theme.fonts.semibold,
+  softDivider: {
+    height: 1,
+    backgroundColor: theme.colors.divider,
+    marginHorizontal: theme.spacing.md,
   },
 
-  // Promo
-  promoCard: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.radius.md,
-    padding: theme.spacing.md,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
+  softSection: {
     gap: theme.spacing.sm,
+    paddingVertical: theme.spacing.sm,
   },
+  softLabel: {
+    ...theme.typography.label,
+    color: theme.colors.textMuted,
+  },
+  softValue: {
+    ...theme.typography.subheading,
+    color: theme.colors.text,
+  },
+  softMuted: {
+    ...theme.typography.caption,
+    color: theme.colors.textMuted,
+  },
+  softAccent: {
+    ...theme.typography.caption,
+    color: theme.colors.primary,
+  },
+
   promoHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: theme.spacing.xs,
+    justifyContent: 'space-between',
   },
-  promoLabel: {
-    ...theme.typography.bodyBold,
-    color: theme.colors.text,
-    flex: 1,
-  },
-  promoAppliedBadge: {
-    backgroundColor: theme.colors.accentMuted,
-    borderRadius: theme.radius.full,
-    paddingHorizontal: 10,
-    paddingVertical: 3,
-  },
-  promoAppliedText: {
-    ...theme.typography.small,
-    color: theme.colors.accentDark,
-    fontFamily: theme.fonts.bold,
+  promoBadge: {
+    ...theme.typography.caption,
+    color: theme.colors.primary,
   },
   promoInputRow: {
     flexDirection: 'row',
@@ -514,8 +448,8 @@ const styles = StyleSheet.create({
   },
   promoInput: {
     flex: 1,
-    backgroundColor: theme.colors.background,
-    borderRadius: theme.radius.sm,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.full,
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.sm,
     ...theme.typography.body,
@@ -525,7 +459,7 @@ const styles = StyleSheet.create({
   },
   promoApplyBtn: {
     backgroundColor: theme.colors.primary,
-    borderRadius: theme.radius.sm,
+    borderRadius: theme.radius.full,
     paddingHorizontal: theme.spacing.lg,
     alignItems: 'center',
     justifyContent: 'center',
@@ -539,129 +473,85 @@ const styles = StyleSheet.create({
   promoActiveRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: theme.colors.accentMuted,
-    borderRadius: theme.radius.sm,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.full,
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.sm,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
   },
   promoActiveCode: {
     ...theme.typography.bodyBold,
-    color: theme.colors.accentDark,
+    color: theme.colors.text,
     flex: 1,
     letterSpacing: 1,
   },
-  promoRemoveBtn: { padding: 2 },
   promoError: {
     ...theme.typography.small,
     color: theme.colors.danger,
   },
 
-  // Summary — forest card
-  summaryCard: {
-    backgroundColor: theme.colors.primary,
-    ...theme.asymmetric,
-    padding: theme.spacing.lg,
-    gap: theme.spacing.sm,
-    ...theme.shadows.medium,
-  },
-  summaryTop: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: theme.spacing.xs,
-  },
-  summaryTitle: {
-    fontFamily: theme.fonts.serifBold,
-    fontSize: 22,
-    color: theme.colors.white,
-  },
-  organicBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: 'rgba(253, 221, 186, 0.14)',
-    borderRadius: theme.radius.full,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-  },
-  organicText: {
-    ...theme.typography.small,
-    color: theme.colors.gold,
-    fontFamily: theme.fonts.semibold,
-  },
   summaryRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  summaryRowBorder: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.12)',
-    paddingTop: theme.spacing.sm,
-  },
   summaryLabel: {
     ...theme.typography.body,
-    color: theme.colors.onPrimaryMuted,
+    color: theme.colors.textMuted,
   },
   summaryValue: {
     ...theme.typography.body,
-    color: theme.colors.white,
+    color: theme.colors.text,
   },
   totalRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-end',
     marginTop: theme.spacing.sm,
-    marginBottom: theme.spacing.sm,
+    paddingTop: theme.spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.divider,
   },
   totalLabel: {
-    fontFamily: theme.fonts.serif,
-    fontSize: 18,
-    color: theme.colors.white,
+    ...theme.typography.subheading,
+    color: theme.colors.text,
   },
   totalValue: {
-    fontFamily: theme.fonts.serifBold,
-    fontSize: 34,
-    color: theme.colors.gold,
+    ...theme.typography.title,
+    color: theme.colors.primary,
   },
   placeBtn: {
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: theme.spacing.sm,
-    backgroundColor: theme.colors.white,
+    backgroundColor: theme.colors.primary,
     borderRadius: theme.radius.full,
     paddingVertical: theme.spacing.md,
+    marginTop: theme.spacing.sm,
   },
   placeBtnText: {
-    fontFamily: theme.fonts.semibold,
-    fontSize: 14,
-    letterSpacing: 1.5,
-    color: theme.colors.primary,
+    ...theme.typography.bodyBold,
+    color: theme.colors.onPrimary,
   },
   summaryNote: {
     ...theme.typography.small,
-    color: theme.colors.onPrimaryMuted,
+    color: theme.colors.textMuted,
     textAlign: 'center',
     marginTop: 4,
   },
 
-  // Empty
   empty: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     gap: theme.spacing.md,
     paddingHorizontal: theme.spacing.xl,
-    paddingBottom: 80,
+    paddingBottom: 100,
   },
   emptyIcon: {
     width: 104,
     height: 104,
-    borderRadius: 52,
+    borderRadius: theme.radius.full,
     backgroundColor: theme.colors.accentMuted,
     alignItems: 'center',
     justifyContent: 'center',

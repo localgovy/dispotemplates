@@ -44,7 +44,6 @@ export default function OrdersScreen() {
       .then(({ data, error }) => {
         if (!error && data) {
           setOrders(data as Order[]);
-          // Auto-expand the most recent order if it is ready
           const first = data[0] as Order | undefined;
           if (first?.status === 'ready') setExpanded(first.id);
         }
@@ -66,7 +65,7 @@ export default function OrdersScreen() {
     return (
       <SafeAreaView style={styles.safe} edges={['top']}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>My Orders</Text>
+          <Text style={styles.headerTitle}>Visit History</Text>
           <AIButton />
         </View>
         <View style={styles.centred}>
@@ -80,12 +79,12 @@ export default function OrdersScreen() {
     return (
       <SafeAreaView style={styles.safe} edges={['top']}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>My Orders</Text>
+          <Text style={styles.headerTitle}>Visit History</Text>
           <AIButton />
         </View>
         <View style={styles.centred}>
-          <Ionicons name="receipt-outline" size={48} color={theme.colors.textDisabled} />
-          <Text style={styles.emptyTitle}>No orders yet</Text>
+          <Ionicons name="clipboard-outline" size={48} color={theme.colors.textDisabled} />
+          <Text style={styles.emptyTitle}>No visits yet</Text>
           <Text style={styles.emptyText}>Your placed orders will appear here.</Text>
         </View>
       </SafeAreaView>
@@ -95,7 +94,7 @@ export default function OrdersScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>My Orders</Text>
+        <Text style={styles.headerTitle}>Visit History</Text>
         <AIButton />
       </View>
 
@@ -111,75 +110,79 @@ export default function OrdersScreen() {
           return (
             <TouchableOpacity
               key={order.id}
-              style={styles.orderCard}
+              style={styles.chartRow}
               onPress={() => setExpanded(isExpanded ? null : order.id)}
               activeOpacity={0.9}
             >
-              {order.status === 'ready' && (
-                <View style={styles.readyBanner}>
-                  <Ionicons name="checkmark-circle" size={14} color={theme.colors.white} />
-                  <Text style={styles.readyBannerText}>Ready for Pickup!</Text>
-                </View>
-              )}
-
-              <View style={styles.orderHeader}>
-                <View>
-                  <Text style={styles.orderCode}>{order.confirmation_code}</Text>
-                  <Text style={styles.orderDate}>{formatDate(order.created_at)}</Text>
-                </View>
-                <View style={styles.orderRight}>
-                  <View
-                    style={[
-                      styles.statusBadge,
-                      { backgroundColor: cfg.color + '20', borderColor: cfg.color + '50' },
-                    ]}
-                  >
-                    <Ionicons name={cfg.icon} size={12} color={cfg.color} />
-                    <Text style={[styles.statusText, { color: cfg.color }]}>{cfg.label}</Text>
-                  </View>
-                  <Text style={styles.orderTotal}>${Number(order.total).toFixed(2)}</Text>
-                </View>
+              <View style={styles.dateCol}>
+                <Text style={styles.dateText}>{formatDate(order.created_at)}</Text>
+                {order.status === 'ready' && (
+                  <View style={styles.readyDot} />
+                )}
               </View>
 
-              {isExpanded && (
-                <View style={styles.orderBody}>
-                  <View style={styles.divider} />
-                  {order.order_items.map((item) => (
-                    <View key={item.id} style={styles.itemRow}>
-                      <View style={styles.itemDot} />
-                      <Text style={styles.itemName} numberOfLines={1}>{item.name}</Text>
-                      <Text style={styles.itemQty}>×{item.qty}</Text>
-                      <Text style={styles.itemPrice}>${Number(item.price).toFixed(2)}</Text>
-                    </View>
-                  ))}
-                  {order.status === 'ready' && (
-                    <View style={styles.viewCodeBtn}>
-                      <Ionicons name="qr-code-outline" size={16} color={theme.colors.primary} />
-                      <Text style={styles.viewCodeText}>Show Pickup Code: {order.confirmation_code}</Text>
-                    </View>
-                  )}
-                </View>
-              )}
+              <View style={styles.detailsCol}>
+                {order.status === 'ready' && (
+                  <View style={styles.readyBanner}>
+                    <Ionicons name="checkmark-circle" size={12} color={theme.colors.onPrimary} />
+                    <Text style={styles.readyBannerText}>Ready for Pickup</Text>
+                  </View>
+                )}
 
-              <View style={styles.orderFooter}>
-                <Text style={styles.itemSummary}>
-                  {order.order_items.length}{' '}
-                  {order.order_items.length === 1 ? 'item' : 'items'}
-                </Text>
-                <Ionicons
-                  name={isExpanded ? 'chevron-up' : 'chevron-down'}
-                  size={16}
-                  color={theme.colors.textMuted}
-                />
+                <View style={styles.detailsHeader}>
+                  <View style={styles.detailsLeft}>
+                    <Text style={styles.orderCode}>{order.confirmation_code}</Text>
+                    <View style={[styles.statusBadge, { borderColor: cfg.color }]}>
+                      <Ionicons name={cfg.icon} size={11} color={cfg.color} />
+                      <Text style={[styles.statusText, { color: cfg.color }]}>{cfg.label}</Text>
+                    </View>
+                  </View>
+                  <View style={styles.detailsRight}>
+                    <Text style={styles.orderTotal}>${Number(order.total).toFixed(2)}</Text>
+                    <Ionicons
+                      name={isExpanded ? 'chevron-up' : 'chevron-down'}
+                      size={14}
+                      color={theme.colors.textMuted}
+                    />
+                  </View>
+                </View>
+
+                {isExpanded && (
+                  <View style={styles.orderBody}>
+                    <View style={styles.divider} />
+                    {order.order_items.map((item) => (
+                      <View key={item.id} style={styles.itemRow}>
+                        <Text style={styles.itemName} numberOfLines={1}>{item.name}</Text>
+                        <Text style={styles.itemQty}>×{item.qty}</Text>
+                        <Text style={styles.itemPrice}>${Number(item.price).toFixed(2)}</Text>
+                      </View>
+                    ))}
+                    {order.status === 'ready' && (
+                      <View style={styles.viewCodeBtn}>
+                        <Ionicons name="qr-code-outline" size={14} color={theme.colors.primary} />
+                        <Text style={styles.viewCodeText}>
+                          Pickup Code: {order.confirmation_code}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                )}
+
+                {!isExpanded && (
+                  <Text style={styles.itemSummary}>
+                    {order.order_items.length}{' '}
+                    {order.order_items.length === 1 ? 'item' : 'items'}
+                  </Text>
+                )}
               </View>
             </TouchableOpacity>
           );
         })}
 
-        <View style={styles.emptyPast}>
-          <Ionicons name="time-outline" size={20} color={theme.colors.textDisabled} />
-          <Text style={styles.emptyPastText}>
-            {orders.length} {orders.length === 1 ? 'order' : 'orders'} at Nebula Clinic
+        <View style={styles.footerNote}>
+          <Ionicons name="time-outline" size={16} color={theme.colors.textDisabled} />
+          <Text style={styles.footerNoteText}>
+            {orders.length} {orders.length === 1 ? 'visit' : 'visits'} at Nebula Clinic
           </Text>
         </View>
       </ScrollView>
@@ -193,10 +196,14 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
   },
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
   },
   headerTitle: {
     ...theme.typography.title,
@@ -217,77 +224,98 @@ const styles = StyleSheet.create({
     ...theme.typography.caption,
     color: theme.colors.textMuted,
   },
-  scroll: {
-    flex: 1,
-  },
+  scroll: { flex: 1 },
   scrollContent: {
     padding: theme.spacing.md,
-    gap: theme.spacing.md,
-    paddingBottom: 120,
+    gap: theme.spacing.sm,
+    paddingBottom: 100,
   },
-  orderCard: {
-    backgroundColor: theme.colors.surface,
-    ...theme.asymmetricSm,
+  chartRow: {
+    flexDirection: 'row',
     borderWidth: 1,
     borderColor: theme.colors.border,
+    borderRadius: theme.radius.sm,
+    backgroundColor: theme.colors.surface,
     overflow: 'hidden',
-    ...theme.shadows.small,
+  },
+  dateCol: {
+    width: 72,
+    paddingVertical: theme.spacing.md,
+    paddingHorizontal: theme.spacing.sm,
+    borderRightWidth: 1,
+    borderRightColor: theme.colors.border,
+    backgroundColor: theme.colors.surfaceElevated,
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    gap: theme.spacing.xs,
+  },
+  dateText: {
+    ...theme.typography.small,
+    color: theme.colors.accentDark,
+    fontFamily: theme.fonts.semibold,
+    textAlign: 'center',
+  },
+  readyDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: theme.colors.primary,
+  },
+  detailsCol: {
+    flex: 1,
+    padding: theme.spacing.sm,
+    gap: theme.spacing.xs,
   },
   readyBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: theme.spacing.xs,
+    gap: 4,
     backgroundColor: theme.colors.primary,
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.xs,
+    borderRadius: theme.radius.sm,
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: 3,
+    alignSelf: 'flex-start',
   },
   readyBannerText: {
-    ...theme.typography.label,
-    color: theme.colors.white,
-    letterSpacing: 0.5,
+    ...theme.typography.small,
+    color: theme.colors.onPrimary,
+    fontFamily: theme.fonts.semibold,
   },
-  orderHeader: {
+  detailsHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    padding: theme.spacing.md,
-    paddingBottom: theme.spacing.sm,
+  },
+  detailsLeft: { gap: 4, flex: 1 },
+  detailsRight: {
+    alignItems: 'flex-end',
+    gap: 4,
   },
   orderCode: {
-    ...theme.typography.subheading,
+    ...theme.typography.bodyBold,
     color: theme.colors.text,
-    fontWeight: '700',
-  },
-  orderDate: {
-    ...theme.typography.small,
-    color: theme.colors.textMuted,
-    marginTop: 2,
-  },
-  orderRight: {
-    alignItems: 'flex-end',
-    gap: 6,
   },
   statusBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
     paddingHorizontal: theme.spacing.sm,
-    paddingVertical: 3,
-    borderRadius: theme.radius.full,
+    paddingVertical: 2,
+    borderRadius: theme.radius.sm,
     borderWidth: 1,
+    alignSelf: 'flex-start',
   },
   statusText: {
     ...theme.typography.small,
-    fontWeight: '700',
+    fontFamily: theme.fonts.semibold,
   },
   orderTotal: {
     ...theme.typography.subheading,
     color: theme.colors.text,
-    fontWeight: '700',
+    fontFamily: theme.fonts.bold,
   },
   orderBody: {
-    paddingHorizontal: theme.spacing.md,
-    paddingBottom: theme.spacing.sm,
+    marginTop: theme.spacing.xs,
   },
   divider: {
     height: 1,
@@ -298,13 +326,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: theme.spacing.xs,
-    paddingVertical: 4,
-  },
-  itemDot: {
-    width: 5,
-    height: 5,
-    borderRadius: 2.5,
-    backgroundColor: theme.colors.primary,
+    paddingVertical: 3,
   },
   itemName: {
     ...theme.typography.caption,
@@ -321,48 +343,39 @@ const styles = StyleSheet.create({
     color: theme.colors.text,
     width: 54,
     textAlign: 'right',
-    fontWeight: '600',
+    fontFamily: theme.fonts.semibold,
   },
   viewCodeBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
     gap: theme.spacing.xs,
     marginTop: theme.spacing.sm,
     paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.sm,
     backgroundColor: theme.colors.primaryMuted,
-    borderRadius: theme.radius.md,
+    borderRadius: theme.radius.sm,
     borderWidth: 1,
     borderColor: theme.colors.primary,
   },
   viewCodeText: {
-    ...theme.typography.caption,
+    ...theme.typography.small,
     color: theme.colors.primary,
-    fontWeight: '700',
-  },
-  orderFooter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
-    borderTopWidth: 1,
-    borderTopColor: theme.colors.divider,
+    fontFamily: theme.fonts.semibold,
+    flex: 1,
   },
   itemSummary: {
     ...theme.typography.small,
     color: theme.colors.textMuted,
   },
-  emptyPast: {
+  footerNote: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: theme.spacing.xs,
     justifyContent: 'center',
     paddingVertical: theme.spacing.md,
   },
-  emptyPastText: {
+  footerNoteText: {
     ...theme.typography.small,
     color: theme.colors.textDisabled,
-    textAlign: 'center',
   },
 });

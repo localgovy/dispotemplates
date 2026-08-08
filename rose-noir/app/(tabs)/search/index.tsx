@@ -24,12 +24,7 @@ import FilterSheet, {
 } from '../../../components/FilterSheet';
 import AIButton from '../../../components/AIButton';
 
-const QUICK_SEARCHES = [
-  'Pink Kush', 'Pre-Rolls', 'Edibles', 'Vape', 'High THC', 'CBD', 'Budget',
-];
-
 const { width: SCREEN_W } = Dimensions.get('window');
-// Card width: screen - (16 left pad + 16 right pad) - (8 gap between 2 cards) / 2
 const CARD_W = Math.floor((SCREEN_W - theme.spacing.md * 2 - theme.spacing.sm) / 2);
 
 export default function SearchScreen() {
@@ -44,7 +39,6 @@ export default function SearchScreen() {
   const activeFilterCount =
     (activeSort !== 'popular' ? 1 : 0) + (activeStrain !== 'All' ? 1 : 0);
 
-  // Sync category from navigation params
   useEffect(() => {
     if (params.category) {
       setActiveCategory(params.category);
@@ -93,7 +87,6 @@ export default function SearchScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      {/* ── Editorial Header ────────────────────────────────── */}
       <View style={styles.pageHeader}>
         <View>
           <Text style={styles.pageEyebrow}>CURATED SELECTION</Text>
@@ -102,7 +95,6 @@ export default function SearchScreen() {
         <AIButton />
       </View>
 
-      {/* ── Search Bar ──────────────────────────────────────── */}
       <View style={styles.searchWrap}>
         <View style={styles.searchBar}>
           <Ionicons name="search" size={18} color={theme.colors.textMuted} />
@@ -140,7 +132,6 @@ export default function SearchScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* ── Category Chips ──────────────────────────────────── */}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -162,7 +153,6 @@ export default function SearchScreen() {
         ))}
       </ScrollView>
 
-      {/* ── Filter Sheet (modal) ─────────────────────────────── */}
       <FilterSheet
         visible={showFilters}
         onClose={() => setShowFilters(false)}
@@ -175,27 +165,6 @@ export default function SearchScreen() {
         onClearAll={clearAll}
       />
 
-      {/* ── Trending / idle state ───────────────────────────── */}
-      {isIdle && (
-        <View style={styles.quickWrap}>
-          <Text style={styles.quickLabel}>Trending Searches</Text>
-          <View style={styles.quickRow}>
-            {QUICK_SEARCHES.map((q) => (
-              <TouchableOpacity
-                key={q}
-                style={styles.quickChip}
-                onPress={() => setQuery(q)}
-                activeOpacity={0.8}
-              >
-                <Ionicons name="trending-up" size={12} color={theme.colors.accent} />
-                <Text style={styles.quickText}>{q}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-      )}
-
-      {/* ── Results header ──────────────────────────────────── */}
       <View style={styles.resultsHeader}>
         <Text style={styles.resultsCount}>
           {filtered.length} {filtered.length === 1 ? 'product' : 'products'}
@@ -335,36 +304,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.md,
     gap: theme.spacing.xs,
     alignItems: 'center',
-  },
-  quickWrap: {
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
-  },
-  quickLabel: {
-    ...theme.typography.label,
-    color: theme.colors.textMuted,
-    marginBottom: theme.spacing.sm,
-  },
-  quickRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: theme.spacing.xs,
-  },
-  quickChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: theme.spacing.sm + 2,
-    paddingVertical: theme.spacing.xs + 1,
-    borderRadius: theme.radius.full,
-    backgroundColor: theme.colors.accentMuted,
-    borderWidth: 1,
-    borderColor: theme.colors.accent + '50',
-  },
-  quickText: {
-    ...theme.typography.caption,
-    color: theme.colors.accent,
-    fontWeight: '600',
   },
   resultsHeader: {
     flexDirection: 'row',

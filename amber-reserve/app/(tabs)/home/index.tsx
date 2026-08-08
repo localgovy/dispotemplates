@@ -23,8 +23,6 @@ import {
   type Category,
   type Product,
 } from '../../../data/products';
-import DealCard from '../../../components/DealCard';
-import CategoryPill from '../../../components/CategoryPill';
 import SectionRow from '../../../components/SectionRow';
 import ProductDetailModal from '../../../components/ProductDetailModal';
 import StoreSheet from '../../../components/StoreSheet';
@@ -93,7 +91,7 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* ── Editorial Hero ─────────────────────────────────── */}
+        {/* ── Full-bleed Editorial Hero ──────────────────────── */}
         <View style={styles.heroWrap}>
           <LinearGradient
             colors={[theme.colors.primary, theme.colors.primaryDark]}
@@ -190,7 +188,7 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* ── Categories ─────────────────────────────────────── */}
+        {/* ── Categories — text rail ─────────────────────────── */}
         <View style={styles.sectionWrap}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Browse the Humidor</Text>
@@ -198,19 +196,22 @@ export default function HomeScreen() {
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.hScroll}
+            contentContainerStyle={styles.textRail}
           >
             {CATEGORIES.map((cat) => (
-              <CategoryPill
+              <TouchableOpacity
                 key={cat.id}
-                category={cat}
                 onPress={() => navigateToCategory(cat.id)}
-              />
+                activeOpacity={0.7}
+                style={styles.textLink}
+              >
+                <Text style={styles.textLinkLabel}>{cat.name}</Text>
+              </TouchableOpacity>
             ))}
           </ScrollView>
         </View>
 
-        {/* ── Featured Reserves ─────────────────────────────────── */}
+        {/* ── Featured Reserves — stacked story cards ────────── */}
         <View style={styles.sectionWrap}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Featured Reserves</Text>
@@ -218,15 +219,33 @@ export default function HomeScreen() {
               <Text style={styles.seeAllText}>View all</Text>
             </TouchableOpacity>
           </View>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.hScroll}
-          >
-            {DEALS.map((deal) => (
-              <DealCard key={deal.id} deal={deal} />
+          <View style={styles.storyStack}>
+            {DEALS.map((deal, index) => (
+              <TouchableOpacity
+                key={deal.id}
+                style={styles.storyCard}
+                activeOpacity={0.85}
+                onPress={() => router.push('/(tabs)/search')}
+              >
+                <LinearGradient
+                  colors={deal.gradient}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.storyGradient}
+                >
+                  <View style={styles.storyTop}>
+                    <View style={styles.storyBadge}>
+                      <Text style={styles.storyBadgeText}>{deal.badge}</Text>
+                    </View>
+                    <Text style={styles.storyIndex}>0{index + 1}</Text>
+                  </View>
+                  <Text style={styles.storyTitle}>{deal.title}</Text>
+                  <Text style={styles.storySubtitle}>{deal.subtitle}</Text>
+                  <Text style={styles.storyCta}>Read the feature →</Text>
+                </LinearGradient>
+              </TouchableOpacity>
             ))}
-          </ScrollView>
+          </View>
         </View>
 
         {/* ── Curated Sections ───────────────────────────────── */}
@@ -357,20 +376,21 @@ const styles = StyleSheet.create({
   },
   scroll: { flex: 1 },
   scrollContent: {
-    paddingTop: theme.spacing.md,
+    paddingTop: 0,
     paddingBottom: 120,
   },
 
-  // Hero
+  // Full-bleed hero
   heroWrap: {
-    paddingHorizontal: theme.spacing.md,
     marginBottom: theme.spacing.lg,
   },
   hero: {
-    borderRadius: theme.radius.md,
-    padding: theme.spacing.lg,
+    borderRadius: 0,
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.xl + 8,
     gap: theme.spacing.sm,
-    ...theme.shadows.medium,
+    minHeight: 240,
+    justifyContent: 'flex-end',
   },
   heroEyebrow: {
     fontFamily: theme.fonts.semibold,
@@ -380,14 +400,15 @@ const styles = StyleSheet.create({
   },
   heroTitle: {
     fontFamily: theme.fonts.serifItalic,
-    fontSize: 30,
-    lineHeight: 36,
+    fontSize: 32,
+    lineHeight: 38,
     color: '#fff',
   },
   heroSub: {
     ...theme.typography.body,
     color: 'rgba(255,255,255,0.85)',
     marginBottom: theme.spacing.xs,
+    maxWidth: 320,
   },
   heroBtn: {
     flexDirection: 'row',
@@ -567,11 +588,80 @@ const styles = StyleSheet.create({
     color: theme.colors.accent,
     textDecorationLine: 'underline',
   },
-  hScroll: {
+
+  // Text category rail
+  textRail: {
     paddingHorizontal: theme.spacing.md,
-    paddingTop: 2,
-    paddingBottom: 6,
+    gap: theme.spacing.lg,
+    alignItems: 'center',
+  },
+  textLink: {
+    paddingVertical: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+  },
+  textLinkLabel: {
+    fontFamily: theme.fonts.serif,
+    fontSize: 15,
+    color: theme.colors.textSecondary,
+    letterSpacing: 0.2,
+  },
+
+  // Stacked story deals
+  storyStack: {
+    paddingHorizontal: theme.spacing.md,
     gap: theme.spacing.md,
+  },
+  storyCard: {
+    borderRadius: theme.radius.md,
+    overflow: 'hidden',
+    ...theme.shadows.medium,
+  },
+  storyGradient: {
+    padding: theme.spacing.lg,
+    minHeight: 168,
+    justifyContent: 'space-between',
+    gap: theme.spacing.sm,
+  },
+  storyTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  storyBadge: {
+    backgroundColor: 'rgba(255,255,255,0.25)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: theme.radius.full,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.4)',
+  },
+  storyBadgeText: {
+    ...theme.typography.label,
+    color: theme.colors.white,
+    fontSize: 9,
+    letterSpacing: 1.2,
+  },
+  storyIndex: {
+    fontFamily: theme.fonts.serifItalic,
+    fontSize: 22,
+    color: 'rgba(255,255,255,0.55)',
+  },
+  storyTitle: {
+    fontFamily: theme.fonts.serifBold,
+    fontSize: 24,
+    lineHeight: 30,
+    color: theme.colors.white,
+  },
+  storySubtitle: {
+    ...theme.typography.body,
+    color: 'rgba(255,255,255,0.9)',
+  },
+  storyCta: {
+    fontFamily: theme.fonts.semibold,
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.95)',
+    marginTop: 4,
   },
 
   // Footer

@@ -59,6 +59,7 @@ export default function HomeScreen() {
   const [showStoreSheet, setShowStoreSheet] = useState(false);
 
   const grovePicks = TOP_TESTERS.length > 0 ? TOP_TESTERS : NEW_PRODUCTS;
+  const featuredDeal = DEALS[0];
 
   const handleProductPress = useCallback((product: Product) => {
     setSelectedProduct(product);
@@ -99,31 +100,59 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* Sun-drenched hero */}
+        {/* Sunny SPLIT hero: left CTA + right deal teaser */}
         <View style={styles.heroWrap}>
-          <LinearGradient
-            colors={[theme.colors.primary, '#F08A3A', theme.colors.accent]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.hero}
-          >
-            <Text style={styles.heroEyebrow}>SUN-DRENCHED HARVEST</Text>
-            <Text style={styles.heroTitle}>Squeeze more joy from every ritual.</Text>
-            <Text style={styles.heroSub}>
-              Coral energy, citrus lift, and grove-fresh botanicals.
-            </Text>
-            <TouchableOpacity
-              style={styles.heroBtn}
-              onPress={() => router.push('/(tabs)/search')}
-              activeOpacity={0.85}
+          <View style={styles.heroSplit}>
+            <LinearGradient
+              colors={[theme.colors.primary, '#F08A3A']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.heroLeft}
             >
-              <Text style={styles.heroBtnText}>ENTER THE GROVE</Text>
-              <Ionicons name="arrow-forward" size={15} color={theme.colors.primaryDark} />
-            </TouchableOpacity>
-          </LinearGradient>
+              <Text style={styles.heroEyebrow}>SUN-DRENCHED</Text>
+              <Text style={styles.heroTitle}>Squeeze more joy.</Text>
+              <Text style={styles.heroSub}>
+                Coral energy & grove-fresh botanicals.
+              </Text>
+              <TouchableOpacity
+                style={styles.heroBtn}
+                onPress={() => router.push('/(tabs)/search')}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.heroBtnText}>ENTER GROVE</Text>
+                <Ionicons name="arrow-forward" size={14} color={theme.colors.primaryDark} />
+              </TouchableOpacity>
+            </LinearGradient>
+
+            {featuredDeal && (
+              <TouchableOpacity
+                style={styles.heroDeal}
+                activeOpacity={0.9}
+                onPress={() => router.push('/(tabs)/search')}
+              >
+                <LinearGradient
+                  colors={featuredDeal.gradient}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.heroDealInner}
+                >
+                  <View style={styles.heroDealBadge}>
+                    <Text style={styles.heroDealBadgeText}>{featuredDeal.badge}</Text>
+                  </View>
+                  <Text style={styles.heroDealTitle} numberOfLines={2}>
+                    {featuredDeal.title}
+                  </Text>
+                  <Text style={styles.heroDealSub} numberOfLines={2}>
+                    {featuredDeal.subtitle}
+                  </Text>
+                  <Text style={styles.heroDealTap}>View →</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
 
-        {/* Sunny pickup chip */}
+        {/* Sunny pickup chip with open-status */}
         <TouchableOpacity style={styles.pickupChip} activeOpacity={0.85} onPress={() => setShowStoreSheet(true)}>
           <View style={styles.pickupSun}>
             <Ionicons name="sunny-outline" size={18} color={theme.colors.primaryDark} />
@@ -355,44 +384,94 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.md,
     marginBottom: theme.spacing.md,
   },
-  hero: {
-    borderRadius: theme.radius.xl,
-    padding: theme.spacing.lg,
+  heroSplit: {
+    flexDirection: 'row',
     gap: theme.spacing.sm,
+    minHeight: 200,
+  },
+  heroLeft: {
+    flex: 1.15,
+    borderRadius: theme.radius.xl,
+    padding: theme.spacing.md,
+    gap: 6,
+    justifyContent: 'flex-end',
     ...theme.shadows.medium,
+  },
+  heroDeal: {
+    flex: 0.95,
+    borderRadius: theme.radius.xl,
+    overflow: 'hidden',
+    ...theme.shadows.medium,
+  },
+  heroDealInner: {
+    flex: 1,
+    padding: theme.spacing.md,
+    justifyContent: 'space-between',
+    minHeight: 200,
+  },
+  heroDealBadge: {
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(255,255,255,0.28)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: theme.radius.full,
+  },
+  heroDealBadgeText: {
+    fontFamily: theme.fonts.bold,
+    fontSize: 9,
+    letterSpacing: 1,
+    color: theme.colors.white,
+  },
+  heroDealTitle: {
+    fontFamily: theme.fonts.serifBold,
+    fontSize: 18,
+    lineHeight: 22,
+    color: theme.colors.white,
+  },
+  heroDealSub: {
+    ...theme.typography.small,
+    color: 'rgba(255,255,255,0.92)',
+  },
+  heroDealTap: {
+    fontFamily: theme.fonts.semibold,
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.9)',
+    alignSelf: 'flex-end',
   },
   heroEyebrow: {
     fontFamily: theme.fonts.bold,
-    fontSize: 11,
-    letterSpacing: 2,
+    fontSize: 10,
+    letterSpacing: 1.4,
     color: theme.colors.white,
   },
   heroTitle: {
     fontFamily: theme.fonts.serifBold,
-    fontSize: 28,
-    lineHeight: 34,
+    fontSize: 22,
+    lineHeight: 26,
     color: theme.colors.white,
   },
   heroSub: {
-    ...theme.typography.body,
+    fontFamily: theme.fonts.body,
+    fontSize: 13,
+    lineHeight: 18,
     color: 'rgba(255,255,255,0.92)',
-    marginBottom: theme.spacing.xs,
+    marginBottom: 4,
   },
   heroBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
-    gap: 8,
+    gap: 6,
     backgroundColor: theme.colors.white,
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
     borderRadius: theme.radius.full,
-    marginTop: theme.spacing.xs,
+    marginTop: 4,
   },
   heroBtnText: {
     fontFamily: theme.fonts.bold,
-    fontSize: 12,
-    letterSpacing: 0.8,
+    fontSize: 11,
+    letterSpacing: 0.6,
     color: theme.colors.primaryDark,
   },
 

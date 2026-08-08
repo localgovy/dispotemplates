@@ -13,7 +13,6 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { supabase, Tables } from '../../../lib/supabase';
 import { useAuth } from '../../../context/AuthContext';
@@ -55,7 +54,9 @@ export default function ProfileScreen() {
   const avatarInitial = displayName.charAt(0).toUpperCase();
   const loyaltyPts = profile?.loyalty_pts ?? 0;
   const memberYear = profile?.created_at ? new Date(profile.created_at).getFullYear() : 2024;
-  // 500 pts = $10 off — progress toward the next redemption tier
+  const archiveId = user?.id
+    ? `ARC-${user.id.slice(0, 4).toUpperCase()}-${user.id.slice(4, 8).toUpperCase()}`
+    : 'ARC-GUEST-0000';
   const REDEEM_THRESHOLD = 500;
   const REDEEM_VALUE = 10;
   const progressPct = Math.min((loyaltyPts % REDEEM_THRESHOLD) / REDEEM_THRESHOLD, 1);
@@ -63,7 +64,10 @@ export default function ProfileScreen() {
   const totalRedeemable = Math.floor(loyaltyPts / REDEEM_THRESHOLD) * REDEEM_VALUE;
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     supabase
       .from('profiles')
       .select('*')
@@ -169,20 +173,20 @@ export default function ProfileScreen() {
 
   const MENU_SECTIONS: { title: string; items: MenuItem[] }[] = [
     {
-      title: 'Account',
+      title: 'VAULT / ACCOUNT',
       items: [
         { id: 'personal', icon: 'person-outline', label: 'Personal Info', value: displayName },
         { id: 'age', icon: 'shield-checkmark-outline', label: 'Age Verification', value: 'Verified ✓' },
         {
           id: 'loyalty',
-          icon: 'gift-outline',
-          label: 'Loyalty Points',
+          icon: 'diamond-outline',
+          label: 'Crypt Tokens',
           value: `${loyaltyPts.toLocaleString()} pts`,
         },
       ],
     },
     {
-      title: 'Preferences',
+      title: 'VAULT / PREFERENCES',
       items: [
         { id: 'notif', icon: 'notifications-outline', label: 'Order Updates', toggle: true, toggleKey: 'notif' },
         { id: 'deals', icon: 'pricetag-outline', label: 'Deal Alerts', toggle: true, toggleKey: 'deals' },
@@ -190,14 +194,14 @@ export default function ProfileScreen() {
       ],
     },
     {
-      title: 'Shop',
+      title: 'VAULT / SHOP',
       items: [
         { id: 'favourites', icon: 'heart-outline', label: 'Saved Favourites' },
         { id: 'payment', icon: 'card-outline', label: 'Payment Methods', value: 'Cash / Debit / Credit' },
       ],
     },
     {
-      title: 'Support',
+      title: 'VAULT / SUPPORT',
       items: [
         { id: 'faq', icon: 'call-outline', label: 'Contact & Hours' },
         { id: 'about', icon: 'globe-outline', label: 'Our Website' },
@@ -214,9 +218,8 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      {/* Top nav row */}
       <View style={styles.topNav}>
-        <Text style={styles.topNavTitle}>Account</Text>
+        <Text style={styles.topNavTitle}>Archive</Text>
         <AIButton />
       </View>
       <ScrollView
@@ -224,60 +227,60 @@ export default function ProfileScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Profile Header */}
-        <LinearGradient
-          colors={[theme.colors.surfaceElevated, theme.colors.surface]}
-          style={styles.profileHeader}
-        >
-          <View style={styles.avatarWrap}>
-            {avatarUrl ? (
-              <Image source={{ uri: avatarUrl }} style={styles.avatarImage} />
-            ) : (
-              <View style={styles.avatar}>
-                <Text style={styles.avatarText}>{avatarInitial}</Text>
-              </View>
-            )}
-            <View style={styles.verifiedBadge}>
-              <Ionicons name="checkmark" size={10} color={theme.colors.white} />
-            </View>
+        {/* Archive member ID block */}
+        <View style={styles.archiveBlock}>
+          <View style={styles.fileTab}>
+            <Ionicons name="folder-outline" size={12} color={theme.colors.primary} />
+            <Text style={styles.fileTabText}>MEMBER_RECORD.vault</Text>
           </View>
-          <Text style={styles.userName}>{displayName}</Text>
-          <Text style={styles.userSince}>Member since {memberYear} · Aurora, ON</Text>
+          <View style={styles.archiveBody}>
+            <View style={styles.archiveHeader}>
+              {avatarUrl ? (
+                <Image source={{ uri: avatarUrl }} style={styles.avatarImage} />
+              ) : (
+                <View style={styles.avatar}>
+                  <Text style={styles.avatarText}>{avatarInitial}</Text>
+                </View>
+              )}
+              <View style={styles.archiveMeta}>
+                <Text style={styles.userName}>{displayName}</Text>
+                <Text style={styles.fieldLabel}>ARCHIVE ID</Text>
+                <Text style={styles.archiveId}>{archiveId}</Text>
+                <Text style={styles.filedAt}>Filed {memberYear} · {store.city} vault</Text>
+              </View>
+            </View>
 
-          {/* Loyalty Card */}
-          <TouchableOpacity
-            style={styles.loyaltyCard}
-            activeOpacity={0.85}
-            onPress={() => handleMenuItem('loyalty')}
-          >
-            {loading ? (
-              <ActivityIndicator size="small" color={theme.colors.gold} />
-            ) : (
-              <>
-                <View style={styles.loyaltyLeft}>
-                  <Ionicons name="leaf" size={20} color={theme.colors.gold} />
+            <View style={styles.dividerLine} />
+
+            <TouchableOpacity
+              style={styles.tokenRow}
+              activeOpacity={0.85}
+              onPress={() => handleMenuItem('loyalty')}
+            >
+              {loading ? (
+                <ActivityIndicator size="small" color={theme.colors.primary} />
+              ) : (
+                <>
                   <View>
-                    <Text style={styles.loyaltyLabel}>GREEN POINTS</Text>
-                    <Text style={styles.loyaltyPoints}>{loyaltyPts.toLocaleString()} pts</Text>
+                    <Text style={styles.fieldLabel}>CRYPT TOKENS</Text>
+                    <Text style={styles.tokenPts}>{loyaltyPts.toLocaleString()}</Text>
                   </View>
-                </View>
-                <View style={styles.loyaltyRight}>
-                  <Text style={styles.loyaltyNext}>
-                    {totalRedeemable > 0
-                      ? `$${totalRedeemable} ready to redeem!`
-                      : `${ptsToNext} pts until $${REDEEM_VALUE} off`}
-                  </Text>
-                  <View style={styles.progressBar}>
-                    <View style={[styles.progressFill, { width: `${progressPct * 100}%` }]} />
+                  <View style={styles.tokenRight}>
+                    <View style={styles.progressBar}>
+                      <View style={[styles.progressFill, { width: `${progressPct * 100}%` }]} />
+                    </View>
+                    <Text style={styles.tokenHint}>
+                      {totalRedeemable > 0
+                        ? `$${totalRedeemable} unlockable`
+                        : `${ptsToNext} → $${REDEEM_VALUE}`}
+                    </Text>
                   </View>
-                  <Text style={styles.loyaltyRedeem}>1 pt / $1 · {REDEEM_THRESHOLD} pts = ${REDEEM_VALUE}</Text>
-                </View>
-              </>
-            )}
-          </TouchableOpacity>
-        </LinearGradient>
+                </>
+              )}
+            </TouchableOpacity>
+          </View>
+        </View>
 
-        {/* Menu Sections */}
         {MENU_SECTIONS.map((section, si) => (
           <View key={si} style={styles.section}>
             {section.title !== '' && (
@@ -297,7 +300,7 @@ export default function ProfileScreen() {
                   <View style={[styles.menuIcon, item.destructive && styles.menuIconDestructive]}>
                     <Ionicons
                       name={item.icon}
-                      size={18}
+                      size={16}
                       color={item.destructive ? theme.colors.danger : theme.colors.primary}
                     />
                   </View>
@@ -335,7 +338,7 @@ export default function ProfileScreen() {
 
         <View style={styles.footer}>
           <View style={styles.footerLogoRow}>
-            <Ionicons name="leaf" size={16} color={theme.colors.accentDark} />
+            <Ionicons name="lock-closed-outline" size={14} color={theme.colors.primary} />
             <Text style={styles.footerLogo}>Emerald Crypt</Text>
           </View>
           <Text style={styles.footerVersion}>{store.name}, {store.province} · v1.0.0</Text>
@@ -377,110 +380,121 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 120,
   },
-  profileHeader: {
-    alignItems: 'center',
-    padding: theme.spacing.xl,
-    gap: theme.spacing.xs,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
+  archiveBlock: {
+    marginHorizontal: theme.spacing.md,
+    marginTop: theme.spacing.md,
   },
-  avatarWrap: {
-    position: 'relative',
-    marginBottom: theme.spacing.xs,
+  fileTab: {
+    alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: theme.colors.surfaceElevated,
+    borderWidth: 1,
+    borderBottomWidth: 0,
+    borderColor: theme.colors.border,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderTopLeftRadius: theme.radius.sm,
+    borderTopRightRadius: theme.radius.sm,
+  },
+  fileTabText: {
+    fontFamily: theme.fonts.medium,
+    fontSize: 10,
+    letterSpacing: 1,
+    color: theme.colors.primary,
+  },
+  archiveBody: {
+    backgroundColor: theme.colors.surface,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    padding: theme.spacing.md,
+    gap: theme.spacing.md,
+  },
+  archiveHeader: {
+    flexDirection: 'row',
+    gap: theme.spacing.md,
   },
   avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: theme.colors.primary,
+    width: 64,
+    height: 64,
+    backgroundColor: theme.colors.primaryMuted,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: theme.colors.accent,
+    borderWidth: 1,
+    borderColor: theme.colors.primary,
   },
   avatarImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    borderWidth: 2,
-    borderColor: theme.colors.accent,
+    width: 64,
+    height: 64,
+    borderWidth: 1,
+    borderColor: theme.colors.primary,
   },
   avatarText: {
-    fontFamily: theme.fonts.serifBold,
-    fontSize: 32,
-    color: theme.colors.gold,
+    fontFamily: theme.fonts.bold,
+    fontSize: 26,
+    color: theme.colors.primary,
   },
-  verifiedBadge: {
-    position: 'absolute',
-    bottom: 2,
-    right: 2,
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    backgroundColor: theme.colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: theme.colors.surface,
+  archiveMeta: {
+    flex: 1,
+    gap: 2,
   },
   userName: {
-    ...theme.typography.title,
+    fontFamily: theme.fonts.bold,
+    fontSize: 20,
     color: theme.colors.text,
+    marginBottom: 4,
   },
-  userSince: {
-    ...theme.typography.caption,
+  fieldLabel: {
+    fontFamily: theme.fonts.medium,
+    fontSize: 10,
+    letterSpacing: 1.2,
+    color: theme.colors.accent,
+  },
+  archiveId: {
+    fontFamily: theme.fonts.semibold,
+    fontSize: 15,
+    color: theme.colors.primaryLight,
+    letterSpacing: 0.8,
+  },
+  filedAt: {
+    ...theme.typography.small,
     color: theme.colors.textMuted,
+    marginTop: 4,
   },
-  loyaltyCard: {
+  dividerLine: {
+    height: 1,
+    backgroundColor: theme.colors.divider,
+  },
+  tokenRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: theme.colors.primary,
-    ...theme.asymmetric,
-    padding: theme.spacing.md,
-    width: '100%',
-    marginTop: theme.spacing.md,
     gap: theme.spacing.md,
-    ...theme.shadows.medium,
-    minHeight: 72,
+    minHeight: 56,
   },
-  loyaltyLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: theme.spacing.sm,
+  tokenPts: {
+    fontFamily: theme.fonts.bold,
+    fontSize: 28,
+    color: theme.colors.text,
   },
-  loyaltyLabel: {
-    ...theme.typography.label,
-    color: theme.colors.gold,
-  },
-  loyaltyPoints: {
-    fontFamily: theme.fonts.serifBold,
-    fontSize: 22,
-    color: theme.colors.white,
-  },
-  loyaltyRight: {
+  tokenRight: {
     flex: 1,
-    gap: 4,
-  },
-  loyaltyNext: {
-    ...theme.typography.small,
-    color: theme.colors.onPrimaryMuted,
+    gap: 6,
   },
   progressBar: {
-    height: 6,
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    borderRadius: theme.radius.full,
+    height: 5,
+    backgroundColor: theme.colors.surfaceLight,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    backgroundColor: theme.colors.gold,
-    borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.primary,
   },
-  loyaltyRedeem: {
-    fontFamily: theme.fonts.semibold,
+  tokenHint: {
+    fontFamily: theme.fonts.medium,
     fontSize: 11,
-    color: theme.colors.gold,
+    color: theme.colors.textMuted,
     textAlign: 'right',
   },
   section: {
@@ -488,14 +502,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.md,
   },
   sectionTitle: {
-    ...theme.typography.label,
-    color: theme.colors.accentDark,
+    fontFamily: theme.fonts.medium,
+    fontSize: 10,
+    letterSpacing: 1.2,
+    color: theme.colors.accent,
     marginBottom: theme.spacing.sm,
-    paddingLeft: 4,
   },
   menuCard: {
     backgroundColor: theme.colors.surface,
-    borderRadius: theme.radius.md,
     borderWidth: 1,
     borderColor: theme.colors.border,
     overflow: 'hidden',
@@ -512,15 +526,17 @@ const styles = StyleSheet.create({
     borderBottomColor: theme.colors.divider,
   },
   menuIcon: {
-    width: 34,
-    height: 34,
-    borderRadius: 10,
+    width: 30,
+    height: 30,
     backgroundColor: theme.colors.primaryMuted,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: theme.colors.border,
   },
   menuIconDestructive: {
     backgroundColor: theme.colors.danger + '15',
+    borderColor: theme.colors.danger + '40',
   },
   menuLabel: {
     ...theme.typography.body,

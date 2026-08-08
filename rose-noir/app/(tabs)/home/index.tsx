@@ -8,7 +8,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useRouter } from 'expo-router';
 import theme from '../../../theme';
 import {
@@ -17,18 +17,19 @@ import {
   TOP_TESTERS,
   BUDGET_FINDS,
   CATEGORIES,
+  PRODUCTS,
   getProductsByCategory,
   type Category,
   type Product,
 } from '../../../data/products';
 import DealCard from '../../../components/DealCard';
-import CategoryPill from '../../../components/CategoryPill';
 import SectionRow from '../../../components/SectionRow';
 import ProductDetailModal from '../../../components/ProductDetailModal';
 import StoreSheet from '../../../components/StoreSheet';
 import AIButton from '../../../components/AIButton';
 import { useCart } from '../../../context/CartContext';
 import { useStore } from '../../../context/StoreContext';
+import { useFavourites } from '../../../context/FavouritesContext';
 
 const ALL_CATEGORIES: Category[] = [
   'Flower',
@@ -42,24 +43,18 @@ const ALL_CATEGORIES: Category[] = [
   'Apparel',
 ];
 
-const CATEGORY_ICONS: Record<Category, React.ComponentProps<typeof Ionicons>['name']> = {
-  Flower: 'flower-outline',
-  'Pre-Rolls': 'flame-outline',
-  Vape: 'cloud-outline',
-  Edibles: 'cafe-outline',
-  Beverage: 'wine-outline',
-  Oral: 'medical-outline',
-  'Hemp Products': 'leaf-outline',
-  Accessories: 'build-outline',
-  Apparel: 'shirt-outline',
-};
-
 export default function HomeScreen() {
   const router = useRouter();
   const { totalItems } = useCart();
   const { store, setStore } = useStore();
+  const { favourites } = useFavourites();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [showStoreSheet, setShowStoreSheet] = useState(false);
+
+  const curatedForYou = useMemo(() => {
+    const favProducts = PRODUCTS.filter((p) => favourites.has(p.id));
+    return favProducts.length > 0 ? favProducts : NEW_PRODUCTS;
+  }, [favourites]);
 
   const handleProductPress = useCallback((product: Product) => {
     setSelectedProduct(product);
@@ -71,7 +66,6 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      {/* ── Header ────────────────────────────────────────────── */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.locationPill} activeOpacity={0.7} onPress={() => setShowStoreSheet(true)}>
           <Ionicons name="location-sharp" size={14} color={theme.colors.accent} />
@@ -101,7 +95,15 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* ── Editorial Hero ─────────────────────────────────── */}
+        {/* Curated for you — early favourites rail */}
+        <SectionRow
+          title="Curated for you"
+          subtitle="Saved favourites & lounge picks"
+          products={curatedForYou}
+          accentColor={theme.colors.accent}
+          onProductPress={handleProductPress}
+        />
+
         <View style={styles.heroWrap}>
           <LinearGradient
             colors={[theme.colors.primary, theme.colors.primaryDark]}
@@ -125,7 +127,6 @@ export default function HomeScreen() {
           </LinearGradient>
         </View>
 
-        {/* ── Pickup ─────────────────────────────────────────── */}
         <TouchableOpacity style={styles.pickupCard} activeOpacity={0.85} onPress={() => setShowStoreSheet(true)}>
           <View style={styles.pickupIcon}>
             <Ionicons name="storefront-outline" size={20} color={theme.colors.accent} />
@@ -141,7 +142,7 @@ export default function HomeScreen() {
           <Ionicons name="chevron-forward" size={18} color={theme.colors.textMuted} />
         </TouchableOpacity>
 
-        {/* ── Categories ─────────────────────────────────────── */}
+        {/* Elegant uppercase text links */}
         <View style={styles.sectionWrap}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Browse the Collection</Text>
@@ -149,19 +150,21 @@ export default function HomeScreen() {
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.hScroll}
+            contentContainerStyle={styles.textRail}
           >
             {CATEGORIES.map((cat) => (
-              <CategoryPill
+              <TouchableOpacity
                 key={cat.id}
-                category={cat}
                 onPress={() => navigateToCategory(cat.id)}
-              />
+                activeOpacity={0.7}
+                style={styles.textLink}
+              >
+                <Text style={styles.textLinkLabel}>{cat.name.toUpperCase()}</Text>
+              </TouchableOpacity>
             ))}
           </ScrollView>
         </View>
 
-        {/* ── Midnight Deals ─────────────────────────────────── */}
         <View style={styles.sectionWrap}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Midnight Deals</Text>
@@ -180,7 +183,6 @@ export default function HomeScreen() {
           </ScrollView>
         </View>
 
-        {/* ── Curated Sections ───────────────────────────────── */}
         <SectionRow
           title="New & Now"
           subtitle="Just landed in store"
@@ -203,7 +205,6 @@ export default function HomeScreen() {
           onProductPress={handleProductPress}
         />
 
-        {/* ── Per-Category Sections ──────────────────────────── */}
         {ALL_CATEGORIES.map((cat) => {
           const products = getProductsByCategory(cat);
           if (products.length === 0) return null;
@@ -219,7 +220,6 @@ export default function HomeScreen() {
           );
         })}
 
-        {/* ── Seal Footer ────────────────────────────────────── */}
         <View style={styles.footer}>
           <View style={styles.seal}>
             <Text style={styles.sealLetter}>M</Text>
@@ -311,8 +311,6 @@ const styles = StyleSheet.create({
     paddingTop: theme.spacing.md,
     paddingBottom: 120,
   },
-
-  // Hero
   heroWrap: {
     paddingHorizontal: theme.spacing.md,
     marginBottom: theme.spacing.lg,
@@ -357,8 +355,6 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     color: theme.colors.primaryDark,
   },
-
-  // Pickup
   pickupCard: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -405,8 +401,6 @@ const styles = StyleSheet.create({
     ...theme.typography.small,
     color: theme.colors.success,
   },
-
-  // Sections
   sectionWrap: { marginBottom: theme.spacing.lg },
   sectionHeader: {
     flexDirection: 'row',
@@ -429,14 +423,26 @@ const styles = StyleSheet.create({
     color: theme.colors.accent,
     textDecorationLine: 'underline',
   },
+  textRail: {
+    paddingHorizontal: theme.spacing.md,
+    gap: theme.spacing.lg,
+    alignItems: 'center',
+  },
+  textLink: {
+    paddingVertical: 6,
+  },
+  textLinkLabel: {
+    fontFamily: theme.fonts.semibold,
+    fontSize: 12,
+    letterSpacing: 2,
+    color: theme.colors.accent,
+  },
   hScroll: {
     paddingHorizontal: theme.spacing.md,
     paddingTop: 2,
     paddingBottom: 6,
     gap: theme.spacing.md,
   },
-
-  // Footer
   footer: {
     alignItems: 'center',
     paddingVertical: theme.spacing.xl,

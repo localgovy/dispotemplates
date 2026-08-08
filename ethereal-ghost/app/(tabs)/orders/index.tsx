@@ -44,7 +44,6 @@ export default function OrdersScreen() {
       .then(({ data, error }) => {
         if (!error && data) {
           setOrders(data as Order[]);
-          // Auto-expand the most recent order if it is ready
           const first = data[0] as Order | undefined;
           if (first?.status === 'ready') setExpanded(first.id);
         }
@@ -113,64 +112,64 @@ export default function OrdersScreen() {
               key={order.id}
               style={styles.orderCard}
               onPress={() => setExpanded(isExpanded ? null : order.id)}
-              activeOpacity={0.9}
+              activeOpacity={0.85}
             >
-              {order.status === 'ready' && (
-                <View style={styles.readyBanner}>
-                  <Ionicons name="checkmark-circle" size={14} color={theme.colors.white} />
-                  <Text style={styles.readyBannerText}>Ready for Pickup!</Text>
+              <View style={styles.cardRow}>
+                <View style={[styles.orb, { backgroundColor: cfg.color }, theme.shadows.small]}>
+                  <View style={styles.orbInner} />
                 </View>
-              )}
 
-              <View style={styles.orderHeader}>
-                <View>
-                  <Text style={styles.orderCode}>{order.confirmation_code}</Text>
-                  <Text style={styles.orderDate}>{formatDate(order.created_at)}</Text>
-                </View>
-                <View style={styles.orderRight}>
-                  <View
-                    style={[
-                      styles.statusBadge,
-                      { backgroundColor: cfg.color + '20', borderColor: cfg.color + '50' },
-                    ]}
-                  >
-                    <Ionicons name={cfg.icon} size={12} color={cfg.color} />
+                <View style={styles.cardContent}>
+                  {order.status === 'ready' && (
+                    <Text style={styles.readyHint}>Ready for Pickup</Text>
+                  )}
+
+                  <View style={styles.orderHeader}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.orderCode}>{order.confirmation_code}</Text>
+                      <Text style={styles.orderDate}>{formatDate(order.created_at)}</Text>
+                    </View>
+                    <Text style={styles.orderTotal}>${Number(order.total).toFixed(2)}</Text>
+                  </View>
+
+                  <View style={styles.statusRow}>
+                    <Ionicons name={cfg.icon} size={13} color={cfg.color} />
                     <Text style={[styles.statusText, { color: cfg.color }]}>{cfg.label}</Text>
                   </View>
-                  <Text style={styles.orderTotal}>${Number(order.total).toFixed(2)}</Text>
-                </View>
-              </View>
 
-              {isExpanded && (
-                <View style={styles.orderBody}>
-                  <View style={styles.divider} />
-                  {order.order_items.map((item) => (
-                    <View key={item.id} style={styles.itemRow}>
-                      <View style={styles.itemDot} />
-                      <Text style={styles.itemName} numberOfLines={1}>{item.name}</Text>
-                      <Text style={styles.itemQty}>×{item.qty}</Text>
-                      <Text style={styles.itemPrice}>${Number(item.price).toFixed(2)}</Text>
-                    </View>
-                  ))}
-                  {order.status === 'ready' && (
-                    <View style={styles.viewCodeBtn}>
-                      <Ionicons name="qr-code-outline" size={16} color={theme.colors.primary} />
-                      <Text style={styles.viewCodeText}>Show Pickup Code: {order.confirmation_code}</Text>
+                  {isExpanded && (
+                    <View style={styles.orderBody}>
+                      <View style={styles.divider} />
+                      {order.order_items.map((item) => (
+                        <View key={item.id} style={styles.itemRow}>
+                          <Text style={styles.itemName} numberOfLines={1}>{item.name}</Text>
+                          <Text style={styles.itemQty}>×{item.qty}</Text>
+                          <Text style={styles.itemPrice}>${Number(item.price).toFixed(2)}</Text>
+                        </View>
+                      ))}
+                      {order.status === 'ready' && (
+                        <View style={styles.viewCodeBtn}>
+                          <Ionicons name="qr-code-outline" size={16} color={theme.colors.primary} />
+                          <Text style={styles.viewCodeText}>
+                            Show Pickup Code: {order.confirmation_code}
+                          </Text>
+                        </View>
+                      )}
                     </View>
                   )}
-                </View>
-              )}
 
-              <View style={styles.orderFooter}>
-                <Text style={styles.itemSummary}>
-                  {order.order_items.length}{' '}
-                  {order.order_items.length === 1 ? 'item' : 'items'}
-                </Text>
-                <Ionicons
-                  name={isExpanded ? 'chevron-up' : 'chevron-down'}
-                  size={16}
-                  color={theme.colors.textMuted}
-                />
+                  <View style={styles.orderFooter}>
+                    <Text style={styles.itemSummary}>
+                      {order.order_items.length}{' '}
+                      {order.order_items.length === 1 ? 'item' : 'items'}
+                    </Text>
+                    <Ionicons
+                      name={isExpanded ? 'chevron-up' : 'chevron-down'}
+                      size={16}
+                      color={theme.colors.textMuted}
+                    />
+                  </View>
+                </View>
               </View>
             </TouchableOpacity>
           );
@@ -193,10 +192,13 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
   },
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
+    borderBottomColor: theme.colors.divider,
   },
   headerTitle: {
     ...theme.typography.title,
@@ -207,7 +209,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: theme.spacing.md,
-    paddingBottom: 80,
+    paddingBottom: 100,
   },
   emptyTitle: {
     ...theme.typography.heading,
@@ -217,94 +219,89 @@ const styles = StyleSheet.create({
     ...theme.typography.caption,
     color: theme.colors.textMuted,
   },
-  scroll: {
-    flex: 1,
-  },
+  scroll: { flex: 1 },
   scrollContent: {
     padding: theme.spacing.md,
     gap: theme.spacing.md,
     paddingBottom: 120,
   },
+
   orderCard: {
-    backgroundColor: theme.colors.surface,
-    ...theme.asymmetricSm,
     borderWidth: 1,
     borderColor: theme.colors.border,
+    borderRadius: theme.radius.lg,
+    backgroundColor: theme.colors.surface,
     overflow: 'hidden',
-    ...theme.shadows.small,
   },
-  readyBanner: {
+  cardRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: theme.spacing.xs,
-    backgroundColor: theme.colors.primary,
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.xs,
+    alignItems: 'flex-start',
+    padding: theme.spacing.md,
+    gap: theme.spacing.md,
   },
-  readyBannerText: {
+  orb: {
+    width: 14,
+    height: 14,
+    borderRadius: theme.radius.full,
+    marginTop: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  orbInner: {
+    width: 6,
+    height: 6,
+    borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.white,
+    opacity: 0.6,
+  },
+  cardContent: {
+    flex: 1,
+    gap: theme.spacing.sm,
+  },
+  readyHint: {
     ...theme.typography.label,
-    color: theme.colors.white,
-    letterSpacing: 0.5,
+    color: theme.colors.primary,
   },
   orderHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'flex-start',
-    padding: theme.spacing.md,
-    paddingBottom: theme.spacing.sm,
+    justifyContent: 'space-between',
+    gap: theme.spacing.sm,
   },
   orderCode: {
     ...theme.typography.subheading,
     color: theme.colors.text,
-    fontWeight: '700',
   },
   orderDate: {
-    ...theme.typography.small,
+    ...theme.typography.caption,
     color: theme.colors.textMuted,
     marginTop: 2,
-  },
-  orderRight: {
-    alignItems: 'flex-end',
-    gap: 6,
-  },
-  statusBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: theme.spacing.sm,
-    paddingVertical: 3,
-    borderRadius: theme.radius.full,
-    borderWidth: 1,
-  },
-  statusText: {
-    ...theme.typography.small,
-    fontWeight: '700',
   },
   orderTotal: {
     ...theme.typography.subheading,
     color: theme.colors.text,
-    fontWeight: '700',
+  },
+  statusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.xs,
+  },
+  statusText: {
+    ...theme.typography.caption,
   },
   orderBody: {
-    paddingHorizontal: theme.spacing.md,
-    paddingBottom: theme.spacing.sm,
+    gap: theme.spacing.xs,
   },
   divider: {
     height: 1,
     backgroundColor: theme.colors.divider,
-    marginBottom: theme.spacing.sm,
+    marginBottom: theme.spacing.xs,
   },
   itemRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: theme.spacing.xs,
     paddingVertical: 4,
-  },
-  itemDot: {
-    width: 5,
-    height: 5,
-    borderRadius: 2.5,
-    backgroundColor: theme.colors.primary,
   },
   itemName: {
     ...theme.typography.caption,
@@ -321,7 +318,6 @@ const styles = StyleSheet.create({
     color: theme.colors.text,
     width: 54,
     textAlign: 'right',
-    fontWeight: '600',
   },
   viewCodeBtn: {
     flexDirection: 'row',
@@ -331,21 +327,19 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing.sm,
     paddingVertical: theme.spacing.sm,
     backgroundColor: theme.colors.primaryMuted,
-    borderRadius: theme.radius.md,
+    borderRadius: theme.radius.full,
     borderWidth: 1,
-    borderColor: theme.colors.primary,
+    borderColor: theme.colors.border,
   },
   viewCodeText: {
     ...theme.typography.caption,
     color: theme.colors.primary,
-    fontWeight: '700',
   },
   orderFooter: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
+    paddingTop: theme.spacing.sm,
     borderTopWidth: 1,
     borderTopColor: theme.colors.divider,
   },

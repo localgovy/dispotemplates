@@ -19,12 +19,12 @@ type OrderStatus = Tables['orders']['status'];
 
 const STATUS_CONFIG: Record<
   OrderStatus,
-  { label: string; color: string; icon: React.ComponentProps<typeof Ionicons>['name'] }
+  { label: string; color: string; bg: string; icon: React.ComponentProps<typeof Ionicons>['name'] }
 > = {
-  ready:      { label: 'Ready for Pickup', color: theme.colors.primary,   icon: 'checkmark-circle' },
-  processing: { label: 'Processing',       color: theme.colors.accent,    icon: 'time' },
-  picked_up:  { label: 'Picked Up',        color: theme.colors.textMuted, icon: 'bag-check-outline' },
-  cancelled:  { label: 'Cancelled',        color: theme.colors.danger,    icon: 'close-circle-outline' },
+  ready:      { label: 'Ready for Pickup', color: theme.colors.primaryDark,   bg: theme.colors.secondaryContainer, icon: 'checkmark-circle' },
+  processing: { label: 'Processing',       color: theme.colors.accentDark,    bg: theme.colors.accentMuted, icon: 'time' },
+  picked_up:  { label: 'Picked Up',        color: theme.colors.textMuted, bg: theme.colors.surfaceLight, icon: 'bag-check-outline' },
+  cancelled:  { label: 'Cancelled',        color: theme.colors.danger,    bg: theme.colors.accentMuted, icon: 'close-circle-outline' },
 };
 
 export default function OrdersScreen() {
@@ -44,7 +44,6 @@ export default function OrdersScreen() {
       .then(({ data, error }) => {
         if (!error && data) {
           setOrders(data as Order[]);
-          // Auto-expand the most recent order if it is ready
           const first = data[0] as Order | undefined;
           if (first?.status === 'ready') setExpanded(first.id);
         }
@@ -66,7 +65,7 @@ export default function OrdersScreen() {
     return (
       <SafeAreaView style={styles.safe} edges={['top']}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>My Orders</Text>
+          <Text style={styles.headerTitle}>Sky Orders</Text>
           <AIButton />
         </View>
         <View style={styles.centred}>
@@ -80,7 +79,7 @@ export default function OrdersScreen() {
     return (
       <SafeAreaView style={styles.safe} edges={['top']}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>My Orders</Text>
+          <Text style={styles.headerTitle}>Sky Orders</Text>
           <AIButton />
         </View>
         <View style={styles.centred}>
@@ -95,7 +94,7 @@ export default function OrdersScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>My Orders</Text>
+        <Text style={styles.headerTitle}>Sky Orders</Text>
         <AIButton />
       </View>
 
@@ -117,7 +116,7 @@ export default function OrdersScreen() {
             >
               {order.status === 'ready' && (
                 <View style={styles.readyBanner}>
-                  <Ionicons name="checkmark-circle" size={14} color={theme.colors.white} />
+                  <Ionicons name="checkmark-circle" size={14} color={theme.colors.onPrimary} />
                   <Text style={styles.readyBannerText}>Ready for Pickup!</Text>
                 </View>
               )}
@@ -128,12 +127,7 @@ export default function OrdersScreen() {
                   <Text style={styles.orderDate}>{formatDate(order.created_at)}</Text>
                 </View>
                 <View style={styles.orderRight}>
-                  <View
-                    style={[
-                      styles.statusBadge,
-                      { backgroundColor: cfg.color + '20', borderColor: cfg.color + '50' },
-                    ]}
-                  >
+                  <View style={[styles.statusPill, { backgroundColor: cfg.bg }]}>
                     <Ionicons name={cfg.icon} size={12} color={cfg.color} />
                     <Text style={[styles.statusText, { color: cfg.color }]}>{cfg.label}</Text>
                   </View>
@@ -155,7 +149,9 @@ export default function OrdersScreen() {
                   {order.status === 'ready' && (
                     <View style={styles.viewCodeBtn}>
                       <Ionicons name="qr-code-outline" size={16} color={theme.colors.primary} />
-                      <Text style={styles.viewCodeText}>Show Pickup Code: {order.confirmation_code}</Text>
+                      <Text style={styles.viewCodeText}>
+                        Show Pickup Code: {order.confirmation_code}
+                      </Text>
                     </View>
                   )}
                 </View>
@@ -193,10 +189,14 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
   },
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
   },
   headerTitle: {
     ...theme.typography.title,
@@ -217,19 +217,17 @@ const styles = StyleSheet.create({
     ...theme.typography.caption,
     color: theme.colors.textMuted,
   },
-  scroll: {
-    flex: 1,
-  },
+  scroll: { flex: 1 },
   scrollContent: {
     padding: theme.spacing.md,
     gap: theme.spacing.md,
-    paddingBottom: 120,
+    paddingBottom: 100,
   },
   orderCard: {
     backgroundColor: theme.colors.surface,
-    ...theme.asymmetricSm,
+    borderRadius: theme.radius.lg,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.borderLight,
     overflow: 'hidden',
     ...theme.shadows.small,
   },
@@ -243,7 +241,7 @@ const styles = StyleSheet.create({
   },
   readyBannerText: {
     ...theme.typography.label,
-    color: theme.colors.white,
+    color: theme.colors.onPrimary,
     letterSpacing: 0.5,
   },
   orderHeader: {
@@ -256,7 +254,7 @@ const styles = StyleSheet.create({
   orderCode: {
     ...theme.typography.subheading,
     color: theme.colors.text,
-    fontWeight: '700',
+    fontFamily: theme.fonts.bold,
   },
   orderDate: {
     ...theme.typography.small,
@@ -267,23 +265,22 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     gap: 6,
   },
-  statusBadge: {
+  statusPill: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
     paddingHorizontal: theme.spacing.sm,
-    paddingVertical: 3,
+    paddingVertical: 5,
     borderRadius: theme.radius.full,
-    borderWidth: 1,
   },
   statusText: {
     ...theme.typography.small,
-    fontWeight: '700',
+    fontFamily: theme.fonts.semibold,
   },
   orderTotal: {
     ...theme.typography.subheading,
     color: theme.colors.text,
-    fontWeight: '700',
+    fontFamily: theme.fonts.bold,
   },
   orderBody: {
     paddingHorizontal: theme.spacing.md,
@@ -321,7 +318,7 @@ const styles = StyleSheet.create({
     color: theme.colors.text,
     width: 54,
     textAlign: 'right',
-    fontWeight: '600',
+    fontFamily: theme.fonts.semibold,
   },
   viewCodeBtn: {
     flexDirection: 'row',
@@ -333,12 +330,12 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.primaryMuted,
     borderRadius: theme.radius.md,
     borderWidth: 1,
-    borderColor: theme.colors.primary,
+    borderColor: theme.colors.primaryLight,
   },
   viewCodeText: {
     ...theme.typography.caption,
     color: theme.colors.primary,
-    fontWeight: '700',
+    fontFamily: theme.fonts.bold,
   },
   orderFooter: {
     flexDirection: 'row',

@@ -2,7 +2,6 @@ import {
   View,
   Text,
   TextInput,
-  ScrollView,
   FlatList,
   TouchableOpacity,
   StyleSheet,
@@ -16,7 +15,6 @@ import { useLocalSearchParams } from 'expo-router';
 import theme from '../../../theme';
 import { PRODUCTS, CATEGORIES, type Product } from '../../../data/products';
 import ProductCard from '../../../components/ProductCard';
-import CategoryPill from '../../../components/CategoryPill';
 import ProductDetailModal from '../../../components/ProductDetailModal';
 import FilterSheet, {
   DEFAULT_SORT_OPTIONS,
@@ -91,7 +89,6 @@ export default function SearchScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      {/* ── Editorial Header ────────────────────────────────── */}
       <View style={styles.pageHeader}>
         <View>
           <Text style={styles.pageEyebrow}>LAB CATALOG // SCAN</Text>
@@ -100,7 +97,42 @@ export default function SearchScreen() {
         <AIButton />
       </View>
 
-      {/* ── Search Bar ──────────────────────────────────────── */}
+      {/* Cyan sharp segmented control flush under title */}
+      <View style={styles.segmentWrap}>
+        <View style={styles.segmentRow}>
+          <TouchableOpacity
+            style={[styles.segmentBtn, activeCategory === 'all' && styles.segmentBtnActive]}
+            onPress={() => {
+              setActiveCategory('all');
+              Keyboard.dismiss();
+            }}
+            activeOpacity={0.8}
+          >
+            <Text style={[styles.segmentText, activeCategory === 'all' && styles.segmentTextActive]}>
+              ALL
+            </Text>
+          </TouchableOpacity>
+          {CATEGORIES.slice(0, 4).map((cat) => {
+            const active = activeCategory === cat.id;
+            return (
+              <TouchableOpacity
+                key={cat.id}
+                style={[styles.segmentBtn, active && styles.segmentBtnActive]}
+                onPress={() => {
+                  setActiveCategory(cat.id);
+                  Keyboard.dismiss();
+                }}
+                activeOpacity={0.8}
+              >
+                <Text style={[styles.segmentText, active && styles.segmentTextActive]} numberOfLines={1}>
+                  {cat.name.toUpperCase()}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </View>
+
       <View style={styles.searchWrap}>
         <View style={styles.searchBar}>
           <Ionicons name="search" size={18} color={theme.colors.primary} />
@@ -137,28 +169,6 @@ export default function SearchScreen() {
           )}
         </TouchableOpacity>
       </View>
-
-      {/* ── Category Chips ──────────────────────────────────── */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.categoryChips}
-        style={styles.categoryRow}
-        keyboardShouldPersistTaps="handled"
-      >
-        {CATEGORIES.map((cat) => (
-          <CategoryPill
-            key={cat.id}
-            category={cat}
-            size="sm"
-            isSelected={activeCategory === cat.id}
-            onPress={() => {
-              setActiveCategory(cat.id);
-              Keyboard.dismiss();
-            }}
-          />
-        ))}
-      </ScrollView>
 
       <FilterSheet
         visible={showFilters}
@@ -261,6 +271,37 @@ const styles = StyleSheet.create({
     color: theme.colors.text,
     marginTop: 2,
   },
+  segmentWrap: {
+    paddingHorizontal: theme.spacing.md,
+    paddingTop: theme.spacing.sm,
+    paddingBottom: theme.spacing.xs,
+  },
+  segmentRow: {
+    flexDirection: 'row',
+    borderWidth: 1,
+    borderColor: theme.colors.primary,
+  },
+  segmentBtn: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.surface,
+    borderRightWidth: 1,
+    borderRightColor: theme.colors.primary,
+  },
+  segmentBtnActive: {
+    backgroundColor: theme.colors.primaryMuted,
+  },
+  segmentText: {
+    fontFamily: theme.fonts.mono,
+    fontSize: 8,
+    letterSpacing: 0.4,
+    color: theme.colors.textMuted,
+  },
+  segmentTextActive: {
+    color: theme.colors.primary,
+  },
   searchWrap: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -317,18 +358,6 @@ const styles = StyleSheet.create({
     fontSize: 8,
     fontWeight: '800',
     color: theme.colors.onPrimary,
-  },
-  categoryRow: {
-    flexGrow: 0,
-    flexShrink: 0,
-    height: 46,
-    marginTop: 4,
-    marginBottom: 2,
-  },
-  categoryChips: {
-    paddingHorizontal: theme.spacing.md,
-    gap: theme.spacing.xs,
-    alignItems: 'center',
   },
   quickWrap: {
     paddingHorizontal: theme.spacing.md,

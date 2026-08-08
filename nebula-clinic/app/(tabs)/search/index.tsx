@@ -102,7 +102,7 @@ export default function SearchScreen() {
           <Ionicons name="search" size={18} color={theme.colors.textMuted} />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search formulations, brands, effects..."
+            placeholder="Compound ID / effect…"
             placeholderTextColor={theme.colors.textMuted}
             value={query}
             onChangeText={setQuery}

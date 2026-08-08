@@ -146,30 +146,7 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        <View style={styles.heroWrap}>
-          <LinearGradient
-            colors={[theme.colors.primary, '#7B9CFF', theme.colors.info]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.hero}
-          >
-            <Text style={styles.heroEyebrow}>DAILY BLOOM</Text>
-            <Text style={styles.heroTitle}>Clear skies for clearer rituals.</Text>
-            <Text style={styles.heroSub}>
-              Periwinkle calm, coral spark, and airy botanical care.
-            </Text>
-            <TouchableOpacity
-              style={styles.heroBtn}
-              onPress={() => router.push('/(tabs)/search')}
-              activeOpacity={0.85}
-            >
-              <Text style={styles.heroBtnText}>START YOUR RITUAL</Text>
-              <Ionicons name="arrow-forward" size={15} color={theme.colors.primaryDark} />
-            </TouchableOpacity>
-          </LinearGradient>
-        </View>
-
-        {/* Daily Ritual checklist */}
+        {/* Daily Ritual FIRST — invert marketing-first layout */}
         <View style={styles.ritualCard}>
           <View style={styles.ritualHeader}>
             <View>
@@ -229,6 +206,30 @@ export default function HomeScreen() {
               </TouchableOpacity>
             ))}
           </View>
+        </View>
+
+        {/* Hero teaser — marketing lower */}
+        <View style={styles.heroWrap}>
+          <LinearGradient
+            colors={[theme.colors.primary, '#7B9CFF', theme.colors.info]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.hero}
+          >
+            <Text style={styles.heroEyebrow}>DAILY BLOOM</Text>
+            <Text style={styles.heroTitle}>Clear skies for clearer rituals.</Text>
+            <Text style={styles.heroSub}>
+              Periwinkle calm, coral spark, and airy botanical care.
+            </Text>
+            <TouchableOpacity
+              style={styles.heroBtn}
+              onPress={() => router.push('/(tabs)/search')}
+              activeOpacity={0.85}
+            >
+              <Text style={styles.heroBtnText}>START YOUR RITUAL</Text>
+              <Ionicons name="arrow-forward" size={15} color={theme.colors.primaryDark} />
+            </TouchableOpacity>
+          </LinearGradient>
         </View>
 
         <TouchableOpacity style={styles.pickupCard} activeOpacity={0.85} onPress={() => setShowStoreSheet(true)}>

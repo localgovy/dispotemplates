@@ -2,7 +2,6 @@ import {
   View,
   Text,
   TextInput,
-  ScrollView,
   FlatList,
   TouchableOpacity,
   StyleSheet,
@@ -13,7 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useState, useMemo, useEffect } from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import theme from '../../../theme';
-import { PRODUCTS, CATEGORIES, type Product } from '../../../data/products';
+import { PRODUCTS, type Product } from '../../../data/products';
 import ProductCard from '../../../components/ProductCard';
 import ProductDetailModal from '../../../components/ProductDetailModal';
 import FilterSheet, {
@@ -26,25 +25,36 @@ const QUICK_SEARCHES = [
   'Pink Kush', 'Pre-Rolls', 'Edibles', 'Vape', 'High THC', 'CBD', 'Budget',
 ];
 
-const STRAIN_CHIPS = ['All', 'Indica', 'Sativa', 'Hybrid', 'CBD'];
+const STRAIN_SEGMENTS = ['All', 'Indica', 'Sativa', 'Hybrid', 'CBD'] as const;
 
 export default function SearchScreen() {
-  const params = useLocalSearchParams<{ category?: string }>();
+  const params = useLocalSearchParams<{ category?: string; mood?: string }>();
   const [query, setQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState(params.category ?? 'all');
   const [activeSort, setActiveSort] = useState('popular');
   const [activeStrain, setActiveStrain] = useState('All');
+  const [activeMood, setActiveMood] = useState(params.mood ?? '');
   const [showFilters, setShowFilters] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const activeFilterCount =
-    (activeSort !== 'popular' ? 1 : 0) + (activeStrain !== 'All' ? 1 : 0);
+    (activeSort !== 'popular' ? 1 : 0) +
+    (activeStrain !== 'All' ? 1 : 0) +
+    (activeMood ? 1 : 0);
 
   useEffect(() => {
     if (params.category) {
       setActiveCategory(params.category);
     }
   }, [params.category]);
+
+  useEffect(() => {
+    if (params.mood) {
+      setActiveMood(params.mood);
+      setActiveCategory('all');
+      setQuery(params.mood);
+    }
+  }, [params.mood]);
 
   const filtered = useMemo(() => {
     let list = [...PRODUCTS];
@@ -62,7 +72,9 @@ export default function SearchScreen() {
           p.name.toLowerCase().includes(q) ||
           p.brand.toLowerCase().includes(q) ||
           p.category.toLowerCase().includes(q) ||
-          p.tags.some((t) => t.toLowerCase().includes(q))
+          p.description.toLowerCase().includes(q) ||
+          p.tags.some((t) => t.toLowerCase().includes(q)) ||
+          (p.effects?.some((e) => e.label.toLowerCase().includes(q)) ?? false)
       );
     }
 
@@ -77,13 +89,14 @@ export default function SearchScreen() {
     return list;
   }, [query, activeCategory, activeSort, activeStrain]);
 
-  const isIdle = query.trim().length === 0 && activeCategory === 'all';
+  const isIdle = query.trim().length === 0 && activeCategory === 'all' && !activeMood;
 
   function clearAll() {
     setQuery('');
     setActiveCategory('all');
     setActiveStrain('All');
     setActiveSort('popular');
+    setActiveMood('');
   }
 
   return (
@@ -104,13 +117,16 @@ export default function SearchScreen() {
             placeholder="Search botanicals, brands, effects..."
             placeholderTextColor={theme.colors.textMuted}
             value={query}
-            onChangeText={setQuery}
+            onChangeText={(t) => {
+              setQuery(t);
+              if (activeMood) setActiveMood('');
+            }}
             returnKeyType="search"
             autoCapitalize="none"
             autoCorrect={false}
           />
           {query.length > 0 && (
-            <TouchableOpacity onPress={() => setQuery('')} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+            <TouchableOpacity onPress={() => { setQuery(''); setActiveMood(''); }} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
               <Ionicons name="close-circle" size={18} color={theme.colors.textMuted} />
             </TouchableOpacity>
           )}
@@ -133,58 +149,30 @@ export default function SearchScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Category pills */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.categoryChips}
-        style={styles.categoryRow}
-        keyboardShouldPersistTaps="handled"
-      >
-        {CATEGORIES.map((cat) => {
-          const selected = activeCategory === cat.id;
-          return (
-            <TouchableOpacity
-              key={cat.id}
-              style={[styles.chip, selected && styles.chipActive]}
-              onPress={() => {
-                setActiveCategory(cat.id);
-                Keyboard.dismiss();
-              }}
-              activeOpacity={0.8}
-            >
-              <Text style={[styles.chipText, selected && styles.chipTextActive]}>
-                {cat.name}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
-
-      {/* Pill strain filters */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.strainChips}
-        style={styles.strainRow}
-        keyboardShouldPersistTaps="handled"
-      >
-        {STRAIN_CHIPS.map((s) => {
-          const selected = activeStrain === s;
-          return (
-            <TouchableOpacity
-              key={s}
-              style={[styles.strainChip, selected && styles.strainChipActive]}
-              onPress={() => setActiveStrain(s)}
-              activeOpacity={0.8}
-            >
-              <Text style={[styles.strainChipText, selected && styles.strainChipTextActive]}>
-                {s}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
+      {/* Soft mint segmented strain control — equal segments, not pills */}
+      <View style={styles.segmentWrap}>
+        <Text style={styles.segmentLabel}>Spectrum</Text>
+        <View style={styles.segmentTrack}>
+          {STRAIN_SEGMENTS.map((s) => {
+            const selected = activeStrain === s;
+            return (
+              <TouchableOpacity
+                key={s}
+                style={[styles.segment, selected && styles.segmentActive]}
+                onPress={() => {
+                  setActiveStrain(s);
+                  Keyboard.dismiss();
+                }}
+                activeOpacity={0.85}
+              >
+                <Text style={[styles.segmentText, selected && styles.segmentTextActive]}>
+                  {s}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </View>
 
       <FilterSheet
         visible={showFilters}
@@ -220,6 +208,7 @@ export default function SearchScreen() {
       <View style={styles.resultsHeader}>
         <Text style={styles.resultsCount}>
           {filtered.length} {filtered.length === 1 ? 'botanical' : 'botanicals'}
+          {activeMood ? ` · ${activeMood}` : ''}
         </Text>
         {!isIdle && (
           <TouchableOpacity onPress={clearAll} style={styles.clearAllBtn}>
@@ -343,70 +332,50 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: theme.colors.white,
   },
-  categoryRow: {
-    flexGrow: 0,
-    flexShrink: 0,
-    height: 44,
-    marginTop: 4,
-  },
-  categoryChips: {
+
+  segmentWrap: {
     paddingHorizontal: theme.spacing.md,
-    gap: theme.spacing.xs,
-    alignItems: 'center',
+    paddingTop: theme.spacing.sm,
+    paddingBottom: theme.spacing.xs,
+    gap: 6,
   },
-  chip: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: theme.radius.full,
-    backgroundColor: theme.colors.surface,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  chipActive: {
-    backgroundColor: theme.colors.primary,
-    borderColor: theme.colors.primary,
-  },
-  chipText: {
-    fontFamily: theme.fonts.medium,
-    fontSize: 13,
-    color: theme.colors.textSecondary,
-  },
-  chipTextActive: {
-    color: theme.colors.white,
+  segmentLabel: {
     fontFamily: theme.fonts.semibold,
-  },
-  strainRow: {
-    flexGrow: 0,
-    flexShrink: 0,
-    height: 40,
-    marginBottom: 2,
-  },
-  strainChips: {
-    paddingHorizontal: theme.spacing.md,
-    gap: theme.spacing.xs,
-    alignItems: 'center',
-  },
-  strainChip: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: theme.radius.full,
-    backgroundColor: theme.colors.secondaryContainer + '88',
-    borderWidth: 1,
-    borderColor: 'transparent',
-  },
-  strainChipActive: {
-    backgroundColor: theme.colors.secondaryContainer,
-    borderColor: theme.colors.primaryLight,
-  },
-  strainChipText: {
-    fontFamily: theme.fonts.medium,
-    fontSize: 12,
+    fontSize: 11,
+    letterSpacing: 1,
     color: theme.colors.textMuted,
   },
-  strainChipTextActive: {
-    color: theme.colors.primaryDark,
-    fontFamily: theme.fonts.semibold,
+  segmentTrack: {
+    flexDirection: 'row',
+    backgroundColor: theme.colors.secondaryContainer,
+    borderRadius: theme.radius.md,
+    padding: 3,
+    borderWidth: 1,
+    borderColor: 'rgba(20, 66, 45, 0.1)',
   },
+  segment: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 9,
+    borderRadius: theme.radius.sm,
+  },
+  segmentActive: {
+    backgroundColor: theme.colors.white,
+    ...theme.shadows.small,
+  },
+  segmentText: {
+    fontFamily: theme.fonts.medium,
+    fontSize: 11,
+    color: theme.colors.primaryDark,
+    opacity: 0.65,
+  },
+  segmentTextActive: {
+    fontFamily: theme.fonts.semibold,
+    opacity: 1,
+    color: theme.colors.primaryDark,
+  },
+
   quickWrap: {
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.sm,

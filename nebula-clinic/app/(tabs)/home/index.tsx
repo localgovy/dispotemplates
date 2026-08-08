@@ -13,6 +13,7 @@ import { useRouter } from 'expo-router';
 import theme from '../../../theme';
 import {
   DEALS,
+  PRODUCTS,
   NEW_PRODUCTS,
   TOP_TESTERS,
   BUDGET_FINDS,
@@ -57,6 +58,11 @@ export default function HomeScreen() {
   const { store, setStore } = useStore();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [showStoreSheet, setShowStoreSheet] = useState(false);
+
+  const protocolOfDay =
+    PRODUCTS.find((p) => p.isFeatured) ??
+    PRODUCTS.find((p) => p.isNew) ??
+    PRODUCTS[0];
 
   const handleProductPress = useCallback((product: Product) => {
     setSelectedProduct(product);
@@ -162,7 +168,55 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* Featured Protocols */}
+        {/* Protocol of the day */}
+        {protocolOfDay && (
+          <View style={styles.sectionWrap}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Protocol of the Day</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.protocolCard}
+              activeOpacity={0.88}
+              onPress={() => handleProductPress(protocolOfDay)}
+            >
+              <View style={styles.protocolBadge}>
+                <View style={styles.protocolDot} />
+                <Text style={styles.protocolEyebrow}>
+                  {protocolOfDay.isFeatured ? 'FEATURED FORMULATION' : 'NEW ARRIVAL'}
+                </Text>
+              </View>
+              <Text style={styles.protocolTitle}>{protocolOfDay.name}</Text>
+              <Text style={styles.protocolDesc} numberOfLines={2}>
+                {protocolOfDay.description}
+              </Text>
+              <View style={styles.protocolMeta}>
+                <Text style={styles.protocolBrand}>{protocolOfDay.brand}</Text>
+                {protocolOfDay.thc != null && (
+                  <Text style={styles.protocolMetric}>THC {protocolOfDay.thc}%</Text>
+                )}
+              </View>
+              <View style={styles.protocolCtaRow}>
+                <TouchableOpacity
+                  style={styles.protocolCta}
+                  onPress={() => handleProductPress(protocolOfDay)}
+                  activeOpacity={0.85}
+                >
+                  <Text style={styles.protocolCtaText}>OPEN PROTOCOL</Text>
+                  <Ionicons name="flask-outline" size={14} color={theme.colors.white} />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.protocolShopBtn}
+                  onPress={() => router.push('/(tabs)/search')}
+                  activeOpacity={0.85}
+                >
+                  <Text style={styles.protocolShopText}>Shop all</Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* Featured Protocols — vertical list */}
         <View style={styles.sectionWrap}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Featured Protocols</Text>
@@ -174,15 +228,16 @@ export default function HomeScreen() {
               <Text style={styles.seeAllText}>View all</Text>
             </TouchableOpacity>
           </View>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.hScroll}
-          >
+          <View style={styles.dealList}>
             {DEALS.map((deal) => (
-              <DealCard key={deal.id} deal={deal} />
+              <DealCard
+                key={deal.id}
+                deal={deal}
+                fullWidth
+                onPress={() => router.push('/(tabs)/search')}
+              />
             ))}
-          </ScrollView>
+          </View>
         </View>
 
         <SectionRow
@@ -442,11 +497,96 @@ const styles = StyleSheet.create({
     color: theme.colors.primary,
     textDecorationLine: 'underline',
   },
-  hScroll: {
+  dealList: {
     paddingHorizontal: theme.spacing.md,
-    paddingTop: 2,
-    paddingBottom: 6,
-    gap: theme.spacing.md,
+    gap: theme.spacing.sm,
+  },
+  protocolCard: {
+    marginHorizontal: theme.spacing.md,
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.lg,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    gap: 8,
+    ...theme.shadows.small,
+  },
+  protocolBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  protocolDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: theme.colors.primary,
+  },
+  protocolEyebrow: {
+    fontFamily: theme.fonts.semibold,
+    fontSize: 10,
+    letterSpacing: 1.2,
+    color: theme.colors.primaryDark,
+  },
+  protocolTitle: {
+    fontFamily: theme.fonts.bold,
+    fontSize: 20,
+    color: theme.colors.text,
+    letterSpacing: -0.3,
+  },
+  protocolDesc: {
+    ...theme.typography.body,
+    color: theme.colors.textSecondary,
+  },
+  protocolMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+  },
+  protocolBrand: {
+    ...theme.typography.caption,
+    color: theme.colors.textMuted,
+  },
+  protocolMetric: {
+    fontFamily: theme.fonts.semibold,
+    fontSize: 11,
+    color: theme.colors.primaryDark,
+    backgroundColor: theme.colors.backgroundLight,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: theme.radius.sm,
+    overflow: 'hidden',
+  },
+  protocolCtaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+    marginTop: 4,
+  },
+  protocolCta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: theme.colors.primaryDark,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: 10,
+    borderRadius: theme.radius.md,
+  },
+  protocolCtaText: {
+    fontFamily: theme.fonts.semibold,
+    fontSize: 11,
+    letterSpacing: 0.6,
+    color: theme.colors.white,
+  },
+  protocolShopBtn: {
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: 8,
+  },
+  protocolShopText: {
+    fontFamily: theme.fonts.semibold,
+    fontSize: 13,
+    color: theme.colors.primary,
+    textDecorationLine: 'underline',
   },
 
   catGrid: {

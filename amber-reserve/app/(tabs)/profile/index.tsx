@@ -13,7 +13,6 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { supabase, Tables } from '../../../lib/supabase';
 import { useAuth } from '../../../context/AuthContext';
@@ -55,7 +54,6 @@ export default function ProfileScreen() {
   const avatarInitial = displayName.charAt(0).toUpperCase();
   const loyaltyPts = profile?.loyalty_pts ?? 0;
   const memberYear = profile?.created_at ? new Date(profile.created_at).getFullYear() : 2024;
-  // 500 pts = $10 off — progress toward the next redemption tier
   const REDEEM_THRESHOLD = 500;
   const REDEEM_VALUE = 10;
   const progressPct = Math.min((loyaltyPts % REDEEM_THRESHOLD) / REDEEM_THRESHOLD, 1);
@@ -63,7 +61,10 @@ export default function ProfileScreen() {
   const totalRedeemable = Math.floor(loyaltyPts / REDEEM_THRESHOLD) * REDEEM_VALUE;
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     supabase
       .from('profiles')
       .select('*')
@@ -176,7 +177,7 @@ export default function ProfileScreen() {
         {
           id: 'loyalty',
           icon: 'gift-outline',
-          label: 'Loyalty Points',
+          label: 'Reserve Points',
           value: `${loyaltyPts.toLocaleString()} pts`,
         },
       ],
@@ -214,7 +215,6 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      {/* Top nav row */}
       <View style={styles.topNav}>
         <Text style={styles.topNavTitle}>Account</Text>
         <AIButton />
@@ -224,10 +224,11 @@ export default function ProfileScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Profile Header */}
-        <LinearGradient
-          colors={[theme.colors.surfaceElevated, theme.colors.surface]}
-          style={styles.profileHeader}
+        {/* Compact member strip */}
+        <TouchableOpacity
+          style={styles.memberStrip}
+          activeOpacity={0.85}
+          onPress={() => handleMenuItem('loyalty')}
         >
           <View style={styles.avatarWrap}>
             {avatarUrl ? (
@@ -237,47 +238,29 @@ export default function ProfileScreen() {
                 <Text style={styles.avatarText}>{avatarInitial}</Text>
               </View>
             )}
-            <View style={styles.verifiedBadge}>
-              <Ionicons name="checkmark" size={10} color={theme.colors.white} />
-            </View>
           </View>
-          <Text style={styles.userName}>{displayName}</Text>
-          <Text style={styles.userSince}>Member since {memberYear} · Aurora, ON</Text>
-
-          {/* Loyalty Card */}
-          <TouchableOpacity
-            style={styles.loyaltyCard}
-            activeOpacity={0.85}
-            onPress={() => handleMenuItem('loyalty')}
-          >
+          <View style={styles.memberMeta}>
+            <Text style={styles.userName} numberOfLines={1}>{displayName}</Text>
+            <Text style={styles.userSince}>Member since {memberYear} · {store.city}</Text>
             {loading ? (
-              <ActivityIndicator size="small" color={theme.colors.gold} />
+              <ActivityIndicator size="small" color={theme.colors.gold} style={{ marginTop: 4 }} />
             ) : (
-              <>
-                <View style={styles.loyaltyLeft}>
-                  <Ionicons name="leaf" size={20} color={theme.colors.gold} />
-                  <View>
-                    <Text style={styles.loyaltyLabel}>GREEN POINTS</Text>
-                    <Text style={styles.loyaltyPoints}>{loyaltyPts.toLocaleString()} pts</Text>
-                  </View>
-                </View>
-                <View style={styles.loyaltyRight}>
-                  <Text style={styles.loyaltyNext}>
-                    {totalRedeemable > 0
-                      ? `$${totalRedeemable} ready to redeem!`
-                      : `${ptsToNext} pts until $${REDEEM_VALUE} off`}
-                  </Text>
-                  <View style={styles.progressBar}>
-                    <View style={[styles.progressFill, { width: `${progressPct * 100}%` }]} />
-                  </View>
-                  <Text style={styles.loyaltyRedeem}>1 pt / $1 · {REDEEM_THRESHOLD} pts = ${REDEEM_VALUE}</Text>
-                </View>
-              </>
+              <View style={styles.pointsRow}>
+                <Text style={styles.pointsLabel}>RESERVE POINTS</Text>
+                <Text style={styles.pointsValue}>{loyaltyPts.toLocaleString()}</Text>
+              </View>
             )}
-          </TouchableOpacity>
-        </LinearGradient>
+          </View>
+          <View style={styles.stripRight}>
+            <View style={styles.miniProgress}>
+              <View style={[styles.miniProgressFill, { width: `${progressPct * 100}%` }]} />
+            </View>
+            <Text style={styles.stripHint}>
+              {totalRedeemable > 0 ? `$${totalRedeemable} ready` : `${ptsToNext} to $${REDEEM_VALUE}`}
+            </Text>
+          </View>
+        </TouchableOpacity>
 
-        {/* Menu Sections */}
         {MENU_SECTIONS.map((section, si) => (
           <View key={si} style={styles.section}>
             {section.title !== '' && (
@@ -377,110 +360,93 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 120,
   },
-  profileHeader: {
+  memberStrip: {
+    flexDirection: 'row',
     alignItems: 'center',
-    padding: theme.spacing.xl,
-    gap: theme.spacing.xs,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
+    marginHorizontal: theme.spacing.md,
+    marginTop: theme.spacing.md,
+    marginBottom: theme.spacing.sm,
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.surface,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    ...theme.asymmetric,
+    gap: theme.spacing.sm,
   },
   avatarWrap: {
     position: 'relative',
-    marginBottom: theme.spacing.xs,
   },
   avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
     backgroundColor: theme.colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 2,
+    borderWidth: 1.5,
     borderColor: theme.colors.accent,
   },
   avatarImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    borderWidth: 2,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    borderWidth: 1.5,
     borderColor: theme.colors.accent,
   },
   avatarText: {
     fontFamily: theme.fonts.serifBold,
-    fontSize: 32,
-    color: theme.colors.gold,
+    fontSize: 22,
+    color: theme.colors.onPrimary,
   },
-  verifiedBadge: {
-    position: 'absolute',
-    bottom: 2,
-    right: 2,
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    backgroundColor: theme.colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: theme.colors.surface,
+  memberMeta: {
+    flex: 1,
+    gap: 2,
   },
   userName: {
-    ...theme.typography.title,
+    fontFamily: theme.fonts.serifBold,
+    fontSize: 17,
     color: theme.colors.text,
   },
   userSince: {
-    ...theme.typography.caption,
+    ...theme.typography.small,
     color: theme.colors.textMuted,
   },
-  loyaltyCard: {
+  pointsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: theme.colors.primary,
-    ...theme.asymmetric,
-    padding: theme.spacing.md,
-    width: '100%',
-    marginTop: theme.spacing.md,
-    gap: theme.spacing.md,
-    ...theme.shadows.medium,
-    minHeight: 72,
+    gap: 8,
+    marginTop: 4,
   },
-  loyaltyLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: theme.spacing.sm,
-  },
-  loyaltyLabel: {
+  pointsLabel: {
     ...theme.typography.label,
     color: theme.colors.gold,
   },
-  loyaltyPoints: {
-    fontFamily: theme.fonts.serifBold,
-    fontSize: 22,
-    color: theme.colors.white,
+  pointsValue: {
+    fontFamily: theme.fonts.semibold,
+    fontSize: 13,
+    color: theme.colors.text,
   },
-  loyaltyRight: {
-    flex: 1,
-    gap: 4,
+  stripRight: {
+    alignItems: 'flex-end',
+    gap: 6,
+    width: 72,
   },
-  loyaltyNext: {
-    ...theme.typography.small,
-    color: theme.colors.onPrimaryMuted,
-  },
-  progressBar: {
-    height: 6,
-    backgroundColor: 'rgba(255,255,255,0.15)',
+  miniProgress: {
+    width: '100%',
+    height: 4,
+    backgroundColor: theme.colors.surfaceLight,
     borderRadius: theme.radius.full,
     overflow: 'hidden',
   },
-  progressFill: {
+  miniProgressFill: {
     height: '100%',
     backgroundColor: theme.colors.gold,
     borderRadius: theme.radius.full,
   },
-  loyaltyRedeem: {
-    fontFamily: theme.fonts.semibold,
-    fontSize: 11,
-    color: theme.colors.gold,
+  stripHint: {
+    fontFamily: theme.fonts.medium,
+    fontSize: 10,
+    color: theme.colors.textMuted,
     textAlign: 'right',
   },
   section: {
@@ -504,7 +470,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.md - 2,
+    paddingVertical: theme.spacing.md,
     gap: theme.spacing.sm,
   },
   menuRowBorder: {

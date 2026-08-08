@@ -6,24 +6,34 @@ import type { Deal } from '../data/products';
 interface Props {
   deal: Deal;
   onPress?: () => void;
+  /** Full-width vertical list row (vs compact carousel card) */
+  fullWidth?: boolean;
 }
 
-export default function DealCard({ deal, onPress }: Props) {
+export default function DealCard({ deal, onPress, fullWidth }: Props) {
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.85}>
+    <TouchableOpacity
+      style={[styles.card, fullWidth && styles.cardFull]}
+      onPress={onPress}
+      activeOpacity={0.85}
+    >
       <LinearGradient
         colors={deal.gradient}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
-        style={styles.gradient}
+        style={[styles.gradient, fullWidth && styles.gradientFull]}
       >
         <View style={styles.badgeWrap}>
           <View style={styles.badge}>
             <Text style={styles.badgeText}>{deal.badge}</Text>
           </View>
         </View>
-        <Text style={styles.title} numberOfLines={2}>{deal.title}</Text>
-        <Text style={styles.subtitle} numberOfLines={2}>{deal.subtitle}</Text>
+        <View style={fullWidth ? styles.fullBody : undefined}>
+          <Text style={[styles.title, fullWidth && styles.titleFull]} numberOfLines={2}>
+            {deal.title}
+          </Text>
+          <Text style={styles.subtitle} numberOfLines={2}>{deal.subtitle}</Text>
+        </View>
         <View style={styles.tapRow}>
           <Text style={styles.tapText}>View deal →</Text>
         </View>
@@ -40,10 +50,25 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     ...theme.shadows.medium,
   },
+  cardFull: {
+    width: '100%',
+    height: undefined,
+    minHeight: 110,
+  },
   gradient: {
     flex: 1,
     padding: theme.spacing.md,
     justifyContent: 'space-between',
+  },
+  gradientFull: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+    paddingVertical: theme.spacing.md,
+  },
+  fullBody: {
+    flex: 1,
+    gap: 2,
   },
   badgeWrap: {
     alignSelf: 'flex-start',
@@ -67,6 +92,10 @@ const styles = StyleSheet.create({
     fontSize: 19,
     lineHeight: 23,
     color: theme.colors.white,
+  },
+  titleFull: {
+    fontSize: 17,
+    lineHeight: 21,
   },
   subtitle: {
     ...theme.typography.small,

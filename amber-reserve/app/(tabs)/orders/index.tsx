@@ -44,7 +44,6 @@ export default function OrdersScreen() {
       .then(({ data, error }) => {
         if (!error && data) {
           setOrders(data as Order[]);
-          // Auto-expand the most recent order if it is ready
           const first = data[0] as Order | undefined;
           if (first?.status === 'ready') setExpanded(first.id);
         }
@@ -66,7 +65,7 @@ export default function OrdersScreen() {
     return (
       <SafeAreaView style={styles.safe} edges={['top']}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>My Orders</Text>
+          <Text style={styles.headerTitle}>Order Timeline</Text>
           <AIButton />
         </View>
         <View style={styles.centred}>
@@ -80,7 +79,7 @@ export default function OrdersScreen() {
     return (
       <SafeAreaView style={styles.safe} edges={['top']}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>My Orders</Text>
+          <Text style={styles.headerTitle}>Order Timeline</Text>
           <AIButton />
         </View>
         <View style={styles.centred}>
@@ -95,7 +94,7 @@ export default function OrdersScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>My Orders</Text>
+        <Text style={styles.headerTitle}>Order Timeline</Text>
         <AIButton />
       </View>
 
@@ -104,73 +103,76 @@ export default function OrdersScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {orders.map((order) => {
+        {orders.map((order, index) => {
           const cfg = STATUS_CONFIG[order.status];
           const isExpanded = expanded === order.id;
+          const isLast = index === orders.length - 1;
 
           return (
             <TouchableOpacity
               key={order.id}
-              style={styles.orderCard}
+              style={styles.timelineRow}
               onPress={() => setExpanded(isExpanded ? null : order.id)}
               activeOpacity={0.9}
             >
-              {order.status === 'ready' && (
-                <View style={styles.readyBanner}>
-                  <Ionicons name="checkmark-circle" size={14} color={theme.colors.white} />
-                  <Text style={styles.readyBannerText}>Ready for Pickup!</Text>
-                </View>
-              )}
+              {/* Vertical status rail */}
+              <View style={styles.rail}>
+                <View style={[styles.railDot, { backgroundColor: cfg.color, borderColor: cfg.color }]} />
+                {!isLast && <View style={styles.railLine} />}
+              </View>
 
-              <View style={styles.orderHeader}>
-                <View>
-                  <Text style={styles.orderCode}>{order.confirmation_code}</Text>
-                  <Text style={styles.orderDate}>{formatDate(order.created_at)}</Text>
-                </View>
-                <View style={styles.orderRight}>
-                  <View
-                    style={[
-                      styles.statusBadge,
-                      { backgroundColor: cfg.color + '20', borderColor: cfg.color + '50' },
-                    ]}
-                  >
-                    <Ionicons name={cfg.icon} size={12} color={cfg.color} />
-                    <Text style={[styles.statusText, { color: cfg.color }]}>{cfg.label}</Text>
+              <View style={styles.timelineCard}>
+                {order.status === 'ready' && (
+                  <View style={styles.readyBanner}>
+                    <Ionicons name="checkmark-circle" size={14} color={theme.colors.onPrimary} />
+                    <Text style={styles.readyBannerText}>Ready for Pickup!</Text>
+                  </View>
+                )}
+
+                <View style={styles.orderHeader}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.orderCode}>{order.confirmation_code}</Text>
+                    <Text style={styles.orderDate}>{formatDate(order.created_at)}</Text>
                   </View>
                   <Text style={styles.orderTotal}>${Number(order.total).toFixed(2)}</Text>
                 </View>
-              </View>
 
-              {isExpanded && (
-                <View style={styles.orderBody}>
-                  <View style={styles.divider} />
-                  {order.order_items.map((item) => (
-                    <View key={item.id} style={styles.itemRow}>
-                      <View style={styles.itemDot} />
-                      <Text style={styles.itemName} numberOfLines={1}>{item.name}</Text>
-                      <Text style={styles.itemQty}>×{item.qty}</Text>
-                      <Text style={styles.itemPrice}>${Number(item.price).toFixed(2)}</Text>
-                    </View>
-                  ))}
-                  {order.status === 'ready' && (
-                    <View style={styles.viewCodeBtn}>
-                      <Ionicons name="qr-code-outline" size={16} color={theme.colors.primary} />
-                      <Text style={styles.viewCodeText}>Show Pickup Code: {order.confirmation_code}</Text>
-                    </View>
-                  )}
+                <View style={styles.statusRow}>
+                  <Ionicons name={cfg.icon} size={14} color={cfg.color} />
+                  <Text style={[styles.statusText, { color: cfg.color }]}>{cfg.label}</Text>
                 </View>
-              )}
 
-              <View style={styles.orderFooter}>
-                <Text style={styles.itemSummary}>
-                  {order.order_items.length}{' '}
-                  {order.order_items.length === 1 ? 'item' : 'items'}
-                </Text>
-                <Ionicons
-                  name={isExpanded ? 'chevron-up' : 'chevron-down'}
-                  size={16}
-                  color={theme.colors.textMuted}
-                />
+                {isExpanded && (
+                  <View style={styles.orderBody}>
+                    <View style={styles.divider} />
+                    {order.order_items.map((item) => (
+                      <View key={item.id} style={styles.itemRow}>
+                        <View style={[styles.itemDot, { backgroundColor: cfg.color }]} />
+                        <Text style={styles.itemName} numberOfLines={1}>{item.name}</Text>
+                        <Text style={styles.itemQty}>×{item.qty}</Text>
+                        <Text style={styles.itemPrice}>${Number(item.price).toFixed(2)}</Text>
+                      </View>
+                    ))}
+                    {order.status === 'ready' && (
+                      <View style={styles.viewCodeBtn}>
+                        <Ionicons name="qr-code-outline" size={16} color={theme.colors.primary} />
+                        <Text style={styles.viewCodeText}>Show Pickup Code: {order.confirmation_code}</Text>
+                      </View>
+                    )}
+                  </View>
+                )}
+
+                <View style={styles.orderFooter}>
+                  <Text style={styles.itemSummary}>
+                    {order.order_items.length}{' '}
+                    {order.order_items.length === 1 ? 'item' : 'items'}
+                  </Text>
+                  <Ionicons
+                    name={isExpanded ? 'chevron-up' : 'chevron-down'}
+                    size={16}
+                    color={theme.colors.textMuted}
+                  />
+                </View>
               </View>
             </TouchableOpacity>
           );
@@ -193,6 +195,9 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
   },
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.md,
     borderBottomWidth: 1,
@@ -217,15 +222,37 @@ const styles = StyleSheet.create({
     ...theme.typography.caption,
     color: theme.colors.textMuted,
   },
-  scroll: {
-    flex: 1,
-  },
+  scroll: { flex: 1 },
   scrollContent: {
     padding: theme.spacing.md,
-    gap: theme.spacing.md,
     paddingBottom: 120,
   },
-  orderCard: {
+  timelineRow: {
+    flexDirection: 'row',
+    gap: theme.spacing.sm,
+    marginBottom: theme.spacing.sm,
+  },
+  rail: {
+    width: 20,
+    alignItems: 'center',
+    paddingTop: 22,
+  },
+  railDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    borderWidth: 2,
+    zIndex: 1,
+  },
+  railLine: {
+    width: 2,
+    flex: 1,
+    backgroundColor: theme.colors.border,
+    marginTop: 4,
+    minHeight: 40,
+  },
+  timelineCard: {
+    flex: 1,
     backgroundColor: theme.colors.surface,
     ...theme.asymmetricSm,
     borderWidth: 1,
@@ -243,7 +270,7 @@ const styles = StyleSheet.create({
   },
   readyBannerText: {
     ...theme.typography.label,
-    color: theme.colors.white,
+    color: theme.colors.onPrimary,
     letterSpacing: 0.5,
   },
   orderHeader: {
@@ -251,7 +278,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     padding: theme.spacing.md,
-    paddingBottom: theme.spacing.sm,
+    paddingBottom: theme.spacing.xs,
   },
   orderCode: {
     ...theme.typography.subheading,
@@ -263,26 +290,20 @@ const styles = StyleSheet.create({
     color: theme.colors.textMuted,
     marginTop: 2,
   },
-  orderRight: {
-    alignItems: 'flex-end',
-    gap: 6,
+  orderTotal: {
+    ...theme.typography.subheading,
+    color: theme.colors.gold,
+    fontWeight: '700',
   },
-  statusBadge: {
+  statusRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: theme.spacing.sm,
-    paddingVertical: 3,
-    borderRadius: theme.radius.full,
-    borderWidth: 1,
+    gap: 6,
+    paddingHorizontal: theme.spacing.md,
+    paddingBottom: theme.spacing.sm,
   },
   statusText: {
     ...theme.typography.small,
-    fontWeight: '700',
-  },
-  orderTotal: {
-    ...theme.typography.subheading,
-    color: theme.colors.text,
     fontWeight: '700',
   },
   orderBody: {
@@ -304,7 +325,6 @@ const styles = StyleSheet.create({
     width: 5,
     height: 5,
     borderRadius: 2.5,
-    backgroundColor: theme.colors.primary,
   },
   itemName: {
     ...theme.typography.caption,

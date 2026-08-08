@@ -55,7 +55,7 @@ export default function ProfileScreen() {
   const avatarInitial = displayName.charAt(0).toUpperCase();
   const loyaltyPts = profile?.loyalty_pts ?? 0;
   const memberYear = profile?.created_at ? new Date(profile.created_at).getFullYear() : 2024;
-  // 500 pts = $10 off — progress toward the next redemption tier
+  const streakDays = Math.max(1, Math.min(14, Math.floor(loyaltyPts / 50) || 3));
   const REDEEM_THRESHOLD = 500;
   const REDEEM_VALUE = 10;
   const progressPct = Math.min((loyaltyPts % REDEEM_THRESHOLD) / REDEEM_THRESHOLD, 1);
@@ -63,7 +63,10 @@ export default function ProfileScreen() {
   const totalRedeemable = Math.floor(loyaltyPts / REDEEM_THRESHOLD) * REDEEM_VALUE;
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     supabase
       .from('profiles')
       .select('*')
@@ -169,35 +172,35 @@ export default function ProfileScreen() {
 
   const MENU_SECTIONS: { title: string; items: MenuItem[] }[] = [
     {
-      title: 'Account',
+      title: 'You',
       items: [
-        { id: 'personal', icon: 'person-outline', label: 'Personal Info', value: displayName },
+        { id: 'personal', icon: 'happy-outline', label: 'Personal Info', value: displayName },
         { id: 'age', icon: 'shield-checkmark-outline', label: 'Age Verification', value: 'Verified ✓' },
         {
           id: 'loyalty',
-          icon: 'gift-outline',
-          label: 'Loyalty Points',
+          icon: 'sunny-outline',
+          label: 'Grove Points',
           value: `${loyaltyPts.toLocaleString()} pts`,
         },
       ],
     },
     {
-      title: 'Preferences',
+      title: 'Vibes',
       items: [
         { id: 'notif', icon: 'notifications-outline', label: 'Order Updates', toggle: true, toggleKey: 'notif' },
         { id: 'deals', icon: 'pricetag-outline', label: 'Deal Alerts', toggle: true, toggleKey: 'deals' },
-        { id: 'location', icon: 'location-outline', label: 'Store Location', value: `${store.name}, ${store.province}` },
+        { id: 'location', icon: 'storefront-outline', label: 'My Grove', value: `${store.name}, ${store.province}` },
       ],
     },
     {
-      title: 'Shop',
+      title: 'Shopping',
       items: [
         { id: 'favourites', icon: 'heart-outline', label: 'Saved Favourites' },
         { id: 'payment', icon: 'card-outline', label: 'Payment Methods', value: 'Cash / Debit / Credit' },
       ],
     },
     {
-      title: 'Support',
+      title: 'Help',
       items: [
         { id: 'faq', icon: 'call-outline', label: 'Contact & Hours' },
         { id: 'about', icon: 'globe-outline', label: 'Our Website' },
@@ -214,9 +217,8 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      {/* Top nav row */}
       <View style={styles.topNav}>
-        <Text style={styles.topNavTitle}>Account</Text>
+        <Text style={styles.topNavTitle}>Hey there!</Text>
         <AIButton />
       </View>
       <ScrollView
@@ -224,10 +226,10 @@ export default function ProfileScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Profile Header */}
+        {/* Friendly avatar header */}
         <LinearGradient
-          colors={[theme.colors.surfaceElevated, theme.colors.surface]}
-          style={styles.profileHeader}
+          colors={[theme.colors.surfaceElevated, theme.colors.background]}
+          style={styles.header}
         >
           <View style={styles.avatarWrap}>
             {avatarUrl ? (
@@ -237,47 +239,49 @@ export default function ProfileScreen() {
                 <Text style={styles.avatarText}>{avatarInitial}</Text>
               </View>
             )}
-            <View style={styles.verifiedBadge}>
-              <Ionicons name="checkmark" size={10} color={theme.colors.white} />
+            <View style={styles.waveBadge}>
+              <Ionicons name="hand-left" size={14} color={theme.colors.primary} />
             </View>
           </View>
           <Text style={styles.userName}>{displayName}</Text>
-          <Text style={styles.userSince}>Member since {memberYear} · Aurora, ON</Text>
+          <Text style={styles.userSince}>Grove member since {memberYear}</Text>
 
-          {/* Loyalty Card */}
+          <View style={styles.streakChip}>
+            <Ionicons name="flame" size={14} color={theme.colors.primary} />
+            <Text style={styles.streakText}>{streakDays}-day visit streak — keep it sunny!</Text>
+          </View>
+
           <TouchableOpacity
-            style={styles.loyaltyCard}
+            style={styles.pointsCard}
             activeOpacity={0.85}
             onPress={() => handleMenuItem('loyalty')}
           >
             {loading ? (
-              <ActivityIndicator size="small" color={theme.colors.gold} />
+              <ActivityIndicator size="small" color={theme.colors.onPrimary} />
             ) : (
               <>
-                <View style={styles.loyaltyLeft}>
-                  <Ionicons name="leaf" size={20} color={theme.colors.gold} />
+                <View style={styles.pointsLeft}>
+                  <Ionicons name="sunny" size={22} color={theme.colors.accent} />
                   <View>
-                    <Text style={styles.loyaltyLabel}>GREEN POINTS</Text>
-                    <Text style={styles.loyaltyPoints}>{loyaltyPts.toLocaleString()} pts</Text>
+                    <Text style={styles.pointsLabel}>GROVE POINTS</Text>
+                    <Text style={styles.pointsValue}>{loyaltyPts.toLocaleString()}</Text>
                   </View>
                 </View>
-                <View style={styles.loyaltyRight}>
-                  <Text style={styles.loyaltyNext}>
+                <View style={styles.pointsRight}>
+                  <Text style={styles.pointsNext}>
                     {totalRedeemable > 0
-                      ? `$${totalRedeemable} ready to redeem!`
-                      : `${ptsToNext} pts until $${REDEEM_VALUE} off`}
+                      ? `$${totalRedeemable} ready!`
+                      : `${ptsToNext} to $${REDEEM_VALUE} off`}
                   </Text>
                   <View style={styles.progressBar}>
                     <View style={[styles.progressFill, { width: `${progressPct * 100}%` }]} />
                   </View>
-                  <Text style={styles.loyaltyRedeem}>1 pt / $1 · {REDEEM_THRESHOLD} pts = ${REDEEM_VALUE}</Text>
                 </View>
               </>
             )}
           </TouchableOpacity>
         </LinearGradient>
 
-        {/* Menu Sections */}
         {MENU_SECTIONS.map((section, si) => (
           <View key={si} style={styles.section}>
             {section.title !== '' && (
@@ -335,7 +339,7 @@ export default function ProfileScreen() {
 
         <View style={styles.footer}>
           <View style={styles.footerLogoRow}>
-            <Ionicons name="leaf" size={16} color={theme.colors.accentDark} />
+            <Ionicons name="leaf" size={16} color={theme.colors.primary} />
             <Text style={styles.footerLogo}>Citrus Grove</Text>
           </View>
           <Text style={styles.footerVersion}>{store.name}, {store.province} · v1.0.0</Text>
@@ -364,11 +368,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.sm + 2,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
   },
   topNavTitle: {
-    ...theme.typography.title,
+    fontFamily: theme.fonts.serifBold,
+    fontSize: 26,
     color: theme.colors.primary,
   },
   scroll: {
@@ -377,134 +380,145 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 120,
   },
-  profileHeader: {
+  header: {
     alignItems: 'center',
-    padding: theme.spacing.xl,
+    paddingHorizontal: theme.spacing.xl,
+    paddingTop: theme.spacing.lg,
+    paddingBottom: theme.spacing.xl,
     gap: theme.spacing.xs,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
   },
   avatarWrap: {
     position: 'relative',
-    marginBottom: theme.spacing.xs,
+    marginBottom: theme.spacing.sm,
   },
   avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 96,
+    height: 96,
+    borderRadius: 48,
     backgroundColor: theme.colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 2,
+    borderWidth: 3,
     borderColor: theme.colors.accent,
   },
   avatarImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    borderWidth: 2,
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    borderWidth: 3,
     borderColor: theme.colors.accent,
   },
   avatarText: {
     fontFamily: theme.fonts.serifBold,
-    fontSize: 32,
-    color: theme.colors.gold,
+    fontSize: 36,
+    color: theme.colors.white,
   },
-  verifiedBadge: {
+  waveBadge: {
     position: 'absolute',
-    bottom: 2,
-    right: 2,
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    backgroundColor: theme.colors.primary,
+    bottom: -2,
+    right: -2,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: theme.colors.white,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: theme.colors.surface,
+    borderColor: theme.colors.background,
   },
   userName: {
-    ...theme.typography.title,
+    fontFamily: theme.fonts.serifBold,
+    fontSize: 26,
     color: theme.colors.text,
   },
   userSince: {
     ...theme.typography.caption,
     color: theme.colors.textMuted,
   },
-  loyaltyCard: {
+  streakChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: theme.spacing.sm,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    backgroundColor: theme.colors.secondaryContainer,
+    borderRadius: theme.radius.full,
+  },
+  streakText: {
+    fontFamily: theme.fonts.semibold,
+    fontSize: 12,
+    color: theme.colors.onSecondaryContainer,
+  },
+  pointsCard: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: theme.colors.primary,
-    ...theme.asymmetric,
-    padding: theme.spacing.md,
     width: '100%',
     marginTop: theme.spacing.md,
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.primary,
+    borderRadius: theme.radius.xl,
     gap: theme.spacing.md,
+    minHeight: 80,
     ...theme.shadows.medium,
-    minHeight: 72,
   },
-  loyaltyLeft: {
+  pointsLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: theme.spacing.sm,
   },
-  loyaltyLabel: {
+  pointsLabel: {
     ...theme.typography.label,
-    color: theme.colors.gold,
+    color: theme.colors.accent,
   },
-  loyaltyPoints: {
+  pointsValue: {
     fontFamily: theme.fonts.serifBold,
-    fontSize: 22,
+    fontSize: 24,
     color: theme.colors.white,
   },
-  loyaltyRight: {
+  pointsRight: {
     flex: 1,
-    gap: 4,
+    gap: 6,
   },
-  loyaltyNext: {
+  pointsNext: {
     ...theme.typography.small,
     color: theme.colors.onPrimaryMuted,
+    textAlign: 'right',
   },
   progressBar: {
     height: 6,
-    backgroundColor: 'rgba(255,255,255,0.15)',
+    backgroundColor: 'rgba(255,255,255,0.25)',
     borderRadius: theme.radius.full,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    backgroundColor: theme.colors.gold,
+    backgroundColor: theme.colors.accent,
     borderRadius: theme.radius.full,
-  },
-  loyaltyRedeem: {
-    fontFamily: theme.fonts.semibold,
-    fontSize: 11,
-    color: theme.colors.gold,
-    textAlign: 'right',
   },
   section: {
     paddingTop: theme.spacing.md,
     paddingHorizontal: theme.spacing.md,
   },
   sectionTitle: {
-    ...theme.typography.label,
-    color: theme.colors.accentDark,
+    fontFamily: theme.fonts.serifBold,
+    fontSize: 15,
+    color: theme.colors.primaryDark,
     marginBottom: theme.spacing.sm,
     paddingLeft: 4,
   },
   menuCard: {
     backgroundColor: theme.colors.surface,
-    borderRadius: theme.radius.md,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderRadius: theme.radius.lg,
     overflow: 'hidden',
+    ...theme.shadows.small,
   },
   menuRow: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.md - 2,
+    paddingVertical: theme.spacing.md,
     gap: theme.spacing.sm,
   },
   menuRowBorder: {
@@ -512,15 +526,15 @@ const styles = StyleSheet.create({
     borderBottomColor: theme.colors.divider,
   },
   menuIcon: {
-    width: 34,
-    height: 34,
-    borderRadius: 10,
-    backgroundColor: theme.colors.primaryMuted,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: theme.colors.surfaceElevated,
     alignItems: 'center',
     justifyContent: 'center',
   },
   menuIconDestructive: {
-    backgroundColor: theme.colors.danger + '15',
+    backgroundColor: theme.colors.danger + '18',
   },
   menuLabel: {
     ...theme.typography.body,
@@ -539,7 +553,7 @@ const styles = StyleSheet.create({
     color: theme.colors.textMuted,
   },
   verifiedText: {
-    color: theme.colors.primary,
+    color: theme.colors.success,
     fontWeight: '700',
   },
   footer: {
@@ -554,7 +568,7 @@ const styles = StyleSheet.create({
   },
   footerLogo: {
     ...theme.typography.subheading,
-    color: theme.colors.textMuted,
+    color: theme.colors.primary,
   },
   footerVersion: {
     ...theme.typography.small,

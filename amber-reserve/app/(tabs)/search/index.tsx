@@ -28,9 +28,15 @@ const QUICK_SEARCHES = [
   'Pink Kush', 'Pre-Rolls', 'Edibles', 'Vape', 'High THC', 'CBD', 'Budget',
 ];
 
+const SORT_CHIPS: { id: string; label: string }[] = [
+  { id: 'popular', label: 'Popular' },
+  { id: 'price_asc', label: 'Price' },
+  { id: 'thc_desc', label: 'THC' },
+];
+
 const { width: SCREEN_W } = Dimensions.get('window');
-// Card width: screen - (16 left pad + 16 right pad) - (8 gap between 2 cards) / 2
 const CARD_W = Math.floor((SCREEN_W - theme.spacing.md * 2 - theme.spacing.sm) / 2);
+const FEATURED_W = SCREEN_W - theme.spacing.md * 2;
 
 export default function SearchScreen() {
   const params = useLocalSearchParams<{ category?: string }>();
@@ -44,7 +50,6 @@ export default function SearchScreen() {
   const activeFilterCount =
     (activeSort !== 'popular' ? 1 : 0) + (activeStrain !== 'All' ? 1 : 0);
 
-  // Sync category from navigation params
   useEffect(() => {
     if (params.category) {
       setActiveCategory(params.category);
@@ -82,6 +87,9 @@ export default function SearchScreen() {
     return list;
   }, [query, activeCategory, activeSort, activeStrain]);
 
+  const featured = filtered[0] ?? null;
+  const gridItems = featured ? filtered.slice(1) : filtered;
+
   const isIdle = query.trim().length === 0 && activeCategory === 'all';
 
   function clearAll() {
@@ -93,7 +101,6 @@ export default function SearchScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      {/* ── Editorial Header ────────────────────────────────── */}
       <View style={styles.pageHeader}>
         <View>
           <Text style={styles.pageEyebrow}>CURATED SELECTION</Text>
@@ -102,7 +109,6 @@ export default function SearchScreen() {
         <AIButton />
       </View>
 
-      {/* ── Search Bar ──────────────────────────────────────── */}
       <View style={styles.searchWrap}>
         <View style={styles.searchBar}>
           <Ionicons name="search" size={18} color={theme.colors.textMuted} />
@@ -140,7 +146,25 @@ export default function SearchScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* ── Category Chips ──────────────────────────────────── */}
+      {/* Sticky sort bar */}
+      <View style={styles.sortBar}>
+        {SORT_CHIPS.map((chip) => {
+          const active = activeSort === chip.id;
+          return (
+            <TouchableOpacity
+              key={chip.id}
+              style={[styles.sortChip, active && styles.sortChipActive]}
+              onPress={() => setActiveSort(chip.id)}
+              activeOpacity={0.8}
+            >
+              <Text style={[styles.sortChipText, active && styles.sortChipTextActive]}>
+                {chip.label}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -162,7 +186,6 @@ export default function SearchScreen() {
         ))}
       </ScrollView>
 
-      {/* ── Filter Sheet (modal) ─────────────────────────────── */}
       <FilterSheet
         visible={showFilters}
         onClose={() => setShowFilters(false)}
@@ -175,7 +198,6 @@ export default function SearchScreen() {
         onClearAll={clearAll}
       />
 
-      {/* ── Trending / idle state ───────────────────────────── */}
       {isIdle && (
         <View style={styles.quickWrap}>
           <Text style={styles.quickLabel}>Trending Searches</Text>
@@ -195,7 +217,6 @@ export default function SearchScreen() {
         </View>
       )}
 
-      {/* ── Results header ──────────────────────────────────── */}
       <View style={styles.resultsHeader}>
         <Text style={styles.resultsCount}>
           {filtered.length} {filtered.length === 1 ? 'product' : 'products'}
@@ -208,13 +229,25 @@ export default function SearchScreen() {
       </View>
 
       <FlatList
-        data={filtered}
+        data={gridItems}
         keyExtractor={(item) => item.id}
         numColumns={2}
         columnWrapperStyle={styles.row}
         contentContainerStyle={styles.grid}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
+        ListHeaderComponent={
+          featured ? (
+            <View style={styles.featuredWrap}>
+              <Text style={styles.featuredLabel}>EDITOR&apos;S PICK</Text>
+              <ProductCard
+                product={featured}
+                width={FEATURED_W}
+                onPress={() => setSelectedProduct(featured)}
+              />
+            </View>
+          ) : null
+        }
         renderItem={({ item }) => (
           <ProductCard
             product={item}
@@ -223,14 +256,16 @@ export default function SearchScreen() {
           />
         )}
         ListEmptyComponent={
-          <View style={styles.empty}>
-            <Ionicons name="search-outline" size={48} color={theme.colors.textMuted} />
-            <Text style={styles.emptyTitle}>No products found</Text>
-            <Text style={styles.emptyText}>Try a different search or clear your filters</Text>
-            <TouchableOpacity style={styles.clearBtn} onPress={clearAll} activeOpacity={0.8}>
-              <Text style={styles.clearBtnText}>Clear filters</Text>
-            </TouchableOpacity>
-          </View>
+          featured ? null : (
+            <View style={styles.empty}>
+              <Ionicons name="search-outline" size={48} color={theme.colors.textMuted} />
+              <Text style={styles.emptyTitle}>No products found</Text>
+              <Text style={styles.emptyText}>Try a different search or clear your filters</Text>
+              <TouchableOpacity style={styles.clearBtn} onPress={clearAll} activeOpacity={0.8}>
+                <Text style={styles.clearBtnText}>Clear filters</Text>
+              </TouchableOpacity>
+            </View>
+          )
         }
       />
 
@@ -324,6 +359,36 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: theme.colors.white,
   },
+  sortBar: {
+    flexDirection: 'row',
+    gap: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.divider,
+    backgroundColor: theme.colors.background,
+  },
+  sortChip: {
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: 8,
+    borderRadius: theme.radius.sm,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
+  },
+  sortChipActive: {
+    backgroundColor: theme.colors.primaryMuted,
+    borderColor: theme.colors.primary,
+  },
+  sortChipText: {
+    fontFamily: theme.fonts.semibold,
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+    letterSpacing: 0.4,
+  },
+  sortChipTextActive: {
+    color: theme.colors.primary,
+  },
   categoryRow: {
     flexGrow: 0,
     flexShrink: 0,
@@ -387,6 +452,17 @@ const styles = StyleSheet.create({
     ...theme.typography.caption,
     color: theme.colors.primary,
     fontWeight: '600',
+  },
+  featuredWrap: {
+    marginBottom: theme.spacing.md,
+    gap: theme.spacing.xs,
+  },
+  featuredLabel: {
+    fontFamily: theme.fonts.semibold,
+    fontSize: 10,
+    letterSpacing: 1.6,
+    color: theme.colors.accent,
+    marginBottom: 4,
   },
   grid: {
     padding: theme.spacing.md,

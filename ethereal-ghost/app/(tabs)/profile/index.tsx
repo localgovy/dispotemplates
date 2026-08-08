@@ -55,7 +55,6 @@ export default function ProfileScreen() {
   const avatarInitial = displayName.charAt(0).toUpperCase();
   const loyaltyPts = profile?.loyalty_pts ?? 0;
   const memberYear = profile?.created_at ? new Date(profile.created_at).getFullYear() : 2024;
-  // 500 pts = $10 off — progress toward the next redemption tier
   const REDEEM_THRESHOLD = 500;
   const REDEEM_VALUE = 10;
   const progressPct = Math.min((loyaltyPts % REDEEM_THRESHOLD) / REDEEM_THRESHOLD, 1);
@@ -63,7 +62,10 @@ export default function ProfileScreen() {
   const totalRedeemable = Math.floor(loyaltyPts / REDEEM_THRESHOLD) * REDEEM_VALUE;
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     supabase
       .from('profiles')
       .select('*')
@@ -175,8 +177,8 @@ export default function ProfileScreen() {
         { id: 'age', icon: 'shield-checkmark-outline', label: 'Age Verification', value: 'Verified ✓' },
         {
           id: 'loyalty',
-          icon: 'gift-outline',
-          label: 'Loyalty Points',
+          icon: 'sparkles-outline',
+          label: 'Atelier Points',
           value: `${loyaltyPts.toLocaleString()} pts`,
         },
       ],
@@ -214,7 +216,6 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      {/* Top nav row */}
       <View style={styles.topNav}>
         <Text style={styles.topNavTitle}>Account</Text>
         <AIButton />
@@ -224,60 +225,60 @@ export default function ProfileScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Profile Header */}
+        {/* Glass member card */}
         <LinearGradient
-          colors={[theme.colors.surfaceElevated, theme.colors.surface]}
-          style={styles.profileHeader}
+          colors={['rgba(255,255,255,0.14)', 'rgba(255,255,255,0.04)']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.glassCard}
         >
-          <View style={styles.avatarWrap}>
-            {avatarUrl ? (
-              <Image source={{ uri: avatarUrl }} style={styles.avatarImage} />
-            ) : (
-              <View style={styles.avatar}>
-                <Text style={styles.avatarText}>{avatarInitial}</Text>
-              </View>
-            )}
-            <View style={styles.verifiedBadge}>
-              <Ionicons name="checkmark" size={10} color={theme.colors.white} />
-            </View>
-          </View>
-          <Text style={styles.userName}>{displayName}</Text>
-          <Text style={styles.userSince}>Member since {memberYear} · Aurora, ON</Text>
-
-          {/* Loyalty Card */}
-          <TouchableOpacity
-            style={styles.loyaltyCard}
-            activeOpacity={0.85}
-            onPress={() => handleMenuItem('loyalty')}
-          >
-            {loading ? (
-              <ActivityIndicator size="small" color={theme.colors.gold} />
-            ) : (
-              <>
-                <View style={styles.loyaltyLeft}>
-                  <Ionicons name="leaf" size={20} color={theme.colors.gold} />
-                  <View>
-                    <Text style={styles.loyaltyLabel}>GREEN POINTS</Text>
-                    <Text style={styles.loyaltyPoints}>{loyaltyPts.toLocaleString()} pts</Text>
-                  </View>
+          <View style={styles.glassInner}>
+            <View style={styles.avatarWrap}>
+              {avatarUrl ? (
+                <Image source={{ uri: avatarUrl }} style={styles.avatarImage} />
+              ) : (
+                <View style={styles.avatar}>
+                  <Text style={styles.avatarText}>{avatarInitial}</Text>
                 </View>
-                <View style={styles.loyaltyRight}>
-                  <Text style={styles.loyaltyNext}>
-                    {totalRedeemable > 0
-                      ? `$${totalRedeemable} ready to redeem!`
-                      : `${ptsToNext} pts until $${REDEEM_VALUE} off`}
-                  </Text>
+              )}
+            </View>
+            <Text style={styles.userName}>{displayName}</Text>
+            <Text style={styles.userSince}>Member since {memberYear} · {store.city}</Text>
+
+            <TouchableOpacity
+              style={styles.loyaltyGlass}
+              activeOpacity={0.85}
+              onPress={() => handleMenuItem('loyalty')}
+            >
+              {loading ? (
+                <ActivityIndicator size="small" color={theme.colors.white} />
+              ) : (
+                <>
+                  <View style={styles.loyaltyTop}>
+                    <Text style={styles.loyaltyLabel}>ATELIER POINTS</Text>
+                    <Text style={styles.loyaltyPoints}>{loyaltyPts.toLocaleString()}</Text>
+                  </View>
                   <View style={styles.progressBar}>
                     <View style={[styles.progressFill, { width: `${progressPct * 100}%` }]} />
                   </View>
-                  <Text style={styles.loyaltyRedeem}>1 pt / $1 · {REDEEM_THRESHOLD} pts = ${REDEEM_VALUE}</Text>
-                </View>
-              </>
-            )}
-          </TouchableOpacity>
+                  <Text style={styles.loyaltyNext}>
+                    {totalRedeemable > 0
+                      ? `$${totalRedeemable} ready to redeem`
+                      : `${ptsToNext} pts until $${REDEEM_VALUE} off`}
+                  </Text>
+                </>
+              )}
+            </TouchableOpacity>
+
+            <View style={styles.tipLine}>
+              <Ionicons name="wine-outline" size={14} color={theme.colors.accent} />
+              <Text style={styles.tipText}>
+                Sommelier tip: pair citrus terps with a quiet evening — ask the atelier desk.
+              </Text>
+            </View>
+          </View>
         </LinearGradient>
 
-        {/* Menu Sections */}
         {MENU_SECTIONS.map((section, si) => (
           <View key={si} style={styles.section}>
             {section.title !== '' && (
@@ -298,7 +299,7 @@ export default function ProfileScreen() {
                     <Ionicons
                       name={item.icon}
                       size={18}
-                      color={item.destructive ? theme.colors.danger : theme.colors.primary}
+                      color={item.destructive ? theme.colors.danger : theme.colors.white}
                     />
                   </View>
                   <Text style={[styles.menuLabel, item.destructive && styles.menuLabelDestructive]}>
@@ -312,7 +313,7 @@ export default function ProfileScreen() {
                         trackColor={{ false: theme.colors.surfaceLight, true: theme.colors.primaryMuted }}
                         thumbColor={
                           toggles[item.toggleKey as keyof typeof toggles]
-                            ? theme.colors.primary
+                            ? theme.colors.white
                             : theme.colors.textMuted
                         }
                         ios_backgroundColor={theme.colors.surfaceLight}
@@ -334,10 +335,7 @@ export default function ProfileScreen() {
         ))}
 
         <View style={styles.footer}>
-          <View style={styles.footerLogoRow}>
-            <Ionicons name="leaf" size={16} color={theme.colors.accentDark} />
-            <Text style={styles.footerLogo}>Ghost Atelier</Text>
-          </View>
+          <Text style={styles.footerLogo}>Ghost Atelier</Text>
           <Text style={styles.footerVersion}>{store.name}, {store.province} · v1.0.0</Text>
           <Text style={styles.footerAge}>19+ Only. Keep out of reach of children.</Text>
         </View>
@@ -364,12 +362,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.sm + 2,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
   },
   topNavTitle: {
     ...theme.typography.title,
-    color: theme.colors.primary,
+    color: theme.colors.white,
   },
   scroll: {
     flex: 1,
@@ -377,111 +373,108 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 120,
   },
-  profileHeader: {
-    alignItems: 'center',
+  glassCard: {
+    marginHorizontal: theme.spacing.md,
+    marginTop: theme.spacing.sm,
+    borderRadius: theme.radius.xl,
+    borderWidth: 1,
+    borderColor: theme.colors.borderLight,
+    overflow: 'hidden',
+  },
+  glassInner: {
     padding: theme.spacing.xl,
-    gap: theme.spacing.xs,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
+    alignItems: 'center',
+    gap: theme.spacing.sm,
   },
   avatarWrap: {
-    position: 'relative',
     marginBottom: theme.spacing.xs,
   },
   avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: theme.colors.primary,
+    width: 84,
+    height: 84,
+    borderRadius: 42,
+    backgroundColor: theme.colors.surfaceElevated,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: theme.colors.accent,
+    borderWidth: 1,
+    borderColor: theme.colors.borderLight,
   },
   avatarImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    borderWidth: 2,
-    borderColor: theme.colors.accent,
+    width: 84,
+    height: 84,
+    borderRadius: 42,
+    borderWidth: 1,
+    borderColor: theme.colors.borderLight,
   },
   avatarText: {
-    fontFamily: theme.fonts.serifBold,
+    fontFamily: theme.fonts.bold,
     fontSize: 32,
-    color: theme.colors.gold,
-  },
-  verifiedBadge: {
-    position: 'absolute',
-    bottom: 2,
-    right: 2,
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    backgroundColor: theme.colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: theme.colors.surface,
+    color: theme.colors.white,
   },
   userName: {
-    ...theme.typography.title,
-    color: theme.colors.text,
+    fontFamily: theme.fonts.bold,
+    fontSize: 24,
+    color: theme.colors.white,
   },
   userSince: {
     ...theme.typography.caption,
     color: theme.colors.textMuted,
   },
-  loyaltyCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: theme.colors.primary,
-    ...theme.asymmetric,
-    padding: theme.spacing.md,
+  loyaltyGlass: {
     width: '100%',
     marginTop: theme.spacing.md,
-    gap: theme.spacing.md,
-    ...theme.shadows.medium,
-    minHeight: 72,
+    padding: theme.spacing.md,
+    borderRadius: theme.radius.lg,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.12)',
+    gap: 8,
+    minHeight: 96,
+    justifyContent: 'center',
   },
-  loyaltyLeft: {
+  loyaltyTop: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: theme.spacing.sm,
+    alignItems: 'baseline',
+    justifyContent: 'space-between',
   },
   loyaltyLabel: {
     ...theme.typography.label,
-    color: theme.colors.gold,
+    color: theme.colors.accent,
   },
   loyaltyPoints: {
-    fontFamily: theme.fonts.serifBold,
-    fontSize: 22,
+    fontFamily: theme.fonts.bold,
+    fontSize: 28,
     color: theme.colors.white,
   },
-  loyaltyRight: {
-    flex: 1,
-    gap: 4,
-  },
-  loyaltyNext: {
-    ...theme.typography.small,
-    color: theme.colors.onPrimaryMuted,
-  },
   progressBar: {
-    height: 6,
-    backgroundColor: 'rgba(255,255,255,0.15)',
+    height: 5,
+    backgroundColor: 'rgba(255,255,255,0.12)',
     borderRadius: theme.radius.full,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    backgroundColor: theme.colors.gold,
+    backgroundColor: theme.colors.white,
     borderRadius: theme.radius.full,
   },
-  loyaltyRedeem: {
-    fontFamily: theme.fonts.semibold,
-    fontSize: 11,
-    color: theme.colors.gold,
-    textAlign: 'right',
+  loyaltyNext: {
+    ...theme.typography.small,
+    color: theme.colors.textMuted,
+  },
+  tipLine: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+    marginTop: theme.spacing.sm,
+    paddingHorizontal: 4,
+  },
+  tipText: {
+    flex: 1,
+    fontFamily: theme.fonts.medium,
+    fontSize: 12,
+    lineHeight: 18,
+    color: theme.colors.textSecondary,
+    fontStyle: 'italic',
   },
   section: {
     paddingTop: theme.spacing.md,
@@ -489,13 +482,13 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     ...theme.typography.label,
-    color: theme.colors.accentDark,
+    color: theme.colors.accent,
     marginBottom: theme.spacing.sm,
     paddingLeft: 4,
   },
   menuCard: {
     backgroundColor: theme.colors.surface,
-    borderRadius: theme.radius.md,
+    borderRadius: theme.radius.lg,
     borderWidth: 1,
     borderColor: theme.colors.border,
     overflow: 'hidden',
@@ -514,13 +507,13 @@ const styles = StyleSheet.create({
   menuIcon: {
     width: 34,
     height: 34,
-    borderRadius: 10,
+    borderRadius: theme.radius.full,
     backgroundColor: theme.colors.primaryMuted,
     alignItems: 'center',
     justifyContent: 'center',
   },
   menuIconDestructive: {
-    backgroundColor: theme.colors.danger + '15',
+    backgroundColor: theme.colors.danger + '18',
   },
   menuLabel: {
     ...theme.typography.body,
@@ -539,18 +532,13 @@ const styles = StyleSheet.create({
     color: theme.colors.textMuted,
   },
   verifiedText: {
-    color: theme.colors.primary,
+    color: theme.colors.white,
     fontWeight: '700',
   },
   footer: {
     alignItems: 'center',
     paddingVertical: theme.spacing.xl,
     gap: 4,
-  },
-  footerLogoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
   },
   footerLogo: {
     ...theme.typography.subheading,

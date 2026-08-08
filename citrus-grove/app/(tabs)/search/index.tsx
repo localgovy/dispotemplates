@@ -24,9 +24,7 @@ import FilterSheet, {
 } from '../../../components/FilterSheet';
 import AIButton from '../../../components/AIButton';
 
-const QUICK_SEARCHES = [
-  'Pink Kush', 'Pre-Rolls', 'Edibles', 'Vape', 'High THC', 'CBD', 'Budget',
-];
+const MOOD_SPECTRUM = ['Relax', 'Euphoria', 'Focus', 'Calm'] as const;
 
 const { width: SCREEN_W } = Dimensions.get('window');
 // Card width: screen - (16 left pad + 16 right pad) - (8 gap between 2 cards) / 2
@@ -38,11 +36,14 @@ export default function SearchScreen() {
   const [activeCategory, setActiveCategory] = useState(params.category ?? 'all');
   const [activeSort, setActiveSort] = useState('popular');
   const [activeStrain, setActiveStrain] = useState('All');
+  const [activeMood, setActiveMood] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const activeFilterCount =
-    (activeSort !== 'popular' ? 1 : 0) + (activeStrain !== 'All' ? 1 : 0);
+    (activeSort !== 'popular' ? 1 : 0) +
+    (activeStrain !== 'All' ? 1 : 0) +
+    (activeMood ? 1 : 0);
 
   // Sync category from navigation params
   useEffect(() => {
@@ -59,6 +60,24 @@ export default function SearchScreen() {
     }
     if (activeStrain !== 'All') {
       list = list.filter((p) => p.strain === activeStrain);
+    }
+    if (activeMood) {
+      const mood = activeMood.toLowerCase();
+      list = list.filter((p) => {
+        const inTags = p.tags.some((t) => t.toLowerCase().includes(mood));
+        const inEffects = p.effects?.some((e) => e.label.toLowerCase().includes(mood)) ?? false;
+        const inDesc = p.description.toLowerCase().includes(mood);
+        // Map common synonyms
+        const synonyms: Record<string, string[]> = {
+          relax: ['relax', 'relaxing', 'calm', 'calming', 'sedat', 'sleep', 'body'],
+          euphoria: ['euphor', 'uplift', 'potent', 'sticky', 'elevat'],
+          focus: ['focus', 'creative', 'daytime', 'pine', 'sativa'],
+          calm: ['calm', 'calming', 'relax', 'gentle', 'balanced', 'classic'],
+        };
+        const keys = synonyms[mood] ?? [mood];
+        const hay = `${p.description} ${p.tags.join(' ')} ${(p.effects ?? []).map((e) => e.label).join(' ')}`.toLowerCase();
+        return inTags || inEffects || inDesc || keys.some((k) => hay.includes(k));
+      });
     }
     if (query.trim().length > 0) {
       const q = query.toLowerCase();
@@ -80,15 +99,16 @@ export default function SearchScreen() {
     }
 
     return list;
-  }, [query, activeCategory, activeSort, activeStrain]);
+  }, [query, activeCategory, activeSort, activeStrain, activeMood]);
 
-  const isIdle = query.trim().length === 0 && activeCategory === 'all';
+  const isIdle = query.trim().length === 0 && activeCategory === 'all' && !activeMood;
 
   function clearAll() {
     setQuery('');
     setActiveCategory('all');
     setActiveStrain('All');
     setActiveSort('popular');
+    setActiveMood(null);
   }
 
   return (
@@ -175,30 +195,31 @@ export default function SearchScreen() {
         onClearAll={clearAll}
       />
 
-      {/* ── Trending / idle state ───────────────────────────── */}
-      {isIdle && (
-        <View style={styles.quickWrap}>
-          <Text style={styles.quickLabel}>Trending Searches</Text>
-          <View style={styles.quickRow}>
-            {QUICK_SEARCHES.map((q) => (
+      {/* ── Mood Spectrum (replaces trending searches) ──────── */}
+      <View style={styles.moodWrap}>
+        <Text style={styles.moodLabel}>Mood Spectrum</Text>
+        <View style={styles.moodRow}>
+          {MOOD_SPECTRUM.map((mood) => {
+            const selected = activeMood === mood;
+            return (
               <TouchableOpacity
-                key={q}
-                style={styles.quickChip}
-                onPress={() => setQuery(q)}
+                key={mood}
+                style={[styles.moodChip, selected && styles.moodChipActive]}
+                onPress={() => setActiveMood(selected ? null : mood)}
                 activeOpacity={0.8}
               >
-                <Ionicons name="trending-up" size={12} color={theme.colors.accent} />
-                <Text style={styles.quickText}>{q}</Text>
+                <Text style={[styles.moodText, selected && styles.moodTextActive]}>{mood}</Text>
               </TouchableOpacity>
-            ))}
-          </View>
+            );
+          })}
         </View>
-      )}
+      </View>
 
       {/* ── Results header ──────────────────────────────────── */}
       <View style={styles.resultsHeader}>
         <Text style={styles.resultsCount}>
           {filtered.length} {filtered.length === 1 ? 'product' : 'products'}
+          {activeMood ? ` · ${activeMood}` : ''}
         </Text>
         {!isIdle && (
           <TouchableOpacity onPress={clearAll} style={styles.clearAllBtn}>
@@ -336,35 +357,39 @@ const styles = StyleSheet.create({
     gap: theme.spacing.xs,
     alignItems: 'center',
   },
-  quickWrap: {
+  moodWrap: {
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.sm,
   },
-  quickLabel: {
+  moodLabel: {
     ...theme.typography.label,
     color: theme.colors.textMuted,
     marginBottom: theme.spacing.sm,
   },
-  quickRow: {
+  moodRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: theme.spacing.xs,
   },
-  quickChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: theme.spacing.sm + 2,
+  moodChip: {
+    paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.xs + 2,
     borderRadius: theme.radius.full,
     backgroundColor: theme.colors.secondaryContainer,
     borderWidth: 1.5,
     borderColor: theme.colors.accent,
   },
-  quickText: {
+  moodChipActive: {
+    backgroundColor: theme.colors.primary,
+    borderColor: theme.colors.primary,
+  },
+  moodText: {
     ...theme.typography.caption,
     color: theme.colors.primaryDark,
     fontWeight: '700',
+  },
+  moodTextActive: {
+    color: theme.colors.white,
   },
   resultsHeader: {
     flexDirection: 'row',

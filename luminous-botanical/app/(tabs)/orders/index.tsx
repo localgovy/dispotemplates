@@ -44,7 +44,6 @@ export default function OrdersScreen() {
       .then(({ data, error }) => {
         if (!error && data) {
           setOrders(data as Order[]);
-          // Auto-expand the most recent order if it is ready
           const first = data[0] as Order | undefined;
           if (first?.status === 'ready') setExpanded(first.id);
         }
@@ -66,7 +65,7 @@ export default function OrdersScreen() {
     return (
       <SafeAreaView style={styles.safe} edges={['top']}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>My Orders</Text>
+          <Text style={styles.headerTitle}>Garden Orders</Text>
           <AIButton />
         </View>
         <View style={styles.centred}>
@@ -80,11 +79,11 @@ export default function OrdersScreen() {
     return (
       <SafeAreaView style={styles.safe} edges={['top']}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>My Orders</Text>
+          <Text style={styles.headerTitle}>Garden Orders</Text>
           <AIButton />
         </View>
         <View style={styles.centred}>
-          <Ionicons name="receipt-outline" size={48} color={theme.colors.textDisabled} />
+          <Ionicons name="leaf-outline" size={48} color={theme.colors.textDisabled} />
           <Text style={styles.emptyTitle}>No orders yet</Text>
           <Text style={styles.emptyText}>Your placed orders will appear here.</Text>
         </View>
@@ -95,7 +94,7 @@ export default function OrdersScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>My Orders</Text>
+        <Text style={styles.headerTitle}>Garden Orders</Text>
         <AIButton />
       </View>
 
@@ -104,75 +103,81 @@ export default function OrdersScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {orders.map((order) => {
+        {orders.map((order, index) => {
           const cfg = STATUS_CONFIG[order.status];
           const isExpanded = expanded === order.id;
+          const isLast = index === orders.length - 1;
 
           return (
-            <TouchableOpacity
-              key={order.id}
-              style={styles.orderCard}
-              onPress={() => setExpanded(isExpanded ? null : order.id)}
-              activeOpacity={0.9}
-            >
-              {order.status === 'ready' && (
-                <View style={styles.readyBanner}>
-                  <Ionicons name="checkmark-circle" size={14} color={theme.colors.white} />
-                  <Text style={styles.readyBannerText}>Ready for Pickup!</Text>
+            <View key={order.id} style={styles.timelineRow}>
+              <View style={styles.railCol}>
+                <View style={[styles.leafMarker, order.status === 'ready' && styles.leafMarkerReady]}>
+                  <Ionicons name="leaf" size={14} color={theme.colors.onPrimary} />
                 </View>
-              )}
+                {!isLast && <View style={styles.railLine} />}
+              </View>
 
-              <View style={styles.orderHeader}>
-                <View>
-                  <Text style={styles.orderCode}>{order.confirmation_code}</Text>
-                  <Text style={styles.orderDate}>{formatDate(order.created_at)}</Text>
-                </View>
-                <View style={styles.orderRight}>
-                  <View
-                    style={[
-                      styles.statusBadge,
-                      { backgroundColor: cfg.color + '20', borderColor: cfg.color + '50' },
-                    ]}
-                  >
-                    <Ionicons name={cfg.icon} size={12} color={cfg.color} />
-                    <Text style={[styles.statusText, { color: cfg.color }]}>{cfg.label}</Text>
+              <TouchableOpacity
+                style={styles.orderCard}
+                onPress={() => setExpanded(isExpanded ? null : order.id)}
+                activeOpacity={0.9}
+              >
+                {order.status === 'ready' && (
+                  <View style={styles.readyBanner}>
+                    <Ionicons name="checkmark-circle" size={14} color={theme.colors.onPrimary} />
+                    <Text style={styles.readyBannerText}>Ready for Pickup!</Text>
                   </View>
-                  <Text style={styles.orderTotal}>${Number(order.total).toFixed(2)}</Text>
-                </View>
-              </View>
+                )}
 
-              {isExpanded && (
-                <View style={styles.orderBody}>
-                  <View style={styles.divider} />
-                  {order.order_items.map((item) => (
-                    <View key={item.id} style={styles.itemRow}>
-                      <View style={styles.itemDot} />
-                      <Text style={styles.itemName} numberOfLines={1}>{item.name}</Text>
-                      <Text style={styles.itemQty}>×{item.qty}</Text>
-                      <Text style={styles.itemPrice}>${Number(item.price).toFixed(2)}</Text>
+                <View style={styles.orderHeader}>
+                  <View>
+                    <Text style={styles.orderCode}>{order.confirmation_code}</Text>
+                    <Text style={styles.orderDate}>{formatDate(order.created_at)}</Text>
+                  </View>
+                  <View style={styles.orderRight}>
+                    <View style={[styles.statusBadge, { backgroundColor: cfg.color + '20' }]}>
+                      <Ionicons name={cfg.icon} size={12} color={cfg.color} />
+                      <Text style={[styles.statusText, { color: cfg.color }]}>{cfg.label}</Text>
                     </View>
-                  ))}
-                  {order.status === 'ready' && (
-                    <View style={styles.viewCodeBtn}>
-                      <Ionicons name="qr-code-outline" size={16} color={theme.colors.primary} />
-                      <Text style={styles.viewCodeText}>Show Pickup Code: {order.confirmation_code}</Text>
-                    </View>
-                  )}
+                    <Text style={styles.orderTotal}>${Number(order.total).toFixed(2)}</Text>
+                  </View>
                 </View>
-              )}
 
-              <View style={styles.orderFooter}>
-                <Text style={styles.itemSummary}>
-                  {order.order_items.length}{' '}
-                  {order.order_items.length === 1 ? 'item' : 'items'}
-                </Text>
-                <Ionicons
-                  name={isExpanded ? 'chevron-up' : 'chevron-down'}
-                  size={16}
-                  color={theme.colors.textMuted}
-                />
-              </View>
-            </TouchableOpacity>
+                {isExpanded && (
+                  <View style={styles.orderBody}>
+                    <View style={styles.divider} />
+                    {order.order_items.map((item) => (
+                      <View key={item.id} style={styles.itemRow}>
+                        <Ionicons name="leaf-outline" size={10} color={theme.colors.primary} />
+                        <Text style={styles.itemName} numberOfLines={1}>{item.name}</Text>
+                        <Text style={styles.itemQty}>×{item.qty}</Text>
+                        <Text style={styles.itemPrice}>${Number(item.price).toFixed(2)}</Text>
+                      </View>
+                    ))}
+                    {order.status === 'ready' && (
+                      <View style={styles.viewCodeBtn}>
+                        <Ionicons name="qr-code-outline" size={16} color={theme.colors.primary} />
+                        <Text style={styles.viewCodeText}>
+                          Show Pickup Code: {order.confirmation_code}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                )}
+
+                <View style={styles.orderFooter}>
+                  <Text style={styles.itemSummary}>
+                    {order.order_items.length}{' '}
+                    {order.order_items.length === 1 ? 'item' : 'items'}
+                  </Text>
+                  <Ionicons
+                    name={isExpanded ? 'chevron-up' : 'chevron-down'}
+                    size={16}
+                    color={theme.colors.textMuted}
+                  />
+                </View>
+              </TouchableOpacity>
+            </View>
           );
         })}
 
@@ -193,6 +198,9 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
   },
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.md,
     borderBottomWidth: 1,
@@ -217,21 +225,46 @@ const styles = StyleSheet.create({
     ...theme.typography.caption,
     color: theme.colors.textMuted,
   },
-  scroll: {
-    flex: 1,
-  },
+  scroll: { flex: 1 },
   scrollContent: {
     padding: theme.spacing.md,
-    gap: theme.spacing.md,
-    paddingBottom: 120,
+    paddingBottom: 100,
+  },
+  timelineRow: {
+    flexDirection: 'row',
+    gap: theme.spacing.sm,
+    marginBottom: theme.spacing.sm,
+  },
+  railCol: {
+    width: 32,
+    alignItems: 'center',
+  },
+  leafMarker: {
+    width: 28,
+    height: 28,
+    borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1,
+  },
+  leafMarkerReady: {
+    backgroundColor: theme.colors.accentDark,
+  },
+  railLine: {
+    flex: 1,
+    width: 2,
+    backgroundColor: theme.colors.border,
+    marginTop: 4,
+    minHeight: 40,
   },
   orderCard: {
-    backgroundColor: theme.colors.surface,
-    ...theme.asymmetricSm,
+    flex: 1,
+    backgroundColor: theme.colors.overlayLight,
+    borderRadius: theme.radius.lg,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.borderLight,
     overflow: 'hidden',
-    ...theme.shadows.small,
   },
   readyBanner: {
     flexDirection: 'row',
@@ -243,7 +276,7 @@ const styles = StyleSheet.create({
   },
   readyBannerText: {
     ...theme.typography.label,
-    color: theme.colors.white,
+    color: theme.colors.onPrimary,
     letterSpacing: 0.5,
   },
   orderHeader: {
@@ -256,7 +289,7 @@ const styles = StyleSheet.create({
   orderCode: {
     ...theme.typography.subheading,
     color: theme.colors.text,
-    fontWeight: '700',
+    fontFamily: theme.fonts.bold,
   },
   orderDate: {
     ...theme.typography.small,
@@ -274,16 +307,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.sm,
     paddingVertical: 3,
     borderRadius: theme.radius.full,
-    borderWidth: 1,
   },
   statusText: {
     ...theme.typography.small,
-    fontWeight: '700',
+    fontFamily: theme.fonts.bold,
   },
   orderTotal: {
     ...theme.typography.subheading,
     color: theme.colors.text,
-    fontWeight: '700',
+    fontFamily: theme.fonts.bold,
   },
   orderBody: {
     paddingHorizontal: theme.spacing.md,
@@ -300,12 +332,6 @@ const styles = StyleSheet.create({
     gap: theme.spacing.xs,
     paddingVertical: 4,
   },
-  itemDot: {
-    width: 5,
-    height: 5,
-    borderRadius: 2.5,
-    backgroundColor: theme.colors.primary,
-  },
   itemName: {
     ...theme.typography.caption,
     color: theme.colors.textSecondary,
@@ -321,7 +347,7 @@ const styles = StyleSheet.create({
     color: theme.colors.text,
     width: 54,
     textAlign: 'right',
-    fontWeight: '600',
+    fontFamily: theme.fonts.semibold,
   },
   viewCodeBtn: {
     flexDirection: 'row',
@@ -331,14 +357,14 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing.sm,
     paddingVertical: theme.spacing.sm,
     backgroundColor: theme.colors.primaryMuted,
-    borderRadius: theme.radius.md,
+    borderRadius: theme.radius.lg,
     borderWidth: 1,
     borderColor: theme.colors.primary,
   },
   viewCodeText: {
     ...theme.typography.caption,
     color: theme.colors.primary,
-    fontWeight: '700',
+    fontFamily: theme.fonts.bold,
   },
   orderFooter: {
     flexDirection: 'row',
@@ -359,6 +385,7 @@ const styles = StyleSheet.create({
     gap: theme.spacing.xs,
     justifyContent: 'center',
     paddingVertical: theme.spacing.md,
+    marginTop: theme.spacing.sm,
   },
   emptyPastText: {
     ...theme.typography.small,
