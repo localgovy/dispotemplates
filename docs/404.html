@@ -9,19 +9,20 @@
       (function () {
         var pathSegmentsToKeep = 2;
         var l = window.location;
+        var segs = l.pathname.split("/").filter(Boolean);
+        // Need repo + app + at least one route segment
+        if (segs.length <= pathSegmentsToKeep) return;
+        if (segs[segs.length - 1] === "404.html") return;
+
         l.replace(
           l.protocol +
             "//" +
             l.hostname +
             (l.port ? ":" + l.port : "") +
-            l.pathname
-              .split("/")
-              .slice(0, 1 + pathSegmentsToKeep)
-              .join("/") +
+            "/" +
+            segs.slice(0, pathSegmentsToKeep).join("/") +
             "/?/" +
-            l.pathname
-              .slice(1)
-              .split("/")
+            segs
               .slice(pathSegmentsToKeep)
               .join("/")
               .replace(/&/g, "~and~") +

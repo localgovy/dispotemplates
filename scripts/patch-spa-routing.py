@@ -30,22 +30,23 @@ ROOT_404 = """<!DOCTYPE html>
     <meta charset="utf-8" />
     <title>Redirecting…</title>
     <script type="text/javascript">
+      // spa-github-pages redirect for /dispotemplates/<app>/<route>
       (function () {
         var pathSegmentsToKeep = 2;
         var l = window.location;
+        var segs = l.pathname.split("/").filter(Boolean);
+        if (segs.length <= pathSegmentsToKeep) return;
+        if (segs[segs.length - 1] === "404.html") return;
+
         l.replace(
           l.protocol +
             "//" +
             l.hostname +
             (l.port ? ":" + l.port : "") +
-            l.pathname
-              .split("/")
-              .slice(0, 1 + pathSegmentsToKeep)
-              .join("/") +
+            "/" +
+            segs.slice(0, pathSegmentsToKeep).join("/") +
             "/?/" +
-            l.pathname
-              .slice(1)
-              .split("/")
+            segs
               .slice(pathSegmentsToKeep)
               .join("/")
               .replace(/&/g, "~and~") +
