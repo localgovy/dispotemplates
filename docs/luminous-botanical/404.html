@@ -32,6 +32,20 @@
     </noscript>
     <!-- The root element for your Expo app. -->
     <div id="root"></div>
+<script type="text/javascript">
+  /* GitHub Pages SPA path restore (rafgraph/spa-github-pages) */
+  (function(l) {
+    if (l.search[1] === "/") {
+      var decoded = l.search.slice(1).split("&").map(function(s) {
+        return s.replace(/~and~/g, "&");
+      }).join("?");
+      window.history.replaceState(null, null,
+        l.pathname.slice(0, -1) + decoded + l.hash
+      );
+    }
+  }(window.location));
+</script>
+
   <script src="/dispotemplates/luminous-botanical/_expo/static/js/web/entry-e510e0f00636c3b1b8c3010eb2f20e3a.js" defer></script>
 </body>
 </html>

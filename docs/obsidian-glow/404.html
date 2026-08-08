@@ -32,6 +32,20 @@
     </noscript>
     <!-- The root element for your Expo app. -->
     <div id="root"></div>
+<script type="text/javascript">
+  /* GitHub Pages SPA path restore (rafgraph/spa-github-pages) */
+  (function(l) {
+    if (l.search[1] === "/") {
+      var decoded = l.search.slice(1).split("&").map(function(s) {
+        return s.replace(/~and~/g, "&");
+      }).join("?");
+      window.history.replaceState(null, null,
+        l.pathname.slice(0, -1) + decoded + l.hash
+      );
+    }
+  }(window.location));
+</script>
+
   <script src="/dispotemplates/obsidian-glow/_expo/static/js/web/entry-5da7ebc741332655d68fdf137a203abd.js" defer></script>
 </body>
 </html>

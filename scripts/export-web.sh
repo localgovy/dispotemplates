@@ -49,7 +49,6 @@ NODE
 
   mkdir -p "$OUT/$app"
   rsync -a --delete dist-web/ "$OUT/$app/"
-  cp "$OUT/$app/index.html" "$OUT/$app/404.html"
   rm -rf dist-web
   echo "✓ $app"
 done
@@ -59,6 +58,9 @@ if [ -f "$ROOT/docs-hub/index.html" ]; then
   cp "$ROOT/docs-hub/index.html" "$OUT/index.html"
   touch "$OUT/.nojekyll"
 fi
+
+# GitHub Pages only honors site-root 404.html for deep SPA routes
+python3 "$ROOT/scripts/patch-spa-routing.py" "$OUT"
 
 echo "All exports written to $OUT"
 echo "Remember: docs/**/assets/node_modules must be committed (fonts/icons)."
