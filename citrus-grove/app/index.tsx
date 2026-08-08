@@ -18,7 +18,8 @@ import theme from '../theme';
 
 const AGE_KEY = '@citrus_grove_age_verified';
 
-const SCREENSHOT_MODE = process.env.EXPO_PUBLIC_SCREENSHOT_MODE === '1';
+const SCREENSHOT_MODE =
+  process.env.EXPO_PUBLIC_SCREENSHOT_MODE === '1' || Platform.OS === 'web';
 
 function calcAge(mm: string, dd: string, yyyy: string): number | null {
   const month = parseInt(mm, 10);
@@ -48,18 +49,37 @@ export default function SplashScreen() {
   const yyyyRef = useRef<TextInput>(null);
 
   useEffect(() => {
-    if (authLoading) return;
-    AsyncStorage.getItem(AGE_KEY).then((val) => {
-      if (val === 'true') {
-        const t = setTimeout(() => {
-          router.replace(session || SCREENSHOT_MODE ? '/(tabs)/home' : '/login');
-        }, 1400);
-        return () => clearTimeout(t);
-      } else {
-        const t = setTimeout(() => setShowAgeGate(true), 1400);
-        return () => clearTimeout(t);
+    // Web demos / screenshot mode: don't block on Supabase auth loading.
+    if (authLoading && !SCREENSHOT_MODE) return;
+
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    (async () => {
+      // Public web demos skip the age gate and land in the app.
+      if (SCREENSHOT_MODE) {
+        await AsyncStorage.setItem(AGE_KEY, 'true');
+        timer = setTimeout(() => {
+          if (!cancelled) router.replace('/(tabs)/home');
+        }, 1200);
+        return;
       }
-    });
+
+      const val = await AsyncStorage.getItem(AGE_KEY);
+      if (cancelled) return;
+      if (val === 'true') {
+        timer = setTimeout(() => {
+          router.replace(session ? '/(tabs)/home' : '/login');
+        }, 1400);
+      } else {
+        timer = setTimeout(() => setShowAgeGate(true), 1400);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+    };
   }, [authLoading, session]);
 
   async function handleConfirm() {

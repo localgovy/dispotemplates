@@ -17,8 +17,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let done = false;
+    const failSafe = setTimeout(() => {
+      if (!done) setLoading(false);
+    }, 2500);
+
     supabase.auth.getSession().then(({ data }) => {
+      done = true;
+      clearTimeout(failSafe);
       setSession(data.session);
+      setLoading(false);
+    }).catch(() => {
+      done = true;
+      clearTimeout(failSafe);
       setLoading(false);
     });
 
@@ -48,7 +59,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     });
 
-    return () => listener.subscription.unsubscribe();
+    return () => {
+      clearTimeout(failSafe);
+      listener.subscription.unsubscribe();
+    };
   }, []);
 
   async function signInWithIdToken(idToken: string) {
