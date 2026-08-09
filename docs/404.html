@@ -5,12 +5,10 @@
     <title>Redirecting…</title>
     <script type="text/javascript">
       // spa-github-pages redirect for /dispotemplates/<app>/<route>
-      // pathSegmentsToKeep = 2 → /dispotemplates/amber-reserve/?/home
       (function () {
         var pathSegmentsToKeep = 2;
         var l = window.location;
         var segs = l.pathname.split("/").filter(Boolean);
-        // Need repo + app + at least one route segment
         if (segs.length <= pathSegmentsToKeep) return;
         if (segs[segs.length - 1] === "404.html") return;
 

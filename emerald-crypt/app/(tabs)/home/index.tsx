@@ -285,7 +285,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
+    paddingVertical: 12,
+    overflow: 'visible',
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
     backgroundColor: theme.colors.background,
@@ -306,6 +307,7 @@ const styles = StyleSheet.create({
   wordmark: {
     fontFamily: theme.fonts.serifBold,
     fontSize: 22,
+    lineHeight: 30,
     color: theme.colors.primaryLight,
     letterSpacing: -0.3,
   },
