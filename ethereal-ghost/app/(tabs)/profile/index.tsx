@@ -18,6 +18,7 @@ import { supabase, Tables } from '../../../lib/supabase';
 import { useAuth } from '../../../context/AuthContext';
 import { useStore } from '../../../context/StoreContext';
 import StoreSheet from '../../../components/StoreSheet';
+import ContactHoursSheet from '../../../components/ContactHoursSheet';
 import AIButton from '../../../components/AIButton';
 import theme from '../../../theme';
 
@@ -42,6 +43,7 @@ export default function ProfileScreen() {
   const [toggles, setToggles] = useState({ notif: true, deals: true });
   const [loading, setLoading] = useState(true);
   const [showStoreSheet, setShowStoreSheet] = useState(false);
+  const [showContactHours, setShowContactHours] = useState(false);
 
   const displayName =
     user?.user_metadata?.full_name ??
@@ -139,17 +141,9 @@ export default function ProfileScreen() {
         );
         break;
 
-      case 'faq': {
-        const schedule = store.hoursLines
-          .map((l) => `• ${l.days}: ${l.hours}`)
-          .join('\n');
-        Alert.alert(
-          `${store.name} — Hours`,
-          `${store.address}\n${store.city}, ${store.province} ${store.postalCode}\n${store.phone}\n\nWeekly schedule\n${schedule}\n\nPickup is available during open hours. Bring valid 19+ ID.`,
-          [{ text: 'OK' }],
-        );
+      case 'faq':
+        setShowContactHours(true);
         break;
-      }
 
       case 'about':
         Alert.alert(
@@ -346,6 +340,12 @@ export default function ProfileScreen() {
         onClose={() => setShowStoreSheet(false)}
         activeStore={store}
         onSelect={setStore}
+      />
+
+      <ContactHoursSheet
+        visible={showContactHours}
+        onClose={() => setShowContactHours(false)}
+        store={store}
       />
     </SafeAreaView>
   );
