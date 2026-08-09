@@ -133,12 +133,15 @@
     .screen {
       width: 100%;
       height: 100%;
-      border-radius: 32px;
+      /* Concentric with .phone radius 42 − side padding 12 */
+      border-radius: 30px;
       overflow: hidden;
       background: var(--screen);
       position: relative;
       display: flex;
       flex-direction: column;
+      /* Seal subpixel hairlines at the bezel/screen join */
+      box-shadow: 0 0 0 1px #0a0c0b;
     }
     /* Fake status-bar inset so tall serif wordmarks aren’t clipped at y=0 */
     .screen-inset {
