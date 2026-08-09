@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
   },
   imageWrap: {
     width: '100%',
-    aspectRatio: 1.25,
+    aspectRatio: 1.4,
     position: 'relative',
     backgroundColor: theme.colors.surfaceElevated,
   },

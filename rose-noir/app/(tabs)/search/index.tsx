@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import theme from '../../../theme';
 import { PRODUCTS, CATEGORIES, type Product } from '../../../data/products';
@@ -85,8 +85,8 @@ export default function SearchScreen() {
     setActiveSort('popular');
   }
 
-  return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+  const listHeader = useCallback(() => (
+    <View>
       <View style={styles.pageHeader}>
         <View>
           <Text style={styles.pageEyebrow}>CURATED SELECTION</Text>
@@ -153,6 +153,21 @@ export default function SearchScreen() {
         ))}
       </ScrollView>
 
+      <View style={styles.resultsHeader}>
+        <Text style={styles.resultsCount}>
+          {filtered.length} {filtered.length === 1 ? 'product' : 'products'}
+        </Text>
+        {!isIdle && (
+          <TouchableOpacity onPress={clearAll} style={styles.clearAllBtn}>
+            <Text style={styles.clearAllText}>Clear all</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    </View>
+  ), [query, showFilters, activeFilterCount, activeCategory, isIdle, filtered.length]);
+
+  return (
+    <SafeAreaView style={styles.safe} edges={['top']}>
       <FilterSheet
         visible={showFilters}
         onClose={() => setShowFilters(false)}
@@ -165,17 +180,6 @@ export default function SearchScreen() {
         onClearAll={clearAll}
       />
 
-      <View style={styles.resultsHeader}>
-        <Text style={styles.resultsCount}>
-          {filtered.length} {filtered.length === 1 ? 'product' : 'products'}
-        </Text>
-        {!isIdle && (
-          <TouchableOpacity onPress={clearAll} style={styles.clearAllBtn}>
-            <Text style={styles.clearAllText}>Clear all</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-
       <FlatList
         data={filtered}
         keyExtractor={(item) => item.id}
@@ -184,6 +188,7 @@ export default function SearchScreen() {
         contentContainerStyle={styles.grid}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
+        ListHeaderComponent={listHeader}
         renderItem={({ item }) => (
           <ProductCard
             product={item}
@@ -328,19 +333,19 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   grid: {
-    padding: theme.spacing.md,
-    paddingTop: theme.spacing.sm,
-    rowGap: theme.spacing.md,
     paddingBottom: 120,
   },
   row: {
     gap: theme.spacing.sm,
     justifyContent: 'flex-start',
+    paddingHorizontal: theme.spacing.md,
+    marginBottom: theme.spacing.md,
   },
   empty: {
     alignItems: 'center',
     paddingVertical: theme.spacing.xxl,
     gap: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
   },
   emptyTitle: {
     ...theme.typography.subheading,

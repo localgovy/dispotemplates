@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import theme from '../../../theme';
 import { PRODUCTS, type Product } from '../../../data/products';
@@ -99,8 +99,8 @@ export default function SearchScreen() {
     setActiveMood('');
   }
 
-  return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+  const listHeader = useCallback(() => (
+    <View>
       <View style={styles.pageHeader}>
         <View style={{ flex: 1 }}>
           <Text style={styles.pageEyebrow}>LUMINOUS BOTANICAL</Text>
@@ -149,7 +149,6 @@ export default function SearchScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Soft mint segmented strain control — equal segments, not pills */}
       <View style={styles.segmentWrap}>
         <Text style={styles.segmentLabel}>Spectrum</Text>
         <View style={styles.segmentTrack}>
@@ -173,18 +172,6 @@ export default function SearchScreen() {
           })}
         </View>
       </View>
-
-      <FilterSheet
-        visible={showFilters}
-        onClose={() => setShowFilters(false)}
-        sortOptions={DEFAULT_SORT_OPTIONS}
-        activeSort={activeSort}
-        onSortChange={setActiveSort}
-        filterGroups={[STRAIN_FILTER_GROUP]}
-        activeFilters={{ strain: activeStrain }}
-        onFilterChange={(_group, value) => setActiveStrain(value)}
-        onClearAll={clearAll}
-      />
 
       {isIdle && (
         <View style={styles.quickWrap}>
@@ -216,6 +203,22 @@ export default function SearchScreen() {
           </TouchableOpacity>
         )}
       </View>
+    </View>
+  ), [query, showFilters, activeFilterCount, activeStrain, activeMood, isIdle, filtered.length]);
+
+  return (
+    <SafeAreaView style={styles.safe} edges={['top']}>
+      <FilterSheet
+        visible={showFilters}
+        onClose={() => setShowFilters(false)}
+        sortOptions={DEFAULT_SORT_OPTIONS}
+        activeSort={activeSort}
+        onSortChange={setActiveSort}
+        filterGroups={[STRAIN_FILTER_GROUP]}
+        activeFilters={{ strain: activeStrain }}
+        onFilterChange={(_group, value) => setActiveStrain(value)}
+        onClearAll={clearAll}
+      />
 
       <FlatList
         data={filtered}
@@ -223,6 +226,7 @@ export default function SearchScreen() {
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
+        ListHeaderComponent={listHeader}
         renderItem={({ item }) => (
           <ProductCard
             product={item}
@@ -429,8 +433,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   list: {
-    padding: theme.spacing.md,
-    paddingTop: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
     gap: theme.spacing.md,
     paddingBottom: 120,
   },
@@ -438,6 +441,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: theme.spacing.xxl,
     gap: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
   },
   emptyTitle: {
     ...theme.typography.subheading,

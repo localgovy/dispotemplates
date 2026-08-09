@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
   },
   imageWrap: {
     width: '100%',
-    aspectRatio: 1.05,
+    aspectRatio: 1.25,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: theme.spacing.sm,

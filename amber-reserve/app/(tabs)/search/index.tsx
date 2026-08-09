@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import theme from '../../../theme';
 import { PRODUCTS, CATEGORIES, type Product } from '../../../data/products';
@@ -36,7 +36,6 @@ const SORT_CHIPS: { id: string; label: string }[] = [
 
 const { width: SCREEN_W } = Dimensions.get('window');
 const CARD_W = Math.floor((SCREEN_W - theme.spacing.md * 2 - theme.spacing.sm) / 2);
-const FEATURED_W = SCREEN_W - theme.spacing.md * 2;
 
 export default function SearchScreen() {
   const params = useLocalSearchParams<{ category?: string }>();
@@ -87,9 +86,6 @@ export default function SearchScreen() {
     return list;
   }, [query, activeCategory, activeSort, activeStrain]);
 
-  const featured = filtered[0] ?? null;
-  const gridItems = featured ? filtered.slice(1) : filtered;
-
   const isIdle = query.trim().length === 0 && activeCategory === 'all';
 
   function clearAll() {
@@ -99,8 +95,8 @@ export default function SearchScreen() {
     setActiveSort('popular');
   }
 
-  return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+  const listHeader = useCallback(() => (
+    <View>
       <View style={styles.pageHeader}>
         <View>
           <Text style={styles.pageEyebrow}>CURATED SELECTION</Text>
@@ -146,7 +142,6 @@ export default function SearchScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Sticky sort bar */}
       <View style={styles.sortBar}>
         {SORT_CHIPS.map((chip) => {
           const active = activeSort === chip.id;
@@ -186,18 +181,6 @@ export default function SearchScreen() {
         ))}
       </ScrollView>
 
-      <FilterSheet
-        visible={showFilters}
-        onClose={() => setShowFilters(false)}
-        sortOptions={DEFAULT_SORT_OPTIONS}
-        activeSort={activeSort}
-        onSortChange={setActiveSort}
-        filterGroups={[STRAIN_FILTER_GROUP]}
-        activeFilters={{ strain: activeStrain }}
-        onFilterChange={(_group, value) => setActiveStrain(value)}
-        onClearAll={clearAll}
-      />
-
       {isIdle && (
         <View style={styles.quickWrap}>
           <Text style={styles.quickLabel}>Trending Searches</Text>
@@ -227,27 +210,40 @@ export default function SearchScreen() {
           </TouchableOpacity>
         )}
       </View>
+    </View>
+  ), [
+    query,
+    showFilters,
+    activeFilterCount,
+    activeSort,
+    activeCategory,
+    isIdle,
+    filtered.length,
+  ]);
+
+  return (
+    <SafeAreaView style={styles.safe} edges={['top']}>
+      <FilterSheet
+        visible={showFilters}
+        onClose={() => setShowFilters(false)}
+        sortOptions={DEFAULT_SORT_OPTIONS}
+        activeSort={activeSort}
+        onSortChange={setActiveSort}
+        filterGroups={[STRAIN_FILTER_GROUP]}
+        activeFilters={{ strain: activeStrain }}
+        onFilterChange={(_group, value) => setActiveStrain(value)}
+        onClearAll={clearAll}
+      />
 
       <FlatList
-        data={gridItems}
+        data={filtered}
         keyExtractor={(item) => item.id}
         numColumns={2}
         columnWrapperStyle={styles.row}
         contentContainerStyle={styles.grid}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
-        ListHeaderComponent={
-          featured ? (
-            <View style={styles.featuredWrap}>
-              <Text style={styles.featuredLabel}>EDITOR&apos;S PICK</Text>
-              <ProductCard
-                product={featured}
-                width={FEATURED_W}
-                onPress={() => setSelectedProduct(featured)}
-              />
-            </View>
-          ) : null
-        }
+        ListHeaderComponent={listHeader}
         renderItem={({ item }) => (
           <ProductCard
             product={item}
@@ -256,16 +252,14 @@ export default function SearchScreen() {
           />
         )}
         ListEmptyComponent={
-          featured ? null : (
-            <View style={styles.empty}>
-              <Ionicons name="search-outline" size={48} color={theme.colors.textMuted} />
-              <Text style={styles.emptyTitle}>No products found</Text>
-              <Text style={styles.emptyText}>Try a different search or clear your filters</Text>
-              <TouchableOpacity style={styles.clearBtn} onPress={clearAll} activeOpacity={0.8}>
-                <Text style={styles.clearBtnText}>Clear filters</Text>
-              </TouchableOpacity>
-            </View>
-          )
+          <View style={styles.empty}>
+            <Ionicons name="search-outline" size={48} color={theme.colors.textMuted} />
+            <Text style={styles.emptyTitle}>No products found</Text>
+            <Text style={styles.emptyText}>Try a different search or clear your filters</Text>
+            <TouchableOpacity style={styles.clearBtn} onPress={clearAll} activeOpacity={0.8}>
+              <Text style={styles.clearBtnText}>Clear filters</Text>
+            </TouchableOpacity>
+          </View>
         }
       />
 
@@ -453,31 +447,20 @@ const styles = StyleSheet.create({
     color: theme.colors.primary,
     fontWeight: '600',
   },
-  featuredWrap: {
-    marginBottom: theme.spacing.md,
-    gap: theme.spacing.xs,
-  },
-  featuredLabel: {
-    fontFamily: theme.fonts.semibold,
-    fontSize: 10,
-    letterSpacing: 1.6,
-    color: theme.colors.accent,
-    marginBottom: 4,
-  },
   grid: {
-    padding: theme.spacing.md,
-    paddingTop: theme.spacing.sm,
-    rowGap: theme.spacing.md,
     paddingBottom: 120,
   },
   row: {
     gap: theme.spacing.sm,
     justifyContent: 'flex-start',
+    paddingHorizontal: theme.spacing.md,
+    marginBottom: theme.spacing.md,
   },
   empty: {
     alignItems: 'center',
     paddingVertical: theme.spacing.xxl,
     gap: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
   },
   emptyTitle: {
     ...theme.typography.subheading,

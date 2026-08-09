@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import theme from '../../../theme';
 import { PRODUCTS, type Product } from '../../../data/products';
@@ -84,8 +84,8 @@ export default function SearchScreen() {
     setActiveSort('popular');
   }
 
-  return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+  const listHeader = useCallback(() => (
+    <View>
       <View style={styles.pageHeader}>
         <View style={styles.titleBlock}>
           <View style={styles.accentLine} />
@@ -97,7 +97,6 @@ export default function SearchScreen() {
         <AIButton />
       </View>
 
-      {/* Floating glass search field */}
       <View style={styles.glassWrap}>
         <View style={styles.glassCard}>
           <Ionicons name="search" size={18} color={theme.colors.textMuted} />
@@ -135,7 +134,6 @@ export default function SearchScreen() {
         </View>
       </View>
 
-      {/* Strain chips only — no category pills */}
       <View style={styles.strainRow}>
         {STRAIN_CHIPS.map((strain) => {
           const active = activeStrain === strain;
@@ -152,6 +150,21 @@ export default function SearchScreen() {
         })}
       </View>
 
+      <View style={styles.resultsHeader}>
+        <Text style={styles.resultsCount}>
+          {filtered.length} {filtered.length === 1 ? 'product' : 'products'}
+        </Text>
+        {!isIdle && (
+          <TouchableOpacity onPress={clearAll} style={styles.clearAllBtn}>
+            <Text style={styles.clearAllText}>Clear all</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    </View>
+  ), [query, showFilters, activeFilterCount, activeStrain, isIdle, filtered.length]);
+
+  return (
+    <SafeAreaView style={styles.safe} edges={['top']}>
       <FilterSheet
         visible={showFilters}
         onClose={() => setShowFilters(false)}
@@ -164,17 +177,6 @@ export default function SearchScreen() {
         onClearAll={clearAll}
       />
 
-      <View style={styles.resultsHeader}>
-        <Text style={styles.resultsCount}>
-          {filtered.length} {filtered.length === 1 ? 'product' : 'products'}
-        </Text>
-        {!isIdle && (
-          <TouchableOpacity onPress={clearAll} style={styles.clearAllBtn}>
-            <Text style={styles.clearAllText}>Clear all</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-
       <FlatList
         data={filtered}
         keyExtractor={(item) => item.id}
@@ -182,6 +184,7 @@ export default function SearchScreen() {
         contentContainerStyle={styles.stack}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
+        ListHeaderComponent={listHeader}
         renderItem={({ item }) => (
           <ProductCard
             product={item}
@@ -351,8 +354,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   stack: {
-    padding: theme.spacing.md,
-    paddingTop: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
     gap: theme.spacing.lg,
     paddingBottom: 120,
   },
@@ -360,6 +362,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: theme.spacing.xxl,
     gap: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
   },
   emptyTitle: {
     ...theme.typography.subheading,

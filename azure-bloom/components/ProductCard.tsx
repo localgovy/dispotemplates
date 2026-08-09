@@ -365,8 +365,8 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.sm,
   },
   listImageWrap: {
-    width: 108,
-    height: 108,
+    width: 88,
+    height: 88,
     position: 'relative',
     backgroundColor: theme.colors.surfaceElevated,
   },

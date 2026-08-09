@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import theme from '../../../theme';
 import { PRODUCTS, CATEGORIES, type Product } from '../../../data/products';
@@ -111,9 +111,8 @@ export default function SearchScreen() {
     setActiveMood(null);
   }
 
-  return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
-      {/* ── Cheerful Shop Header ─────────────────────────────── */}
+  const listHeader = useCallback(() => (
+    <View>
       <View style={styles.pageHeader}>
         <View>
           <Text style={styles.pageEyebrow}>BRIGHT FINDS</Text>
@@ -122,7 +121,6 @@ export default function SearchScreen() {
         <AIButton />
       </View>
 
-      {/* ── Search Bar ──────────────────────────────────────── */}
       <View style={styles.searchWrap}>
         <View style={styles.searchBar}>
           <Ionicons name="search" size={18} color={theme.colors.textMuted} />
@@ -160,7 +158,6 @@ export default function SearchScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* ── Category Chips ──────────────────────────────────── */}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -182,20 +179,6 @@ export default function SearchScreen() {
         ))}
       </ScrollView>
 
-      {/* ── Filter Sheet (modal) ─────────────────────────────── */}
-      <FilterSheet
-        visible={showFilters}
-        onClose={() => setShowFilters(false)}
-        sortOptions={DEFAULT_SORT_OPTIONS}
-        activeSort={activeSort}
-        onSortChange={setActiveSort}
-        filterGroups={[STRAIN_FILTER_GROUP]}
-        activeFilters={{ strain: activeStrain }}
-        onFilterChange={(_group, value) => setActiveStrain(value)}
-        onClearAll={clearAll}
-      />
-
-      {/* ── Mood Spectrum (replaces trending searches) ──────── */}
       <View style={styles.moodWrap}>
         <Text style={styles.moodLabel}>Mood Spectrum</Text>
         <View style={styles.moodRow}>
@@ -215,7 +198,6 @@ export default function SearchScreen() {
         </View>
       </View>
 
-      {/* ── Results header ──────────────────────────────────── */}
       <View style={styles.resultsHeader}>
         <Text style={styles.resultsCount}>
           {filtered.length} {filtered.length === 1 ? 'product' : 'products'}
@@ -227,6 +209,22 @@ export default function SearchScreen() {
           </TouchableOpacity>
         )}
       </View>
+    </View>
+  ), [query, showFilters, activeFilterCount, activeCategory, activeMood, isIdle, filtered.length]);
+
+  return (
+    <SafeAreaView style={styles.safe} edges={['top']}>
+      <FilterSheet
+        visible={showFilters}
+        onClose={() => setShowFilters(false)}
+        sortOptions={DEFAULT_SORT_OPTIONS}
+        activeSort={activeSort}
+        onSortChange={setActiveSort}
+        filterGroups={[STRAIN_FILTER_GROUP]}
+        activeFilters={{ strain: activeStrain }}
+        onFilterChange={(_group, value) => setActiveStrain(value)}
+        onClearAll={clearAll}
+      />
 
       <FlatList
         data={filtered}
@@ -236,6 +234,7 @@ export default function SearchScreen() {
         contentContainerStyle={styles.grid}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
+        ListHeaderComponent={listHeader}
         renderItem={({ item }) => (
           <ProductCard
             product={item}
@@ -414,19 +413,19 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   grid: {
-    padding: theme.spacing.md,
-    paddingTop: theme.spacing.sm,
-    rowGap: theme.spacing.md,
     paddingBottom: 120,
   },
   row: {
     gap: theme.spacing.sm,
     justifyContent: 'flex-start',
+    paddingHorizontal: theme.spacing.md,
+    marginBottom: theme.spacing.md,
   },
   empty: {
     alignItems: 'center',
     paddingVertical: theme.spacing.xxl,
     gap: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
   },
   emptyTitle: {
     ...theme.typography.subheading,

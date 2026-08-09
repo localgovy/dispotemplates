@@ -169,12 +169,12 @@ const styles = StyleSheet.create({
   },
   imageWrap: {
     width: '100%',
-    aspectRatio: 1.55,
+    aspectRatio: 1.7,
     position: 'relative',
     backgroundColor: theme.colors.backgroundLight,
   },
   imageWrapCompact: {
-    aspectRatio: 1.15,
+    aspectRatio: 1.35,
   },
   image: {
     width: '100%',
