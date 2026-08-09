@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -36,7 +37,11 @@ export default function OrdersScreen() {
   const [expanded, setExpanded] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user) {
+    // Web/demo previews must never hang on a Supabase round-trip.
+    const demoMode =
+      Platform.OS === 'web' || process.env.EXPO_PUBLIC_SCREENSHOT_MODE === '1';
+
+    if (demoMode || !user) {
       setOrders([]);
       setLoading(false);
       return;
@@ -45,6 +50,13 @@ export default function OrdersScreen() {
     let cancelled = false;
     setLoading(true);
 
+    const failSafe = setTimeout(() => {
+      if (!cancelled) {
+        setOrders([]);
+        setLoading(false);
+      }
+    }, 3500);
+
     supabase
       .from('orders')
       .select('*, order_items(*)')
@@ -52,6 +64,7 @@ export default function OrdersScreen() {
       .order('created_at', { ascending: false })
       .then(({ data, error }) => {
         if (cancelled) return;
+        clearTimeout(failSafe);
         if (!error && data) {
           setOrders(data as Order[]);
           const first = data[0] as Order | undefined;
@@ -60,10 +73,17 @@ export default function OrdersScreen() {
           setOrders([]);
         }
         setLoading(false);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        clearTimeout(failSafe);
+        setOrders([]);
+        setLoading(false);
       });
 
     return () => {
       cancelled = true;
+      clearTimeout(failSafe);
     };
   }, [user]);
 
