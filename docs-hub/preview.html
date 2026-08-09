@@ -138,21 +138,13 @@
       overflow: hidden;
       background: var(--screen);
       position: relative;
-      display: flex;
-      flex-direction: column;
       /* Seal subpixel hairlines at the bezel/screen join */
       box-shadow: 0 0 0 1px #0a0c0b;
     }
-    /* Fake status-bar inset so tall serif wordmarks aren’t clipped at y=0 */
-    .screen-inset {
-      height: 28px;
-      flex-shrink: 0;
-      background: #0d0d0d;
-    }
+    /* Full-bleed demo: Dynamic Island lives in the bezel padding above, like a real phone */
     .screen iframe {
       width: 100%;
-      flex: 1;
-      min-height: 0;
+      height: 100%;
       border: 0;
       display: block;
       background: #000;
@@ -240,7 +232,6 @@
     <main class="stage" id="stage">
       <div class="phone" id="phone">
         <div class="screen">
-          <div class="screen-inset" aria-hidden="true"></div>
           <div class="loading" id="loading">
             <div class="spinner" aria-hidden="true"></div>
             <span>Loading demo…</span>
