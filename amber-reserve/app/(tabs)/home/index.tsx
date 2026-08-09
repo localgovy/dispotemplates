@@ -348,6 +348,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     lineHeight: 30,
     color: theme.colors.primary,
+    overflow: 'visible',
     letterSpacing: -0.3,
   },
   headerActions: {

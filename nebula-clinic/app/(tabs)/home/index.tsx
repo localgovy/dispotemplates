@@ -337,6 +337,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     lineHeight: 28,
     color: theme.colors.primaryDark,
+    overflow: 'visible',
     letterSpacing: -0.3,
   },
   headerActions: {

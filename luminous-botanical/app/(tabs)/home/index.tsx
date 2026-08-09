@@ -309,6 +309,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     lineHeight: 28,
     color: theme.colors.primary,
+    overflow: 'visible',
     letterSpacing: -0.2,
     flex: 1,
     textAlign: 'center',
