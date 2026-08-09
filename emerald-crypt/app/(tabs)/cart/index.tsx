@@ -282,7 +282,7 @@ export default function CartScreen() {
             </View>
           )}
           <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>HST (13%)</Text>
+            <Text style={styles.summaryLabel}>Est. Tax</Text>
             <Text style={styles.summaryValue}>${tax.toFixed(2)}</Text>
           </View>
           <View style={styles.summaryRow}>

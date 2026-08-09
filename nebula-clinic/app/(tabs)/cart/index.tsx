@@ -276,7 +276,7 @@ export default function CartScreen() {
             </View>
           )}
           <View style={styles.tableRow}>
-            <Text style={styles.tableLabel}>HST (13%)</Text>
+            <Text style={styles.tableLabel}>Est. Tax</Text>
             <Text style={styles.tableValue}>${tax.toFixed(2)}</Text>
           </View>
           <View style={[styles.tableRow, styles.tableRowTotal]}>
