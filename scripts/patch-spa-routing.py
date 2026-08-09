@@ -69,6 +69,12 @@ for app in APPS:
   if not idx.exists():
     continue
   html = idx.read_text()
+  if 'http-equiv="Cache-Control"' not in html and '<meta charset="utf-8" />' in html:
+    html = html.replace(
+      '<meta charset="utf-8" />',
+      '<meta http-equiv="Cache-Control" content="no-cache" />\n    <meta charset="utf-8" />',
+      1,
+    )
   if "GitHub Pages SPA path restore" not in html:
     if '<div id="root"></div>' in html:
       html = html.replace('<div id="root"></div>', '<div id="root"></div>\n' + RESTORE)

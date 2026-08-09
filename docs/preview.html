@@ -349,7 +349,15 @@
       root.style.setProperty("--status-fg", meta.light ? "#111111" : "#f5f5f5");
 
       var src = "./" + app + "/";
-      var framed = src + "?vb=" + encodeURIComponent(bust);
+      // Unique t= every preview load so a hard-reload of this shell cannot
+      // reuse a stale app index.html that still points at a deleted entry-*.js
+      // (GitHub Pages caches HTML for ~10 minutes; hashed bundles are replaced on each export).
+      var framed =
+        src +
+        "?vb=" +
+        encodeURIComponent(bust) +
+        "&t=" +
+        Date.now();
       titleEl.textContent = meta.name;
       document.title = meta.name + " · Mobile preview";
       full.href = src;
@@ -359,11 +367,73 @@
       var hideLoading = function () {
         if (loading) loading.classList.add("hidden");
       };
+      var showLoadError = function (message) {
+        hideLoading();
+        if (!loading) return;
+        loading.classList.remove("hidden");
+        loading.innerHTML =
+          '<span style="max-width:220px;text-align:center;line-height:1.4">' +
+          message +
+          '</span><a href="' +
+          framed +
+          '" target="_blank" rel="noopener" style="color:#7dcea0;font-weight:600;margin-top:8px">Open demo</a>';
+        loading.style.flexDirection = "column";
+      };
+      var rootReady = function () {
+        try {
+          var doc = frame.contentDocument;
+          if (!doc) return false;
+          var root = doc.getElementById("root");
+          return !!(root && root.childNodes.length > 0);
+        } catch (e) {
+          return false;
+        }
+      };
+      var entryMissing = function () {
+        try {
+          var doc = frame.contentDocument;
+          if (!doc) return false;
+          var scripts = doc.querySelectorAll('script[src*="entry-"]');
+          if (!scripts.length) return false;
+          // If the shell loaded but React never mounted, the hashed entry likely 404'd.
+          return true;
+        } catch (e) {
+          return false;
+        }
+      };
       frame.addEventListener("load", function () {
-        // Expo demos need a beat after the shell loads
-        setTimeout(hideLoading, 900);
+        var tries = 0;
+        var poll = function () {
+          tries += 1;
+          if (rootReady()) {
+            hideLoading();
+            return;
+          }
+          if (tries < 40) {
+            setTimeout(poll, 250);
+            return;
+          }
+          if (entryMissing()) {
+            showLoadError(
+              "Demo assets looked stale after a deploy. Open the demo or refresh once more."
+            );
+          } else {
+            hideLoading();
+          }
+        };
+        poll();
       });
-      setTimeout(hideLoading, 8000);
+      setTimeout(function () {
+        if (!rootReady()) {
+          if (entryMissing()) {
+            showLoadError(
+              "Demo assets looked stale after a deploy. Open the demo or refresh once more."
+            );
+          } else {
+            hideLoading();
+          }
+        }
+      }, 12000);
     })();
   </script>
 </body>
