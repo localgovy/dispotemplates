@@ -141,7 +141,7 @@ export default function CartScreen() {
         </View>
         <View style={styles.empty}>
           <View style={styles.emptyIcon}>
-            <Ionicons name="bag-handle-outline" size={48} color={theme.colors.accentDark} />
+            <Ionicons name="bag-handle-outline" size={48} color={theme.colors.primary} />
           </View>
           <Text style={styles.emptyTitle}>Your basket is empty</Text>
           <Text style={styles.emptyText}>Browse the humidor to build your reserve.</Text>

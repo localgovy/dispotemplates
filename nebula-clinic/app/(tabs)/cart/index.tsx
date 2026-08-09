@@ -141,7 +141,7 @@ export default function CartScreen() {
         </View>
         <View style={styles.empty}>
           <View style={styles.emptyIcon}>
-            <Ionicons name="clipboard-outline" size={48} color={theme.colors.accentDark} />
+            <Ionicons name="clipboard-outline" size={48} color={theme.colors.primary} />
           </View>
           <Text style={styles.emptyTitle}>Your cart is empty</Text>
           <Text style={styles.emptyText}>Add products to build your order.</Text>
