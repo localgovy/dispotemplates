@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   name: {
-    fontFamily: theme.fonts.serif,
+    fontFamily: theme.fonts.serifBold,
     fontSize: 18,
     color: theme.colors.text,
     lineHeight: 24,

@@ -827,7 +827,7 @@ const styles = StyleSheet.create({
   },
   strainText: {
     ...theme.typography.caption,
-    fontWeight: '700',
+
   },
   weightBadge: {
     flexDirection: 'row',
@@ -855,7 +855,7 @@ const styles = StyleSheet.create({
   categoryText: {
     ...theme.typography.caption,
     color: theme.colors.primary,
-    fontWeight: '600',
+
   },
   strainDesc: {
     ...theme.typography.caption,
@@ -947,7 +947,7 @@ const styles = StyleSheet.create({
   price: {
     ...theme.typography.heading,
     color: theme.colors.text,
-    fontWeight: '800',
+
   },
   salePrice: {
     color: theme.colors.saleRed,
@@ -968,7 +968,7 @@ const styles = StyleSheet.create({
   addBtnText: {
     ...theme.typography.subheading,
     color: theme.colors.white,
-    fontWeight: '700',
+
   },
   qtyControl: {
     flex: 1,
@@ -995,7 +995,7 @@ const styles = StyleSheet.create({
   qtyText: {
     ...theme.typography.heading,
     color: theme.colors.text,
-    fontWeight: '700',
+
     minWidth: 40,
     textAlign: 'center',
   },

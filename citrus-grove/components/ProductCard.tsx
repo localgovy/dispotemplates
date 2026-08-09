@@ -193,12 +193,12 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   brand: {
-    fontFamily: theme.fonts.medium,
-    fontSize: 10,
-    color: theme.colors.textMuted,
+    fontFamily: theme.fonts.semibold,
+    fontSize: 11,
     lineHeight: 14,
-    textTransform: 'uppercase',
-    letterSpacing: 0.6,
+    letterSpacing: 1.0,
+    textTransform: 'uppercase' as const,
+    color: theme.colors.textMuted,
   },
   name: {
     fontFamily: theme.fonts.serifBold,

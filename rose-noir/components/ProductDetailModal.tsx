@@ -373,11 +373,18 @@ const styles = StyleSheet.create({
     gap: theme.spacing.sm,
   },
   brand: {
-    ...theme.typography.caption,
+    fontFamily: theme.fonts.semibold,
+    fontSize: 11,
+    lineHeight: 14,
+    letterSpacing: 1.2,
+    textTransform: 'uppercase' as const,
     color: theme.colors.textMuted,
   },
   name: {
-    ...theme.typography.title,
+    fontFamily: theme.fonts.serifBold,
+    fontSize: 26,
+    lineHeight: 32,
+    letterSpacing: -0.3,
     color: theme.colors.text,
   },
   metaRow: {
@@ -400,8 +407,10 @@ const styles = StyleSheet.create({
     borderRadius: 3.5,
   },
   strainText: {
-    ...theme.typography.caption,
-    fontWeight: '700',
+    fontFamily: theme.fonts.semibold,
+    fontSize: 12,
+    lineHeight: 16,
+    letterSpacing: 0.2,
   },
   weightBadge: {
     flexDirection: 'row',
@@ -415,7 +424,9 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.border,
   },
   weightText: {
-    ...theme.typography.caption,
+    fontFamily: theme.fonts.medium,
+    fontSize: 12,
+    lineHeight: 16,
     color: theme.colors.textSecondary,
   },
   categoryBadge: {
@@ -427,14 +438,16 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.primary + '50',
   },
   categoryText: {
-    ...theme.typography.caption,
+    fontFamily: theme.fonts.semibold,
+    fontSize: 12,
+    lineHeight: 16,
     color: theme.colors.primary,
-    fontWeight: '600',
   },
   strainDesc: {
-    ...theme.typography.caption,
+    fontFamily: theme.fonts.medium,
+    fontSize: 12,
+    lineHeight: 16,
     color: theme.colors.textMuted,
-    fontStyle: 'italic',
     marginTop: -4,
   },
   statsRow: {
@@ -451,7 +464,11 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.border,
   },
   statLabel: {
-    ...theme.typography.label,
+    fontFamily: theme.fonts.semibold,
+    fontSize: 10,
+    lineHeight: 14,
+    letterSpacing: 1.2,
+    textTransform: 'uppercase' as const,
     color: theme.colors.textMuted,
     marginBottom: 4,
   },
@@ -461,9 +478,10 @@ const styles = StyleSheet.create({
     lineHeight: 30,
   },
   description: {
-    ...theme.typography.body,
-    color: theme.colors.textSecondary,
+    fontFamily: theme.fonts.body,
+    fontSize: 15,
     lineHeight: 24,
+    color: theme.colors.textSecondary,
   },
   tagsRow: {
     flexDirection: 'row',
@@ -479,7 +497,10 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.border,
   },
   tagText: {
-    ...theme.typography.small,
+    fontFamily: theme.fonts.medium,
+    fontSize: 11,
+    lineHeight: 16,
+    letterSpacing: 0.2,
     color: theme.colors.textMuted,
   },
   cta: {
@@ -500,14 +521,18 @@ const styles = StyleSheet.create({
     gap: 1,
   },
   originalPrice: {
-    ...theme.typography.small,
+    fontFamily: theme.fonts.medium,
+    fontSize: 12,
+    lineHeight: 16,
     color: theme.colors.textMuted,
     textDecorationLine: 'line-through',
   },
   price: {
-    ...theme.typography.heading,
+    fontFamily: theme.fonts.serifBold,
+    fontSize: 22,
+    lineHeight: 28,
+    letterSpacing: -0.2,
     color: theme.colors.text,
-    fontWeight: '800',
   },
   salePrice: {
     color: theme.colors.saleRed,
@@ -526,9 +551,10 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.md - 2,
   },
   addBtnText: {
-    ...theme.typography.subheading,
+    fontFamily: theme.fonts.bold,
+    fontSize: 16,
+    lineHeight: 22,
     color: theme.colors.white,
-    fontWeight: '700',
   },
   qtyControl: {
     flex: 1,
@@ -553,9 +579,10 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.primary,
   },
   qtyText: {
-    ...theme.typography.heading,
+    fontFamily: theme.fonts.serifBold,
+    fontSize: 20,
+    lineHeight: 26,
     color: theme.colors.text,
-    fontWeight: '700',
     minWidth: 40,
     textAlign: 'center',
   },

@@ -279,16 +279,18 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   name: {
-    fontFamily: theme.fonts.serif,
+    fontFamily: theme.fonts.serifBold,
     fontSize: 15,
     color: theme.colors.text,
     lineHeight: 19,
   },
   brand: {
-    fontFamily: theme.fonts.medium,
+    fontFamily: theme.fonts.semibold,
     fontSize: 11,
-    color: theme.colors.textMuted,
     lineHeight: 14,
+    letterSpacing: 1.0,
+    textTransform: 'uppercase' as const,
+    color: theme.colors.textMuted,
   },
   pastelChip: {
     paddingHorizontal: 8,

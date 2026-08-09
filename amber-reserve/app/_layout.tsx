@@ -14,6 +14,7 @@ import {
   SourceSerif4_400Regular,
 } from '@expo-google-fonts/source-serif-4';
 import {
+  Inter_400Regular,
   Inter_500Medium,
   Inter_600SemiBold,
   Inter_700Bold,
@@ -59,6 +60,7 @@ export default function RootLayout() {
     LibreCaslonText_400Regular_Italic,
     LibreCaslonText_700Bold,
     SourceSerif4_400Regular,
+    Inter_400Regular,
     Inter_500Medium,
     Inter_600SemiBold,
     Inter_700Bold,

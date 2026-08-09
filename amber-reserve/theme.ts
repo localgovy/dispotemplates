@@ -1,6 +1,6 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // Amber Reserve — "Tactile / Modern Skeuomorphic" design system
-// Mahogany lounge, honey-amber CTAs, Libre Caslon + Source Serif + Inter.
+// Mahogany lounge, honey-amber CTAs, Libre Caslon display + Inter UI.
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const fonts = {
@@ -8,7 +8,7 @@ export const fonts = {
   serifBold: 'LibreCaslonText_700Bold',
   serifRegular: 'LibreCaslonText_400Regular',
   serifItalic: 'LibreCaslonText_400Regular_Italic',
-  body: 'SourceSerif4_400Regular',
+  body: 'Inter_400Regular',
   medium: 'Inter_500Medium',
   semibold: 'Inter_600SemiBold',
   bold: 'Inter_700Bold',
