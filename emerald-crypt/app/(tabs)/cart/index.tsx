@@ -481,7 +481,6 @@ const styles = StyleSheet.create({
   },
   promoInput: {
     flex: 1,
-    fontFamily: theme.fonts.mono,
     fontSize: 13,
     color: theme.colors.text,
     borderWidth: 1,
@@ -490,6 +489,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.sm,
     paddingVertical: theme.spacing.sm,
     backgroundColor: theme.colors.background,
+      outlineStyle: 'none' as any,
+    fontFamily: theme.fonts.mono,
+    outlineStyle: 'none' as any,
   },
   promoApplyBtn: {
     backgroundColor: theme.colors.primary,

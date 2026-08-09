@@ -69,6 +69,22 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
+    if (Platform.OS !== 'web' || typeof document === 'undefined') return;
+    const id = 'dispo-web-input-fonts';
+    if (document.getElementById(id)) return;
+    const style = document.createElement('style');
+    style.id = id;
+    style.textContent = `
+      /* Keep RN/expo-font on the control; only fix Arial placeholders on web */
+      input::placeholder, textarea::placeholder {
+        font-family: inherit !important;
+        letter-spacing: inherit;
+      }
+    `;
+    document.head.appendChild(style);
+  }, []);
+
+  useEffect(() => {
     const t = setTimeout(() => setFontTimeout(true), 2500);
     return () => clearTimeout(t);
   }, []);

@@ -316,9 +316,13 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    ...theme.typography.body,
+    fontFamily: theme.fonts.body,
+    fontSize: 14,
+    lineHeight: 20,
+    letterSpacing: 0.2,
     color: theme.colors.text,
     padding: 0,
+    outlineStyle: 'none' as any,
   },
   filterBtn: {
     width: 44,

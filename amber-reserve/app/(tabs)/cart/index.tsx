@@ -500,6 +500,8 @@ const styles = StyleSheet.create({
     color: theme.colors.text,
     borderWidth: 1,
     borderColor: theme.colors.border,
+    fontFamily: theme.fonts.medium,
+    outlineStyle: 'none' as any,
   },
   promoApplyBtn: {
     backgroundColor: theme.colors.primary,

@@ -464,13 +464,14 @@ const styles = StyleSheet.create({
   },
   promoInput: {
     flex: 1,
-    fontFamily: theme.fonts.mono,
     fontSize: 13,
     color: theme.colors.text,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
     paddingHorizontal: theme.spacing.sm,
     paddingVertical: theme.spacing.sm,
+    fontFamily: theme.fonts.mono,
+    outlineStyle: 'none' as any,
   },
   promoApplyBtn: {
     backgroundColor: theme.colors.surfaceElevated,
