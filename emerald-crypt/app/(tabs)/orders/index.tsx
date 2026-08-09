@@ -36,7 +36,14 @@ export default function OrdersScreen() {
   const [expanded, setExpanded] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setOrders([]);
+      setLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    setLoading(true);
 
     supabase
       .from('orders')
@@ -44,13 +51,20 @@ export default function OrdersScreen() {
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .then(({ data, error }) => {
+        if (cancelled) return;
         if (!error && data) {
           setOrders(data as Order[]);
           const first = data[0] as Order | undefined;
           if (first?.status === 'ready') setExpanded(first.id);
+        } else {
+          setOrders([]);
         }
         setLoading(false);
       });
+
+    return () => {
+      cancelled = true;
+    };
   }, [user]);
 
   function formatTimestamp(iso: string) {
@@ -86,7 +100,7 @@ export default function OrdersScreen() {
           <AIButton />
         </View>
         <View style={styles.centred}>
-          <Ionicons name="receipt-outline" size={48} color={theme.colors.textDisabled} />
+          <Ionicons name="receipt-outline" size={48} color={theme.colors.primary} />
           <Text style={styles.emptyTitle}>No orders yet</Text>
           <Text style={styles.emptyText}>Your placed orders will appear here.</Text>
           <TouchableOpacity
