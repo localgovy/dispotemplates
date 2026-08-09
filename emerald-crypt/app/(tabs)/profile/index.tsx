@@ -341,7 +341,7 @@ export default function ProfileScreen() {
             <Ionicons name="lock-closed-outline" size={14} color={theme.colors.primary} />
             <Text style={styles.footerLogo}>Emerald Crypt</Text>
           </View>
-          <Text style={styles.footerVersion}>{store.name}, {store.province} · v1.0.0</Text>
+          <Text style={styles.footerVersion}>{store.name}, {store.province}</Text>
           <Text style={styles.footerAge}>19+ Only. Keep out of reach of children.</Text>
         </View>
       </ScrollView>

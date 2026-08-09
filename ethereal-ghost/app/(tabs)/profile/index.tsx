@@ -336,7 +336,7 @@ export default function ProfileScreen() {
 
         <View style={styles.footer}>
           <Text style={styles.footerLogo}>Ghost Atelier</Text>
-          <Text style={styles.footerVersion}>{store.name}, {store.province} · v1.0.0</Text>
+          <Text style={styles.footerVersion}>{store.name}, {store.province}</Text>
           <Text style={styles.footerAge}>19+ Only. Keep out of reach of children.</Text>
         </View>
       </ScrollView>

@@ -432,7 +432,7 @@ export default function ProfileScreen() {
             <Ionicons name="leaf" size={16} color={theme.colors.accentDark} />
             <Text style={styles.footerLogo}>Luminous Botanical</Text>
           </View>
-          <Text style={styles.footerVersion}>{store.name}, {store.province} · v1.0.0</Text>
+          <Text style={styles.footerVersion}>{store.name}, {store.province}</Text>
           <Text style={styles.footerAge}>19+ Only. Keep out of reach of children.</Text>
         </View>
       </ScrollView>
