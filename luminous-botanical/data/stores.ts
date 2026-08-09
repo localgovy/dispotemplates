@@ -20,8 +20,12 @@ export const STORES: Store[] = [
     province: 'ON',
     postalCode: '98101',
     phone: '(206) 555-0201',
-    hoursShort: 'Every day  9 am – 11 pm',
-    hoursLines: [{ days: 'Mon – Sun', hours: '9 am – 11 pm' }],
+        hoursShort: 'Every day  9 am – 11 pm',
+    hoursLines: [
+      { days: 'Monday – Thursday', hours: '9:00 am – 11:00 pm' },
+      { days: 'Friday – Saturday', hours: '9:00 am – 11:00 pm' },
+      { days: 'Sunday', hours: '10:00 am – 11:00 pm' },
+    ],
     mapsQuery: '1420 1st Ave Seattle ON 98101',
   },
   {
@@ -32,8 +36,12 @@ export const STORES: Store[] = [
     province: 'ON',
     postalCode: '98102',
     phone: '(206) 555-0202',
-    hoursShort: 'Every day  9 am – 11 pm',
-    hoursLines: [{ days: 'Mon – Sun', hours: '9 am – 11 pm' }],
+        hoursShort: 'Every day  9 am – 11 pm',
+    hoursLines: [
+      { days: 'Monday – Thursday', hours: '9:00 am – 11:00 pm' },
+      { days: 'Friday – Saturday', hours: '9:00 am – 11:00 pm' },
+      { days: 'Sunday', hours: '10:00 am – 11:00 pm' },
+    ],
     mapsQuery: '512 Broadway E Seattle ON 98102',
   },
   {
@@ -44,8 +52,12 @@ export const STORES: Store[] = [
     province: 'ON',
     postalCode: '98004',
     phone: '(425) 555-0203',
-    hoursShort: 'Every day  9 am – 11 pm',
-    hoursLines: [{ days: 'Mon – Sun', hours: '9 am – 11 pm' }],
+        hoursShort: 'Every day  9 am – 11 pm',
+    hoursLines: [
+      { days: 'Monday – Thursday', hours: '9:00 am – 11:00 pm' },
+      { days: 'Friday – Saturday', hours: '9:00 am – 11:00 pm' },
+      { days: 'Sunday', hours: '10:00 am – 11:00 pm' },
+    ],
     mapsQuery: '88 Bellevue Way Bellevue ON 98004',
   },
 ];

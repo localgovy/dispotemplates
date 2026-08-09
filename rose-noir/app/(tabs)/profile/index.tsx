@@ -8,7 +8,6 @@ import {
   Alert,
   Image,
   ActivityIndicator,
-  Linking,
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -26,7 +25,6 @@ import StoreSheet from '../../../components/StoreSheet';
 import AIButton from '../../../components/AIButton';
 import theme from '../../../theme';
 
-const STORE_WEBSITE = 'https://www.rosenoir.com';
 const DOSAGE_KEY = '@rose_noir_dosage_journal';
 
 type Profile = Tables['profiles'];
@@ -260,29 +258,31 @@ export default function ProfileScreen() {
         );
         break;
 
-      case 'faq':
+      case 'faq': {
+        const schedule = store.hoursLines
+          .map((l) => `• ${l.days}: ${l.hours}`)
+          .join('\n');
         Alert.alert(
-          `${store.name} — Contact & Hours`,
-          `${store.address}, ${store.city} ${store.postalCode}\n\n📞 ${store.phone}\n\n🕐 ${store.hoursLines.map((l) => `${l.days}: ${l.hours}`).join('\n')}\n\nFor product questions, call us or visit in store.`,
-          [
-            { text: 'Call Now', onPress: () => Linking.openURL(`tel:${store.phone}`) },
-            { text: 'Close', style: 'cancel' },
-          ],
+          `${store.name} — Hours`,
+          `${store.address}\n${store.city}, ${store.province} ${store.postalCode}\n${store.phone}\n\nWeekly schedule\n${schedule}\n\nPickup is available during open hours. Bring valid 19+ ID.`,
+          [{ text: 'OK' }],
         );
         break;
+      }
 
       case 'about':
-        Linking.openURL(STORE_WEBSITE);
+        Alert.alert(
+          'Our Website',
+          'The store website isn’t available in this demo preview.\n\nWhen you launch your own app, this link will open your real site.',
+          [{ text: 'OK' }],
+        );
         break;
 
       case 'terms':
         Alert.alert(
           'Terms & Privacy',
-          'By using this app you confirm you are 19+ years of age. All purchases require valid government-issued ID at pickup.\n\nPersonal data is stored securely and never sold to third parties. For full terms visit our website.',
-          [
-            { text: 'View Website', onPress: () => Linking.openURL(STORE_WEBSITE) },
-            { text: 'OK', style: 'cancel' },
-          ],
+          'By using this app you confirm you are 19+ years of age. All purchases require valid government-issued ID at pickup.\n\nPersonal data is stored securely and never sold to third parties. Full terms will be linked on your production website.',
+          [{ text: 'OK' }],
         );
         break;
     }
