@@ -97,7 +97,7 @@ export default function ProductCard({ product, onPress, width = 160, flex }: Pro
               ${product.price.toFixed(2)}
             </Text>
           </View>
-          {product.strain !== 'N/A' && (
+          {['Indica','Sativa','Hybrid','CBD'].includes(product.strain) && (
             <View style={styles.strainChip}>
               <Text style={styles.strainText}>{product.strain}</Text>
             </View>

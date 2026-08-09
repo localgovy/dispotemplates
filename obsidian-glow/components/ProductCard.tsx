@@ -20,7 +20,8 @@ const STRAIN_COLORS: Record<string, string> = {
   Sativa: theme.colors.sativa,
   Hybrid: theme.colors.hybrid,
   CBD: theme.colors.cbd,
-  'N/A': theme.colors.textMuted,
+  Accessory: theme.colors.textMuted,
+  Apparel: theme.colors.textMuted,
 };
 
 export default function ProductCard({ product, onPress, width, flex }: Props) {
@@ -55,7 +56,7 @@ export default function ProductCard({ product, onPress, width, flex }: Props) {
           resizeMode="cover"
         />
 
-        {product.strain !== 'N/A' && (
+        {['Indica','Sativa','Hybrid','CBD'].includes(product.strain) && (
           <View style={[styles.strainOnImage, { borderColor: strainColor }]}>
             <Text style={[styles.strainOnImageText, { color: strainColor }]}>
               {product.strain}

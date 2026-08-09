@@ -22,7 +22,8 @@ const STRAIN_STAMPS: Record<string, { bg: string; fg: string }> = {
   Sativa: { bg: 'rgba(255, 122, 89, 0.22)', fg: '#E55A3A' },
   Hybrid: { bg: 'rgba(125, 211, 252, 0.35)', fg: '#2B8BB8' },
   CBD: { bg: 'rgba(91, 124, 250, 0.20)', fg: '#3D5BD9' },
-  'N/A': { bg: 'rgba(138, 155, 184, 0.18)', fg: '#8A9BB8' },
+  Accessory: { bg: 'rgba(138, 155, 184, 0.18)', fg: '#8A9BB8' },
+  Apparel: { bg: 'rgba(138, 155, 184, 0.18)', fg: '#8A9BB8' },
 };
 
 function firstEffectLabel(product: Product): string | null {
@@ -36,7 +37,7 @@ export default function ProductCard({ product, onPress, width = 160, flex, list 
   const { addToCart, getQty } = useCart();
   const { toggle, isFavourite } = useFavourites();
 
-  const stamp = STRAIN_STAMPS[product.strain] ?? STRAIN_STAMPS['N/A'];
+  const stamp = STRAIN_STAMPS[product.strain] ?? STRAIN_STAMPS.Accessory;
   const isOnSale = product.originalPrice !== undefined;
   const qty = getQty(product.id);
   const fav = isFavourite(product.id);
@@ -62,7 +63,7 @@ export default function ProductCard({ product, onPress, width = 160, flex, list 
 
         <View style={styles.listInfo}>
           <View style={styles.listTopRow}>
-            {product.strain !== 'N/A' && (
+            {['Indica','Sativa','Hybrid','CBD'].includes(product.strain) && (
               <View style={[styles.stamp, { backgroundColor: stamp.bg }]}>
                 <Text style={[styles.stampText, { color: stamp.fg }]}>{product.strain}</Text>
               </View>
@@ -164,7 +165,7 @@ export default function ProductCard({ product, onPress, width = 160, flex, list 
       </View>
 
       <View style={styles.info}>
-        {product.strain !== 'N/A' && (
+        {['Indica','Sativa','Hybrid','CBD'].includes(product.strain) && (
           <View style={[styles.stamp, { backgroundColor: stamp.bg, alignSelf: 'flex-start' }]}>
             <Text style={[styles.stampText, { color: stamp.fg }]}>{product.strain}</Text>
           </View>

@@ -39,7 +39,7 @@ export default function ProductCard({ product, onPress, width = 200, flex }: Pro
           resizeMode="cover"
         />
 
-        {product.strain !== 'N/A' && (
+        {['Indica','Sativa','Hybrid','CBD'].includes(product.strain) && (
           <View style={styles.strainBadge}>
             <Text style={styles.strainBadgeText}>{product.strain}</Text>
           </View>

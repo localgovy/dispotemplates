@@ -27,7 +27,8 @@ const STRAIN_COLORS: Record<string, string> = {
   Sativa: theme.colors.sativa,
   Hybrid: theme.colors.hybrid,
   CBD: theme.colors.cbd,
-  'N/A': theme.colors.textMuted,
+  Accessory: theme.colors.textMuted,
+  Apparel: theme.colors.textMuted,
 };
 
 const STRAIN_DESCRIPTIONS: Record<string, string> = {
@@ -35,7 +36,8 @@ const STRAIN_DESCRIPTIONS: Record<string, string> = {
   Sativa: 'Uplifting · Mind · Daytime',
   Hybrid: 'Balanced · Mind & Body',
   CBD: 'Wellness · Non-intoxicating',
-  'N/A': '',
+  Accessory: 'Tools · Prep · Session gear',
+  Apparel: 'Merch · Everyday wear',
 };
 
 interface Props {
@@ -185,7 +187,7 @@ export default function ProductDetailModal({ product, visible, onClose }: Props)
             </View>
 
             {/* Strain description */}
-            {product.strain !== 'N/A' && (
+            {product.strain !== 'Accessory' && product.strain !== 'Apparel' && (
               <Text style={styles.strainDesc}>{STRAIN_DESCRIPTIONS[product.strain]}</Text>
             )}
 

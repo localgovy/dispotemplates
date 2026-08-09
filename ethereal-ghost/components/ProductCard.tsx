@@ -22,7 +22,7 @@ export default function ProductCard({ product, onPress, width = 280, flex }: Pro
   const isOnSale = product.originalPrice !== undefined;
   const qty = getQty(product.id);
   const fav = isFavourite(product.id);
-  const hasStrain = product.strain !== 'N/A';
+  const hasStrain = ['Indica','Sativa','Hybrid','CBD'].includes(product.strain);
 
   const sizeStyle = flex !== undefined ? { flex } : { width };
 

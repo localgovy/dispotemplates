@@ -16,7 +16,7 @@ interface Props {
 }
 
 function strainLabel(strain: string): string {
-  if (strain === 'N/A') return 'Multi';
+  if (strain === 'Accessory' || strain === 'Apparel') return strain;
   return strain;
 }
 
