@@ -140,7 +140,7 @@
     }
     /* Fake status-bar inset so tall serif wordmarks aren’t clipped at y=0 */
     .screen-inset {
-      height: 14px;
+      height: 20px;
       flex-shrink: 0;
       background: #000;
     }
@@ -270,6 +270,7 @@
 
       var params = new URLSearchParams(window.location.search);
       var app = params.get("app") || "";
+      var bust = params.get("v") || String(Date.now());
       var titleEl = document.getElementById("title");
       var frame = document.getElementById("frame");
       var full = document.getElementById("fullscreen");
@@ -284,10 +285,11 @@
       }
 
       var src = "./" + app + "/";
+      var framed = src + "?vb=" + encodeURIComponent(bust);
       titleEl.textContent = APPS[app];
       document.title = APPS[app] + " · Mobile preview";
       full.href = src;
-      frame.src = src;
+      frame.src = framed;
 
       var loading = document.getElementById("loading");
       var hideLoading = function () {
