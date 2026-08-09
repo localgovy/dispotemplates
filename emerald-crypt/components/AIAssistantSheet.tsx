@@ -15,7 +15,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useAIAssistant } from '../context/AIAssistantContext';
 import { QUIZ_QUESTIONS, scoreProducts, type QuizAnswers } from '../data/aiQuiz';
 import { getRecommendationBlurb } from '../lib/groq';
-import ProductCard from './ProductCard';
+import AIPickCard from './AIPickCard';
 import { useCart } from '../context/CartContext';
 import { useFavourites } from '../context/FavouritesContext';
 import theme from '../theme';
@@ -433,7 +433,7 @@ export default function AIAssistantSheet() {
             ) : (
               <View style={styles.blurbCard}>
                 <Text style={styles.blurbText}>
-                  Based on your answers, here are our top picks for you. Tap a card for full details.
+                  Based on your answers, here are our top picks for you. Tap a pick for full details.
                 </Text>
               </View>
             )}
@@ -445,12 +445,12 @@ export default function AIAssistantSheet() {
                 </Text>
               </View>
             ) : (
-              <View style={styles.productGrid}>
+              <View style={styles.productList}>
                 {candidates.map((product, index) => (
-                  <ProductCard
+                  <AIPickCard
                     key={product.id}
                     product={product}
-                    flex={1}
+                    rank={index + 1}
                     onPress={() => openDetail(index)}
                   />
                 ))}
@@ -685,9 +685,7 @@ const styles = StyleSheet.create({
     color: theme.colors.text,
     lineHeight: 21,
   },
-  productGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+  productList: {
     gap: theme.spacing.sm,
   },
   emptyWrap: {
