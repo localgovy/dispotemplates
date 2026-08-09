@@ -56,6 +56,9 @@ done
 # Restore hub files if a source copy exists
 if [ -f "$ROOT/docs-hub/index.html" ]; then
   cp "$ROOT/docs-hub/index.html" "$OUT/index.html"
+  if [ -f "$ROOT/docs-hub/preview.html" ]; then
+    cp "$ROOT/docs-hub/preview.html" "$OUT/preview.html"
+  fi
   touch "$OUT/.nojekyll"
 fi
 
