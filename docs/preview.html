@@ -96,14 +96,16 @@
     }
     .stage {
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
+      gap: 14px;
       padding: 28px 16px 40px;
     }
     .phone {
       width: min(390px, calc(100vw - 32px));
       aspect-ratio: 390 / 844;
-      max-height: calc(100vh - 120px);
+      max-height: calc(100vh - 150px);
       background: linear-gradient(160deg, #2a2f2c, #121412 40%, #0a0c0b);
       border-radius: 42px;
       /* Extra top padding keeps the Dynamic Island in the bezel, not over the app header */
@@ -190,15 +192,13 @@
     }
     .error p { color: var(--muted); line-height: 1.5; }
     .hint {
-      position: absolute;
-      bottom: 14px;
-      left: 50%;
-      transform: translateX(-50%);
       font-size: 11px;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: rgba(255,255,255,0.35);
+      color: rgba(255,255,255,0.45);
       pointer-events: none;
+      text-align: center;
+      padding: 0 12px;
     }
 
     /* On real phones: drop the bezel, full-bleed demo */
@@ -249,8 +249,8 @@
             loading="eager"
           ></iframe>
         </div>
-        <div class="hint">Scroll inside the phone</div>
       </div>
+      <div class="hint">Scroll inside the phone</div>
     </main>
   </div>
 
